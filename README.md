@@ -4,6 +4,8 @@ Randomizer League of Legends façon table de casino : champion, lane, type de bu
 
 Site : https://skybreacoeur.github.io/trollpicks-plus/
 
-Les données (champions, objets, runes, sorts) viennent de Data Dragon, l'API publique de Riot, et se mettent à jour à chaque visite. Les listes d'objets par type de build sont dans `index.html` (constante `BUILDS`).
+Partage : chaque ticket (ou équipe) peut être envoyé par lien, le tirage complet est rangé dans l'adresse (`#p=` ou `#t=`), ou en image PNG prête pour Discord.
+
+Les données (champions, objets, runes, sorts) viennent de Data Dragon, l'API publique de Riot, et se mettent à jour à chaque visite. Les listes d'objets par type de build sont dans `index.html` (constante `BUILDS`). Si Riot retire un objet, il est remplacé automatiquement par un objet du patch qui a les mêmes statistiques (constante `FALLBACK`). Pour tester : ajouter `?retirer=3089,3031` à l'adresse.
 
 TrollPicks+ n'est pas approuvé par Riot Games et ne reflète pas les opinions de Riot Games ou de toute personne officiellement impliquée dans la production ou la gestion de League of Legends. League of Legends et Riot Games sont des marques de Riot Games, Inc.

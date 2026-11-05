@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TrollPicks+</title>
 <meta name="description" content="La table de casino des troll picks League of Legends : champion, lane, build complet, objets situationnels, runes et sorts.">
+<meta name="theme-color" content="#cf2f2a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TrollPicks+">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="TrollPicks+ : tire ton troll pick">
+<meta property="og:description" content="Un champion, une lane, un build complet et cohérent. Lance la roue, puis envoie le ticket à tes potes.">
+<meta property="og:url" content="https://skybreacoeur.github.io/trollpicks-plus/">
+<meta property="og:image" content="https://skybreacoeur.github.io/trollpicks-plus/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="TrollPicks+, la roue des troll picks League of Legends">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -200,6 +213,9 @@ header.top{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:28px 
 .skill .key{position:absolute;top:-8px;left:2px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--red);color:var(--cream);font-weight:800;font-size:.78rem}
 .skill-order{font-family:var(--display);font-size:1.5rem;margin-bottom:12px}
 .t-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:28px 0 0}
+.t-share{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;padding:20px 0 0}
+.t-share-label{width:100%;text-align:center;font-weight:800;color:var(--muted);font-size:.9rem}
+.t-share .btn{padding:9px 16px;font-size:.92rem}
 
 /* ---------- team ---------- */
 .panel-paper{background:var(--paper);color:var(--ink);border-radius:10px;padding:28px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
@@ -379,7 +395,8 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
     </div>
     <div class="team-actions">
       <button class="btn-chip" id="spinTeam" disabled>Distribuer</button>
-      <button class="btn" id="copyTeam" hidden>Copier le récap</button>
+      <button class="btn" id="linkTeam" hidden>Copier le lien de l'équipe</button>
+      <button class="btn" id="copyTeam" hidden>Copier le texte</button>
     </div>
     <div class="team-grid" id="teamGrid"></div>
   </section>
@@ -687,20 +704,74 @@ async function load() {
     runes.forEach(t => t.slots.forEach(s => s.runes.forEach(r => RUNE_BY_ID[r.id] = { ...r, tree: t })));
     SUMMS = summ.data;
 
-    const ok = id => ITEMS[id] && ITEMS[id].maps?.["11"] !== false;
-    for (const b of Object.values(BUILDS)) {
-      b.core = b.core.filter(ok); b.must = b.must.filter(ok); b.items = b.items.filter(ok);
-      b.boots = b.boots.filter(ok);
-      b.keystones = b.keystones.filter(id => RUNE_BY_ID[id]);
-      for (const k in b.situational) b.situational[k] = b.situational[k].filter(ok);
-    }
+    // ?retirer=3089,3031 simule la suppression d'objets par Riot (test de l'adaptation)
+    new URLSearchParams(location.search).get("retirer")?.split(",").forEach(id => delete ITEMS[id.trim()]);
+    adaptBuildsToPatch();
     initAfterLoad();
-    $("#status").textContent = `${CHAMPS.length} champions • patch ${V.split(".").slice(0, 2).join(".")} • Data Dragon`;
+    const fixed = PATCH.removed.length ? ` • ${PATCH.removed.length} objet${PATCH.removed.length > 1 ? "s" : ""} retiré${PATCH.removed.length > 1 ? "s" : ""} par Riot, builds adaptés` : "";
+    $("#status").textContent = `${CHAMPS.length} champions • patch ${V.split(".").slice(0, 2).join(".")} • Data Dragon${fixed}`;
+    openFromHash();
   } catch (e) {
     console.error(e);
     $("#status").innerHTML = `Impossible de joindre Data Dragon. Vérifie ta connexion. <button class="btn" onclick="location.reload()">Réessayer</button>`;
     $("#spinAll").textContent = "Données indisponibles";
   }
+}
+
+/* Quand Riot retire un objet d'un patch, on le remplace par un objet légendaire du patch
+   qui a les mêmes statistiques que le build (ex. un objet critique pour AD Crit). */
+const FALLBACK = {
+  AP_BRUISER:  { need: ["SpellDamage", "Health"], boots: ["MagicPenetration", "SpellBlock", "Armor"] },
+  AP_ASSASSIN: { need: ["SpellDamage"], avoid: ["Health", "Armor"], boots: ["MagicPenetration", "CooldownReduction"] },
+  AD_BRUISER:  { need: ["Damage", "Health"], boots: ["Armor", "SpellBlock", "CooldownReduction"] },
+  AD_CRIT:     { need: ["CriticalStrike"], boots: ["AttackSpeed", "LifeSteal"] },
+  AD_ASSASSIN: { need: ["Damage"], avoid: ["Health", "CriticalStrike", "AttackSpeed"], boots: ["CooldownReduction", "LifeSteal"] },
+  TANK:        { need: ["Health"], avoid: ["Damage", "SpellDamage", "CriticalStrike"], boots: ["Armor", "SpellBlock"] },
+  ENCHANTER:   { need: ["ManaRegen"], avoid: ["Damage", "CriticalStrike"], boots: ["CooldownReduction"] },
+  ON_HIT:      { need: ["OnHit"], boots: ["AttackSpeed", "SpellBlock"] }
+};
+const MIN_POOL = 9;
+const PATCH = { removed: [], added: [] };
+const onRift = it => it && it.maps?.["11"] !== false;
+function isLegendary(it) {
+  return onRift(it) && it.gold?.purchasable !== false && it.gold.total >= 2200 && !it.into?.length
+    && !it.requiredChampion && !it.requiredAlly
+    && !it.tags.some(t => ["Boots", "Consumable", "Trinket", "Jungle", "Lane", "GoldPer"].includes(t));
+}
+function adaptBuildsToPatch() {
+  const ok = id => {
+    if (onRift(ITEMS[id])) return true;
+    if (!PATCH.removed.includes(id)) PATCH.removed.push(id);
+    return false;
+  };
+  // les objets de la Faille ont 4 chiffres ; les variantes d'autres modes (226676, 667666…) sont ignorées
+  const allIds = Object.keys(ITEMS).map(Number).filter(id => id < 10000);
+  const legendaries = allIds.filter(id => isLegendary(ITEMS[id]));
+  for (const [key, b] of Object.entries(BUILDS)) {
+    b.core = b.core.filter(ok); b.must = b.must.filter(ok); b.items = b.items.filter(ok); b.boots = b.boots.filter(ok);
+    for (const k in b.situational) b.situational[k] = b.situational[k].filter(ok);
+
+    const have = new Set([...b.core, ...b.must, ...b.items]);
+    if (have.size < MIN_POOL) {
+      const f = FALLBACK[key], tags = id => ITEMS[id].tags;
+      const extra = legendaries
+        .filter(id => !have.has(id) && f.need.every(t => tags(id).includes(t)) && !(f.avoid || []).some(t => tags(id).includes(t)))
+        .sort((x, y) => ITEMS[y].gold.total - ITEMS[x].gold.total)
+        .slice(0, MIN_POOL - have.size);
+      b.items.push(...extra);
+      extra.forEach(id => PATCH.added.push(id));
+    }
+    if (!b.boots.length) {
+      const boots = allIds.filter(id => onRift(ITEMS[id]) && ITEMS[id].tags.includes("Boots") && ITEMS[id].from?.includes("1001") && ITEMS[id].gold?.purchasable !== false);
+      const fitting = boots.filter(id => FALLBACK[key].boots.some(t => ITEMS[id].tags.includes(t)));
+      b.boots = fitting.length ? fitting : boots;
+      PATCH.added.push(...b.boots);
+    }
+
+    b.keystones = b.keystones.filter(id => RUNE_BY_ID[id]);
+    if (!b.keystones.length) b.keystones = RUNE_TREES.flatMap(t => t.slots[0].runes.map(r => r.id));
+  }
+  if (PATCH.removed.length) console.warn("Objets absents du patch :", PATCH.removed, "remplacés par :", PATCH.added);
 }
 
 async function getChampDetail(id) {
@@ -734,26 +805,26 @@ function fitsChamp(champ, id) {
   return true;
 }
 
-function pickItems(champ, buildKey, role) {
-  const b = BUILDS[buildKey];
-  const notes = [];
-  const fits = id => fitsChamp(champ, id);
-
-  const all = [...b.core, ...b.must, ...b.items];
+/* Remarques affichées sous le build (recalculées aussi pour un tirage reçu par lien). */
+function notesFor(champ, buildKey, role, hasSupport) {
+  const b = BUILDS[buildKey], all = [...b.core, ...b.must, ...b.items], notes = [];
   if (!usesMana(champ) && all.some(id => ITEMS[id]?.tags.includes("Mana")))
     notes.push(`${champ.name} n'utilise pas de mana : objets à mana retirés`);
   if (isMelee(champ) && all.some(id => RANGED_ONLY.includes(id)))
     notes.push("Corps-à-corps : pas d'objets réservés aux distances");
-
-  const noBoots = champ.id === "Cassiopeia";
-  if (noBoots) notes.push("Cassiopeia ne peut pas acheter de bottes : un objet de plus");
-
-  let support = null;
-  if (role === "support") {
-    support = rand((SUPPORT_UPGRADES[buildKey] || [3869]).filter(id => ITEMS[id])) || null;
-    if (support) notes.push("Lane support : la quête de support occupe un emplacement");
-  }
+  if (champ.id === "Cassiopeia") notes.push("Cassiopeia ne peut pas acheter de bottes : un objet de plus");
+  if (hasSupport) notes.push("Lane support : la quête de support occupe un emplacement");
   if (role === "jungle") notes.push("Jungle : familier adapté au build et Châtiment");
+  return notes;
+}
+
+function pickItems(champ, buildKey, role) {
+  const b = BUILDS[buildKey];
+  const fits = id => fitsChamp(champ, id);
+  const all = [...b.core, ...b.must, ...b.items];
+  const noBoots = champ.id === "Cassiopeia";
+  const support = role === "support" ? rand((SUPPORT_UPGRADES[buildKey] || [3869]).filter(id => ITEMS[id])) || null : null;
+  const notes = notesFor(champ, buildKey, role, !!support);
 
   const count = (noBoots ? 6 : 5) - (support ? 1 : 0);
   const chosen = [];
@@ -783,7 +854,7 @@ function pickItems(champ, buildKey, role) {
   }
 
   const starter = starterFor(role, buildKey);
-  return { starter: ITEMS[starter] ? starter : null, support, boots: noBoots ? null : rand(b.boots), items: chosen, notes };
+  return { starter: ITEMS[starter] ? starter : null, support, boots: noBoots ? null : rand(b.boots) || null, items: chosen, notes };
 }
 
 /* Alternatives selon la game : objets adaptés au champion, avec indication si déjà dans le build. */
@@ -836,6 +907,74 @@ function makePick(champ, role, buildKey, player = null) {
   };
 }
 function addHistory(pick) { history.unshift(pick); history = history.slice(0, 40); store.set("history", history); }
+
+/* =========================================================
+   LIEN DE PARTAGE
+   Le tirage complet est rangé dans l'adresse (#p= pour un joueur, #t= pour l'équipe) :
+   pas de serveur, le lien suffit.
+========================================================= */
+const b64e = s => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const b64d = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)));
+const SENTENCES = [...TROLL, ...VIABLE];
+
+function packPick(p) {
+  const r = p.runes;
+  return [p.champ, p.role, p.build, p.player || "", p.starter || 0, p.support || 0, p.boots || 0, p.items,
+    [r.tree, r.keystone, r.minors, r.secTree, r.sec], p.summs, p.skills.join(""), p.score, SENTENCES.indexOf(p.sentence), p.ts];
+}
+/* Tout est vérifié : un lien modifié à la main ne peut rien casser ni injecter. */
+function unpackPick(a) {
+  if (!Array.isArray(a) || a.length < 14) return null;
+  const [champId, role, build, player, starter, support, boots, items, ru, summs, skills, score, sentIdx, ts] = a;
+  const champ = typeof champId === "string" && CHAMP_BY_ID[champId];
+  if (!champ || !ROLES.some(r => r.key === role) || !BUILDS.hasOwnProperty(build)) return null;
+  const item = x => Number.isInteger(x) && ITEMS[x] ? x : null;
+  const rune = x => Number.isInteger(x) && RUNE_BY_ID[x];
+  const treeOk = x => RUNE_TREES.some(t => t.id === x);
+  let runes = Array.isArray(ru) ? { tree: ru[0], keystone: ru[1], minors: ru[2], secTree: ru[3], sec: ru[4] } : null;
+  if (!runes || !rune(runes.keystone) || !treeOk(runes.tree) || !treeOk(runes.secTree)
+      || !Array.isArray(runes.minors) || !runes.minors.every(rune) || !Array.isArray(runes.sec) || !runes.sec.every(rune))
+    runes = pickRunes(build);
+  const sup = item(support);
+  const sc = Number.isInteger(score) ? Math.max(0, Math.min(99, score)) : trollScore(champ, build);
+  return {
+    champ: champ.id, role, build,
+    player: typeof player === "string" && player.trim() ? player.trim().slice(0, 24) : null,
+    starter: item(starter), support: sup, boots: item(boots),
+    items: (Array.isArray(items) ? items : []).map(item).filter(Boolean).slice(0, 6),
+    notes: notesFor(champ, build, role, !!sup),
+    runes,
+    summs: Array.isArray(summs) && summs.length === 2 && summs.every(k => typeof k === "string" && SUMMS.hasOwnProperty(k)) ? summs : pickSumms(role),
+    skills: typeof skills === "string" && /^(?!.*(.).*\1)[QWE]{3}$/.test(skills) ? skills.split("") : shuffle(["Q", "W", "E"]),
+    score: sc,
+    sentence: SENTENCES[sentIdx] || rand(sc < 30 ? VIABLE : TROLL),
+    ts: Number.isFinite(ts) ? ts : Date.now(),
+    shared: true
+  };
+}
+const pageUrl = () => location.href.split("#")[0];
+const pickLink = p => `${pageUrl()}#p=${b64e(JSON.stringify(packPick(p)))}`;
+const teamLink = team => `${pageUrl()}#t=${b64e(JSON.stringify(team.map(packPick)))}`;
+function clearHash() { if (location.hash) window.history.replaceState(null, "", pageUrl()); }
+
+function openFromHash() {
+  const m = location.hash.match(/^#([pt])=([\w-]+)$/); if (!m) return;
+  try {
+    const data = JSON.parse(b64d(m[2]));
+    if (m[1] === "p") {
+      const p = unpackPick(data); if (!p) throw new Error("tirage invalide");
+      showView("solo"); renderResult(p);
+    } else {
+      const team = (Array.isArray(data) ? data : []).slice(0, 5).map(unpackPick).filter(Boolean);
+      if (!team.length) throw new Error("équipe invalide");
+      showView("team"); renderTeam(team, false);
+    }
+  } catch (e) {
+    console.warn(e);
+    toast("Ce lien de tirage est illisible");
+  }
+}
+addEventListener("hashchange", () => { if (CHAMPS.length) openFromHash(); });
 
 /* =========================================================
    CASINO (rangée de cartes)
@@ -999,7 +1138,7 @@ async function runSolo(which) {
     else if (which === "build") await doBuild();
     if (solo.champ && solo.role && solo.build) {
       const pick = makePick(solo.champ, solo.role, solo.build);
-      addHistory(pick); chime();
+      addHistory(pick); chime(); clearHash();
       await renderResult(pick);
     }
   } finally { setBusy(false); }
@@ -1018,7 +1157,7 @@ function orderedItems(pick) {
   const list = pick.items.slice();
   if (pick.boots) list.splice(1, 0, pick.boots);
   if (pick.support) list.unshift(pick.support);
-  return list;
+  return list.filter(id => ITEMS[id]);
 }
 function slotLabel(pick, id) {
   if (id === pick.support) return "Quête support";
@@ -1051,7 +1190,7 @@ async function renderResult(pick) {
     <div class="t-top">
       <div class="t-art"><img src="${imgCard(champ)}" alt="${esc(champ.name)}"></div>
       <div class="t-head">
-        <div class="t-case">${pick.player ? esc(pick.player) + ", dossier" : "Dossier"} n° ${String(pick.ts).slice(-6)}</div>
+        <div class="t-case">${pick.shared ? "Ticket reçu par lien • " : ""}${pick.player ? esc(pick.player) + ", dossier" : "Dossier"} n° ${String(pick.ts).slice(-6)}</div>
         <h2 class="champ-name">${esc(champ.name)}</h2>
         <div class="champ-title">${esc(champ.title)}</div>
         <dl class="facts">
@@ -1105,7 +1244,13 @@ async function renderResult(pick) {
   <div class="t-actions">
     <button class="btn-chip" data-act="again">Relancer le désastre</button>
     <button class="btn" data-act="items">Autres objets, même pick</button>
-    <button class="btn" data-act="copy">Copier le récap</button>
+  </div>
+  <div class="t-share" role="group" aria-label="Partager ce ticket">
+    <span class="t-share-label">Envoyer à tes potes</span>
+    <button class="btn" data-act="link">Copier le lien</button>
+    <button class="btn" data-act="img">Copier l'image</button>
+    <button class="btn" data-act="dl">Enregistrer l'image</button>
+    <button class="btn" data-act="copy">Copier le texte</button>
   </div>`;
   el.hidden = false;
   el._pick = pick;
@@ -1124,9 +1269,15 @@ function recap(pick) {
     `Sorts : ${pick.summs.map(k => SUMMS[k]?.name).join(" + ")} • Max ${pick.skills.join(" > ")}`
   ].join("\n");
 }
-async function copy(text) {
-  try { await navigator.clipboard.writeText(text); toast("Récap copié"); }
-  catch { toast("Copie impossible dans ce navigateur"); }
+async function copy(text, done = "Récap copié") {
+  try { await navigator.clipboard.writeText(text); toast(done); return; } catch {}
+  // secours pour les navigateurs qui bloquent l'accès au presse-papiers
+  const ta = Object.assign(document.createElement("textarea"), { value: text, readOnly: true });
+  ta.style.cssText = "position:fixed;opacity:0;top:0";
+  document.body.append(ta); ta.select();
+  let ok = false; try { ok = document.execCommand("copy"); } catch {}
+  ta.remove();
+  toast(ok ? done : "Copie bloquée par le navigateur");
 }
 let toastT;
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 1800); }
@@ -1136,12 +1287,203 @@ $("#result").addEventListener("click", async e => {
   const pick = $("#result")._pick;
   if (act === "again") runSolo("all");
   if (act === "copy") copy(recap(pick));
+  if (act === "link") copy(pickLink(pick), "Lien copié : colle-le à tes potes");
+  if (act === "img") copyTicketImage(pick);
+  if (act === "dl") saveTicketImage(pick);
   if (act === "items") {
     const c = CHAMP_BY_ID[pick.champ];
-    const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build), skills: shuffle(["Q", "W", "E"]), ts: Date.now() };
-    addHistory(np); await renderResult(np);
+    const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build), skills: shuffle(["Q", "W", "E"]), ts: Date.now(), shared: false };
+    addHistory(np); clearHash(); await renderResult(np);
   }
 });
+
+/* =========================================================
+   IMAGE DU TICKET (PNG paysage, taille idéale pour Discord)
+========================================================= */
+const IMG_W = 1200, IMG_H = 675;
+const loadImg = src => new Promise(res => {
+  const im = new Image();
+  im.crossOrigin = "anonymous";
+  im.onload = () => res(im); im.onerror = () => res(null);
+  im.src = src;
+});
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function ellipsize(ctx, text, maxW) {
+  if (ctx.measureText(text).width <= maxW) return text;
+  while (text.length > 1 && ctx.measureText(text + "…").width > maxW) text = text.slice(0, -1);
+  return text.trimEnd() + "…";
+}
+function wrapLines(ctx, text, maxW, maxLines) {
+  const lines = []; let line = "";
+  for (const w of text.split(" ")) {
+    const t = line ? line + " " + w : w;
+    if (!line || ctx.measureText(t).width <= maxW) line = t; else { lines.push(line); line = w; }
+  }
+  if (line) lines.push(line);
+  if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] += "…"; }
+  return lines.map(l => ellipsize(ctx, l, maxW));
+}
+function fitFont(ctx, text, family, max, min, maxW) {
+  let s = max;
+  ctx.font = `${s}px ${family}`;
+  while (s > min && ctx.measureText(text).width > maxW) { s -= 2; ctx.font = `${s}px ${family}`; }
+  return s;
+}
+
+async function drawTicket(pick) {
+  const champ = CHAMP_BY_ID[pick.champ], role = ROLES.find(r => r.key === pick.role), b = BUILDS[pick.build];
+  const key = RUNE_BY_ID[pick.runes.keystone];
+  const tree = RUNE_TREES.find(t => t.id === pick.runes.tree), sec = RUNE_TREES.find(t => t.id === pick.runes.secTree);
+  const ids = orderedItems(pick), summs = pick.summs.filter(k => SUMMS[k]);
+  await Promise.all(["40px Bungee", "600 16px Archivo", "700 16px Archivo", "800 16px Archivo"]
+    .map(f => document.fonts?.load(f).catch(() => null)));
+  const [art, keyImg, ...rest] = await Promise.all([
+    loadImg(imgCard(champ)), loadImg(imgRune(key)),
+    ...summs.map(k => loadImg(imgSpell(SUMMS[k].image.full))),
+    ...ids.map(id => loadImg(imgItem(id)))
+  ]);
+  const spellImgs = rest.slice(0, summs.length), itemImgs = rest.slice(summs.length);
+
+  const C = { felt: "#0f4a35", paper: "#f7f1e3", paper2: "#ece3cf", line: "#d3c7ad", ink: "#1b1714", ink2: "#6a6053",
+    red: "#cf2f2a", redDeep: "#8e1d19", gold: "#e2b24a", green: "#1f7a4c", cream: "#f3ecdc" };
+  const D = "Bungee, Impact, sans-serif", A = "Archivo, system-ui, sans-serif";
+  const cv = document.createElement("canvas");
+  cv.width = IMG_W; cv.height = IMG_H;
+  const ctx = cv.getContext("2d");
+  ctx.textBaseline = "alphabetic";
+
+  // tapis + ticket
+  ctx.fillStyle = C.felt; ctx.fillRect(0, 0, IMG_W, IMG_H);
+  const TX = 22, TY = 22, TW = IMG_W - 44, TH = IMG_H - 44, AW = 330;
+  ctx.save();
+  rr(ctx, TX, TY, TW, TH, 14); ctx.fillStyle = C.paper; ctx.fill(); ctx.clip();
+
+  // illustration du champion, avec la phrase et le nom du site en bas
+  ctx.fillStyle = C.paper2; ctx.fillRect(TX, TY, AW, TH);
+  if (art) {
+    const s = Math.max(AW / art.width, TH / art.height), w = art.width * s, h = art.height * s;
+    ctx.drawImage(art, TX + (AW - w) / 2, TY + (TH - h) * .12, w, h);
+  }
+  const g = ctx.createLinearGradient(0, TY + TH - 250, 0, TY + TH);
+  g.addColorStop(0, "rgba(8,22,16,0)"); g.addColorStop(.45, "rgba(8,22,16,.72)"); g.addColorStop(1, "rgba(8,22,16,.94)");
+  ctx.fillStyle = g; ctx.fillRect(TX, TY + TH - 250, AW, 250);
+  ctx.font = `700 17px ${A}`; ctx.fillStyle = C.cream;
+  const sent = wrapLines(ctx, `« ${pick.sentence} »`, AW - 44, 2);
+  sent.forEach((l, i) => ctx.fillText(l, TX + 22, TY + TH - 88 - (sent.length - 1 - i) * 22));
+  ctx.font = `28px ${D}`;
+  let wx = TX + 22;
+  [["TROLL", C.cream], ["PICKS", C.red], ["+", C.cream]].forEach(([t, col]) => { ctx.fillStyle = col; ctx.fillText(t, wx, TY + TH - 42); wx += ctx.measureText(t).width; });
+  ctx.font = `700 14px ${A}`; ctx.fillStyle = "rgba(243,236,220,.75)";
+  ctx.fillText("skybreacoeur.github.io/trollpicks-plus", TX + 22, TY + TH - 18);
+  ctx.restore();
+
+  const CX = TX + AW + 38, CR = TX + TW - 34, CW = CR - CX;
+  const dash = y => { ctx.save(); ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.setLineDash([9, 7]); ctx.beginPath(); ctx.moveTo(CX, y); ctx.lineTo(CR, y); ctx.stroke(); ctx.restore(); };
+  const label = (t, x, y) => { ctx.font = `16px ${D}`; ctx.fillStyle = C.ink; ctx.fillText(t, x, y); };
+
+  // en-tête
+  const nameW = 450;
+  ctx.font = `700 18px ${A}`; ctx.fillStyle = C.ink2;
+  ctx.fillText(ellipsize(ctx, `${pick.player ? pick.player + ", dossier" : "Dossier"} n° ${String(pick.ts).slice(-6)}`, nameW), CX, 70);
+  fitFont(ctx, champ.name.toUpperCase(), D, 80, 34, nameW);
+  ctx.fillStyle = C.ink; ctx.fillText(champ.name.toUpperCase(), CX, 154);
+  ctx.font = `600 19px ${A}`; ctx.fillStyle = C.ink2;
+  ctx.fillText(ellipsize(ctx, champ.title, nameW), CX, 188);
+  let fx = CX;
+  for (const [l, v, col] of [["Lane", role.label, C.ink], ["Build", b.label, C.ink], ["Troll", `${pick.score} %`, C.red]]) {
+    ctx.font = `700 15px ${A}`; ctx.fillStyle = C.ink2; ctx.fillText(l, fx, 226);
+    ctx.font = `28px ${D}`; ctx.fillStyle = col; ctx.fillText(v.toUpperCase(), fx, 260);
+    fx += Math.max(ctx.measureText(v.toUpperCase()).width, 60) + 44;
+  }
+
+  // tampon
+  const guilty = pick.score >= 30, sc = guilty ? C.red : C.green, word = guilty ? "COUPABLE" : "RELAXÉ";
+  ctx.save();
+  ctx.translate(CR - 118, 112); ctx.rotate(-11 * Math.PI / 180); ctx.globalAlpha = .9;
+  ctx.font = `32px ${D}`;
+  const bw = Math.max(ctx.measureText(word).width, 170) + 36, bh = 80;
+  rr(ctx, -bw / 2, -bh / 2, bw, bh, 8); ctx.lineWidth = 5; ctx.strokeStyle = sc; ctx.stroke();
+  ctx.fillStyle = sc; ctx.textAlign = "center"; ctx.fillText(word, 0, 6);
+  ctx.font = `800 13px ${A}`; ctx.fillText("Tribunal de la Faille", 0, 28);
+  ctx.restore();
+
+  // build
+  dash(290);
+  label("LE BUILD", CX, 326);
+  ctx.font = `800 17px ${A}`; ctx.fillStyle = C.ink2; ctx.textAlign = "right";
+  ctx.fillText(gold(totalGold(pick)), CR, 326); ctx.textAlign = "left";
+  const n = Math.max(ids.length, 1), gap = 16, cellW = (CW - gap * (n - 1)) / n, size = Math.min(78, cellW - 12), iy = 346;
+  ids.forEach((id, i) => {
+    const cx = CX + i * (cellW + gap) + cellW / 2, x0 = cx - size / 2, lab = slotLabel(pick, id);
+    if (lab === "1er objet") { rr(ctx, x0 - 6, iy - 6, size + 12, size + 12, 10); ctx.fillStyle = C.gold; ctx.fill(); }
+    rr(ctx, x0 - 3, iy - 3, size + 6, size + 6, 8); ctx.fillStyle = C.ink; ctx.fill();
+    ctx.save(); rr(ctx, x0, iy, size, size, 6); ctx.clip();
+    if (itemImgs[i]) ctx.drawImage(itemImgs[i], x0, iy, size, size); else { ctx.fillStyle = C.paper2; ctx.fill(); }
+    ctx.restore();
+    ctx.textAlign = "center";
+    ctx.font = `800 13px ${A}`; ctx.fillStyle = C.ink2; ctx.fillText(lab, cx, iy + size + 24);
+    ctx.font = `700 15px ${A}`; ctx.fillStyle = C.ink;
+    wrapLines(ctx, ITEMS[id].name, cellW, 2).forEach((l, k) => ctx.fillText(l, cx, iy + size + 44 + k * 18));
+    ctx.textAlign = "left";
+  });
+
+  // runes, sorts, montée
+  dash(510);
+  label("RUNES", CX, 544);
+  ctx.beginPath(); ctx.arc(CX + 28, 586, 28, 0, Math.PI * 2); ctx.fillStyle = C.ink; ctx.fill();
+  if (keyImg) ctx.drawImage(keyImg, CX + 4, 562, 48, 48);
+  ctx.font = `800 17px ${A}`; ctx.fillStyle = C.ink; ctx.fillText(ellipsize(ctx, key.name, 250), CX + 70, 582);
+  ctx.font = `600 15px ${A}`; ctx.fillStyle = C.ink2; ctx.fillText(ellipsize(ctx, `${tree.name} + ${sec.name}`, 250), CX + 70, 604);
+
+  const SX = CX + 350;
+  label("SORTS", SX, 544);
+  spellImgs.forEach((im, i) => {
+    const x = SX + i * 62;
+    rr(ctx, x - 2, 558, 56, 56, 7); ctx.fillStyle = C.ink; ctx.fill();
+    if (im) { ctx.save(); rr(ctx, x, 560, 52, 52, 6); ctx.clip(); ctx.drawImage(im, x, 560, 52, 52); ctx.restore(); }
+  });
+
+  const KX = CX + 500;
+  label("MONTÉE", KX, 544);
+  ctx.font = `30px ${D}`; ctx.fillStyle = C.red; ctx.fillText(pick.skills.join(" › "), KX, 598);
+
+  return cv;
+}
+const ticketBlob = pick => drawTicket(pick).then(cv => new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error("toBlob")), "image/png")));
+const ticketFileName = pick => `trollpicks-${pick.champ}-${pick.role}.png`.toLowerCase();
+
+async function copyTicketImage(pick) {
+  if (!window.ClipboardItem || !navigator.clipboard?.write) return saveTicketImage(pick, "Copie d'image impossible ici : image enregistrée");
+  toast("Préparation de l'image…");
+  try {
+    // la promesse est passée directement : Safari exige que l'appel parte du clic
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": ticketBlob(pick) })]);
+    toast("Image copiée : colle-la dans Discord");
+  } catch (e) {
+    console.warn(e);
+    saveTicketImage(pick, "Copie impossible : image enregistrée à la place");
+  }
+}
+async function saveTicketImage(pick, done = "Image enregistrée") {
+  try {
+    const blob = await ticketBlob(pick), name = ticketFileName(pick);
+    const file = new File([blob], name, { type: "image/png" });
+    // sur téléphone : feuille de partage (Discord, Photos…)
+    if (matchMedia("(pointer: coarse)").matches && navigator.canShare?.({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: "TrollPicks+" }); }
+      catch (e) { if (e.name !== "AbortError") throw e; }
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast(done);
+  } catch (e) {
+    console.error(e);
+    toast("Impossible de créer l'image");
+  }
+}
 
 /* =========================================================
    ÉQUIPE
@@ -1174,26 +1516,31 @@ async function spinTeam() {
   setBusy(true);
   try {
     const roles = shuffle(ROLES.map(r => r.key)), used = [], builds = activeBuilds();
-    lastTeam = teamNames.map((name, i) => { const c = rand(eligibleChamps(used)); used.push(c.id); return makePick(c, roles[i], rand(builds), name); });
-    lastTeam.slice().reverse().forEach(addHistory);
-    const grid = $("#teamGrid");
-    grid.innerHTML = lastTeam.map(teamCardHTML).join("");
-    const pool = eligibleChamps(), imgs = [...grid.querySelectorAll(".tcard-img img")], f = speedF();
-    if (f > 0) {
-      await Promise.all(imgs.map((img, i) => new Promise(res => {
-        const end = performance.now() + (900 + i * 350) * f;
-        (function tick() {
-          if (performance.now() >= end) { img.src = img.dataset.final; beep(1300, .06, "sine", .04); return res(); }
-          img.src = imgChamp(rand(pool)); beep(900, .015); setTimeout(tick, 80);
-        })();
-      })));
-    }
+    const team = teamNames.map((name, i) => { const c = rand(eligibleChamps(used)); used.push(c.id); return makePick(c, roles[i], rand(builds), name); });
+    team.slice().reverse().forEach(addHistory);
+    clearHash();
+    await renderTeam(team, true);
     chime();
-    $("#copyTeam").hidden = false;
   } finally { setBusy(false); }
+}
+async function renderTeam(team, animate) {
+  lastTeam = team;
+  const grid = $("#teamGrid");
+  grid.innerHTML = team.map(teamCardHTML).join("");
+  $("#copyTeam").hidden = $("#linkTeam").hidden = false;
+  const pool = eligibleChamps(), imgs = [...grid.querySelectorAll(".tcard-img img")], f = speedF();
+  if (!animate || f === 0) return;
+  await Promise.all(imgs.map((img, i) => new Promise(res => {
+    const end = performance.now() + (900 + i * 350) * f;
+    (function tick() {
+      if (performance.now() >= end) { img.src = img.dataset.final; beep(1300, .06, "sine", .04); return res(); }
+      img.src = imgChamp(rand(pool)); beep(900, .015); setTimeout(tick, 80);
+    })();
+  })));
 }
 $("#spinTeam").addEventListener("click", spinTeam);
 $("#copyTeam").addEventListener("click", () => copy(lastTeam.map(recap).join("\n\n")));
+$("#linkTeam").addEventListener("click", () => copy(teamLink(lastTeam), "Lien de l'équipe copié"));
 $("#teamGrid").addEventListener("click", e => {
   const i = e.target.closest("[data-team]")?.dataset.team; if (i == null) return;
   showView("solo"); renderResult(lastTeam[+i]);
