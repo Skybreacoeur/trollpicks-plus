@@ -1,6 +1,8 @@
 # TrollPicks+
 
-Randomizer League of Legends façon table de casino : champion, lane, type de build, puis un build complet et cohérent (objets dans l'ordre d'achat, objets selon la game, runes, sorts, ordre des compétences). Mode équipe de 2 à 5 joueurs avec rôles verrouillables, historique et réglages.
+Randomizer League of Legends façon table de casino : champion, lane, type de build, puis un build complet et cohérent (objets dans l'ordre d'achat, objets selon la game, runes, sorts, ordre des compétences). Mode équipe de 2 à 5 joueurs avec rôles verrouillables, historique et réglages. En solo, on peut aussi verrouiller sa lane.
+
+La Partie truquée : un mode à rôles secrets pour jouer une vraie game entre potes (3 à 10 joueurs, un Tricheur par équipe, vote et points à la fin), inspiré du concept Among Legends de Solary avec des rôles et des visuels propres au site. Chaque joueur reçoit un lien secret (#r=) qui affiche sa carte, les ordres du Pantin et les tirages de Pile ou Face, sans serveur.
 
 Site : https://skybreacoeur.github.io/trollpicks-plus/
 

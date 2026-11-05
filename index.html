@@ -336,6 +336,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
 .size-pick button[aria-checked="true"]{background:var(--red);color:var(--cream);box-shadow:0 3px 0 var(--red-deep)}
 .team-form{grid-template-columns:repeat(var(--n,5),1fr)}
 .role-pick{margin-top:8px}
+.solo-role{width:min(100%,330px);margin-top:20px}
 .role-pick select{width:100%;appearance:none;-webkit-appearance:none;font:inherit;font-weight:700;font-size:.9rem;color:var(--ink-2);
   padding:8px 30px 8px 12px;border-radius:6px;border:2px solid var(--paper-line);cursor:pointer;
   background:#fffaf0 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236a6053' stroke-width='2'/></svg>") no-repeat right 10px center;
@@ -358,6 +359,67 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
   .t-nav .btn{padding:8px 12px;font-size:.85rem}
 }
 
+/* ---------- partie truquée ---------- */
+.party-step{margin-top:20px}
+.party-step h2{font-family:var(--display);font-weight:400;font-size:1.3rem;margin-bottom:6px}
+.party-step .hint{color:var(--ink-2);font-size:.95rem;margin-bottom:16px;max-width:62ch}
+.party-players{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.party-player{display:grid;gap:8px;background:var(--paper-2);border-radius:8px;padding:12px}
+.party-player label{font-size:.85rem;font-weight:800;color:var(--ink-2)}
+.team-toggle{display:flex;gap:6px}
+.team-toggle button{flex:1;padding:6px 8px;border-radius:999px;font-weight:800;font-size:.85rem;color:var(--ink-2);box-shadow:inset 0 0 0 2px var(--paper-line);transition:background-color .15s ease,color .15s ease}
+.team-toggle button[aria-pressed="true"][data-team="0"]{background:#2b5fa8;color:#fff;box-shadow:none}
+.team-toggle button[aria-pressed="true"][data-team="1"]{background:var(--red);color:#fff;box-shadow:none}
+.party-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.link-list{display:grid;gap:8px}
+.link-row{display:flex;align-items:center;gap:12px;background:var(--paper-2);border-radius:8px;padding:10px 12px;flex-wrap:wrap}
+.link-row .who{font-weight:800;flex:1;min-width:120px;overflow-wrap:anywhere}
+.link-row .team-dot{width:12px;height:12px;border-radius:50%;flex:none}
+.link-row .sent{font-size:.8rem;font-weight:800;color:#1f7a4c}
+.vote-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.vote-grid .party-player select{width:100%}
+.result-toggle{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-weight:800}
+.reveal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.reveal-card{background:var(--paper);border-radius:10px;padding:14px;display:grid;gap:8px;box-shadow:0 0 0 2px var(--paper-line);animation:deal .45s var(--ease-out) both}
+.reveal-card.still{animation:none}
+.reveal-card .role-line{display:flex;align-items:center;gap:10px}
+.reveal-card .suit{width:42px;height:56px;border-radius:6px;display:grid;place-items:center;font-size:1.6rem;color:#fff;flex:none}
+.reveal-card .role-name{font-family:var(--display);font-size:1.05rem;line-height:1.05}
+.reveal-card .pname{font-weight:800;color:var(--ink-2);font-size:.88rem}
+.reveal-card label{display:flex;gap:8px;align-items:center;font-size:.88rem;font-weight:600}
+.reveal-card .pts{font-family:var(--display);font-size:1.6rem;color:var(--red)}
+.reveal-card .pts small{font-family:Archivo,sans-serif;font-size:.8rem;color:var(--ink-2);font-weight:700;display:block}
+.podium{display:grid;gap:6px;margin-top:6px}
+.podium div{display:flex;justify-content:space-between;gap:12px;font-weight:800;padding:8px 12px;border-radius:6px;background:var(--paper-2);font-variant-numeric:tabular-nums}
+.podium div:first-child{background:var(--gold);color:var(--ink)}
+
+/* carte secrète du joueur */
+.secret{max-width:440px;margin:24px auto 0;display:grid;gap:18px;justify-items:center;text-align:center}
+.secret-who{font-weight:800;color:var(--muted)}
+.card3d{width:min(100%,320px);aspect-ratio:5/7;perspective:1200px;cursor:pointer}
+.card3d-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s var(--ease-out)}
+.card3d.open .card3d-inner{transform:rotateY(180deg)}
+.card-face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:22px;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.card-back{background:var(--red);color:var(--cream);border:10px solid var(--paper);
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.09) 0 10px,transparent 10px 20px)}
+.card-back b{font-family:var(--display);font-weight:400;font-size:1.6rem;line-height:1}
+.card-back span{font-weight:800;font-size:.95rem}
+.card-front{background:var(--paper);color:var(--ink);transform:rotateY(180deg);justify-content:flex-start;text-align:center}
+.card-front .corner{position:absolute;font-size:1.6rem;line-height:1;font-weight:800}
+.card-front .corner.tl{top:14px;left:16px}.card-front .corner.br{bottom:14px;right:16px;transform:rotate(180deg)}
+.card-front .big-suit{font-size:4.2rem;line-height:1;margin-top:18px}
+.card-front h2{font-family:var(--display);font-weight:400;font-size:1.7rem;line-height:1}
+.card-front p{font-weight:600;font-size:.98rem;line-height:1.4;text-wrap:pretty}
+.secret-live{width:100%;background:var(--paper);color:var(--ink);border-radius:12px;padding:18px;display:grid;gap:10px;text-align:left}
+.secret-live h3{font-family:var(--display);font-weight:400;font-size:1.05rem}
+.secret-live .big{font-family:var(--display);font-size:1.5rem;line-height:1.1}
+.secret-live .clock{font-variant-numeric:tabular-nums;font-weight:800;color:var(--ink-2)}
+.secret-live.flash{animation:flash .9s var(--ease-out)}
+@keyframes flash{0%{box-shadow:0 0 0 0 var(--gold)}30%{box-shadow:0 0 0 6px var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
+.secret-points{width:100%;color:var(--muted);font-size:.9rem;text-align:left}
+.secret-points li{margin-left:18px}
+body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
+
 /* ---------- mouvement ---------- */
 /* changement d'onglet : simple fondu court (action fréquente) */
 .view{transition:opacity .16s var(--ease-out),transform .16s var(--ease-out)}
@@ -376,6 +438,8 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
   @starting-style{.view{opacity:0;transform:none}}
   .btn:active:not(:disabled),.btn-chip:active:not(:disabled){transform:none}
   #toast,#toast.on{transform:translate(-50%,0);transition:opacity .2s ease}
+  .card3d-inner{transition:none}
+  @keyframes flash{0%,100%{opacity:1}50%{opacity:.6}}
 }
 </style>
 </head>
@@ -387,6 +451,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
     <nav class="tabs" role="tablist" aria-label="Modes">
       <button class="tab" role="tab" aria-selected="true" data-view="solo">Solo</button>
       <button class="tab" role="tab" aria-selected="false" data-view="team">Équipe</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="party" aria-label="Partie truquée">Truquée</button>
       <button class="tab" role="tab" aria-selected="false" data-view="history">Historique</button>
     </nav>
     <div class="head-actions">
@@ -421,6 +486,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
       <div class="wheel-card">
         <div class="row-head"><span class="label">Ta lane</span><span class="pick-chip" id="chipRole">—</span></div>
         <div class="wheel-wrap"><div class="wheel-pointer"></div><canvas id="roleWheel" width="660" height="660"></canvas><div class="wheel-hub"></div></div>
+        <div class="role-pick solo-role"><select id="soloRole" aria-label="Ta lane"><option value="">Lane au hasard</option><option value="top">Je joue Top</option><option value="jungle">Je joue Jungle</option><option value="mid">Je joue Mid</option><option value="adc">Je joue ADC</option><option value="support">Je joue Support</option></select></div>
       </div>
       <div class="wheel-card">
         <div class="row-head"><span class="label">Ton build</span><span class="pick-chip" id="chipBuild">—</span></div>
@@ -466,6 +532,20 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
       <button class="btn" id="copyTeam" hidden>Copier le texte</button>
     </div>
     <div class="team-grid" id="teamGrid"></div>
+  </section>
+
+  <!-- =============== PARTIE TRUQUÉE (hôte) =============== -->
+  <section class="view" id="view-party" role="tabpanel" hidden>
+    <div class="intro">
+      <h1>La partie est truquée</h1>
+      <p>Des rôles secrets pendant une vraie game, de 3 à 10 joueurs. Un tricheur dans chaque équipe, un vote à la fin, et des points pour tout le monde.</p>
+    </div>
+    <div id="partyBody"></div>
+  </section>
+
+  <!-- =============== CARTE SECRÈTE (joueur) =============== -->
+  <section class="view" id="view-secret" role="tabpanel" hidden>
+    <div id="secretBody"></div>
   </section>
 
   <!-- =============== HISTORY =============== -->
@@ -1172,7 +1252,8 @@ const teamLink = team => `${pageUrl()}#t=${b64e(JSON.stringify(team.map(packPick
 function clearHash() { if (location.hash) window.history.replaceState(null, "", pageUrl()); }
 
 function openFromHash() {
-  const m = location.hash.match(/^#([pt])=([\w-]+)$/); if (!m) return;
+  const m = location.hash.match(/^#([ptr])=([\w-]+)$/); if (!m) return;
+  if (m[1] === "r") { if (!openSecret(m[2])) toast("Ce lien secret est illisible"); return; }
   try {
     const data = JSON.parse(b64d(m[2]));
     if (m[1] === "p") {
@@ -1318,6 +1399,7 @@ function refreshBuildWheel() {
 function setBusy(v) {
   busy = v;
   ["#spinAll", "#spinChamp", "#spinRole", "#spinBuild", "#spinTeam"].forEach(s => $(s).disabled = v);
+  if (!v) $("#spinRole").disabled = !!settings.soloRole;
   document.querySelectorAll("#result .btn, #result .btn-chip").forEach(b => b.disabled = v);
 }
 async function doChamp() {
@@ -1330,11 +1412,28 @@ async function doChamp() {
 }
 async function doRole() {
   $("#chipRole").textContent = "…";
-  const i = Math.floor(Math.random() * ROLES.length);
+  // lane verrouillée : la roue s'arrête quand même dessus, pour le spectacle
+  const locked = ROLES.findIndex(r => r.key === settings.soloRole);
+  const i = locked >= 0 ? locked : Math.floor(Math.random() * ROLES.length);
   await roleWheel.spinTo(i);
   solo.role = ROLES[i].key;
-  $("#chipRole").innerHTML = `<strong>${ROLES[i].label}</strong>`;
+  showSoloRole();
 }
+function showSoloRole() {
+  const r = ROLES.find(x => x.key === solo.role);
+  $("#chipRole").innerHTML = r ? `<strong>${r.label}</strong>${settings.soloRole ? " (choisie)" : ""}` : "—";
+}
+function syncSoloRole() {
+  const sel = $("#soloRole");
+  sel.value = settings.soloRole || "";
+  sel.classList.toggle("locked", !!sel.value);
+  if (!busy) $("#spinRole").disabled = !!settings.soloRole;
+}
+$("#soloRole").addEventListener("change", e => {
+  settings.soloRole = e.target.value; saveSettings();
+  if (settings.soloRole) solo.role = settings.soloRole;
+  syncSoloRole(); showSoloRole();
+});
 async function doBuild() {
   $("#chipBuild").textContent = "…";
   const segs = buildWheel.segs, i = Math.floor(Math.random() * segs.length);
@@ -1768,6 +1867,7 @@ $("#teamSize").addEventListener("click", e => {
   const n = +e.target.closest("[data-size]")?.dataset.size; if (!n) return;
   teamSize = n; store.set("teamSize", n);
   renderTeamForm();
+  syncSoloRole();
 });
 function teamCardHTML(p, i) {
   const c = CHAMP_BY_ID[p.champ], role = ROLES.find(r => r.key === p.role), key = RUNE_BY_ID[p.runes.keystone];
@@ -1827,6 +1927,357 @@ $("#teamGrid").addEventListener("click", e => {
 });
 
 /* =========================================================
+   PARTIE TRUQUÉE : rôles secrets pendant une vraie game
+   L'hôte distribue les rôles et envoie un lien secret à chaque joueur (#r=…).
+   La page du joueur calcule seule ses ordres et ses bascules à partir d'une graine :
+   pas de serveur, et deux appareils avec le même lien affichent la même chose.
+========================================================= */
+const PARTY_ROLES = {
+  TRICHEUR:   { name: "Le Tricheur", suit: "♠", color: "#1b1714",
+    goal: "Fais perdre ton équipe sans te faire démasquer au vote.",
+    points: ["+3 si ton équipe perd", "+2 si le vote ne t'accuse pas"] },
+  PANTIN:     { name: "Le Pantin", suit: "♣", color: "#2b5fa8",
+    goal: "Gagne la partie en obéissant aux ordres qui s'affichent ici. Un nouvel ordre toutes les 4 minutes.",
+    points: ["+2 si ton équipe gagne", "+2 si tu as obéi à tous les ordres", "+1 si tu votes contre le Tricheur"] },
+  PILEFACE:   { name: "Pile ou Face", suit: "♦", color: "#b3541e",
+    goal: "Toutes les 7 minutes, la pièce est relancée. Côté Allié : fais gagner ton équipe. Côté Tricheur : fais-la perdre. Seul ton côté à la fin de la game compte.",
+    points: ["+3 si le résultat colle à ton côté final", "+1 si tu votes contre le Tricheur"] },
+  FLAMBEUR:   { name: "Le Flambeur", suit: "♥", color: "#cf2f2a",
+    goal: "Gagne la partie en étant celui de ton équipe qui meurt le plus et qui fait le plus de dégâts.",
+    points: ["+2 si ton équipe gagne", "+1 si tu as le plus de morts", "+1 si tu as le plus de dégâts", "+1 si tu votes contre le Tricheur"] },
+  HIGHROLLER: { name: "Le High Roller", suit: "♦", color: "#a8862a",
+    goal: "Tu mises gros : tu dois gagner. Bonus si tu finis premier de ton équipe en kills, en dégâts ou en assistances.",
+    points: ["+2 si ton équipe gagne, −2 si elle perd", "+2 si tu es premier en kills, dégâts ou assistances", "+1 si tu votes contre le Tricheur"] },
+  BLUFFEUR:   { name: "Le Bluffeur", suit: "♣", color: "#5b3d8a",
+    goal: "Fais-toi accuser d'être le Tricheur au vote, tout en faisant gagner ton équipe.",
+    points: ["+3 si le vote t'accuse", "+1 si ton équipe gagne, −1 si elle perd"] },
+  AME:        { name: "L'Âme liée", suit: "♥", color: "#c2417a",
+    goal: "Ton destin est lié à {p}. Chaque fois que {p} meurt, tu dois mourir aussi, le plus vite possible. Et gagne la partie.",
+    points: ["+2 si tu as respecté le lien", "+1 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] },
+  HONNETE:    { name: "L'Honnête joueur", suit: "♠", color: "#1f7a4c",
+    goal: "Aucun pouvoir, aucune consigne. Gagne la partie et démasque le Tricheur.",
+    points: ["+2 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] }
+};
+const PARTY_OPTIONAL = ["PANTIN", "PILEFACE", "FLAMBEUR", "HIGHROLLER", "BLUFFEUR", "AME"];
+const PANTIN_ORDERS = [
+  "Rentre à la base maintenant, même si tout va bien.",
+  "Va voir la lane la plus proche et reste-y 1 minute.",
+  "Joue sans Flash pendant les 3 prochaines minutes.",
+  "Ping « en danger » 3 fois sur un allié, sans raison.",
+  "Achète une Balise de contrôle au prochain retour.",
+  "Utilise ton ultime dans les 60 prochaines secondes.",
+  "Suis ton jungler jusqu'à ton prochain retour base.",
+  "Ne pose aucune balise pendant 4 minutes.",
+  "Fais l'emote de danse après ton prochain kill ou assistance.",
+  "Pars farmer la jungle ennemie pendant 1 minute.",
+  "Reste en vie pendant les 3 prochaines minutes, quoi qu'il arrive.",
+  "Va aider pour le prochain objectif (dragon, héraut ou baron).",
+  "Écris « je suis innocent » dans le chat d'équipe.",
+  "Prends le prochain camp de jungle que tu croises.",
+  "Va te placer en buisson et attends 30 secondes.",
+  "Vends ton objet le moins cher au prochain retour."
+];
+const PANTIN_FIRST = 2 * 60e3, PANTIN_EVERY = 4 * 60e3, COIN_EVERY = 7 * 60e3;
+const TEAM_NAMES = ["Bleue", "Rouge"], TEAM_COLORS = ["#2b5fa8", "#cf2f2a"];
+
+/* Nombre pseudo-aléatoire stable à partir d'une graine (mêmes valeurs sur tous les appareils). */
+function seeded(seed, k) {
+  let t = (seed ^ Math.imul(k + 1, 0x9E3779B1)) >>> 0;
+  t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+/* Le lien secret est brouillé pour qu'un coup d'œil sur l'adresse ne révèle pas le rôle. */
+const KEY = [116, 114, 111, 108, 108, 112, 105, 99, 107, 115];
+function scramble(str) {
+  const bytes = new TextEncoder().encode(str).map((b, i) => b ^ KEY[i % KEY.length]);
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function unscramble(s) {
+  const raw = Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)).map((b, i) => b ^ KEY[i % KEY.length]);
+  return new TextDecoder().decode(raw);
+}
+
+let party = store.get("party", null);
+let revealAnim = false;
+const saveParty = () => store.set("party", party);
+function newParty() {
+  const names = teamNames.slice();
+  party = {
+    id: Math.random().toString(36).slice(2, 8), phase: "setup", size: Math.max(3, Math.min(10, teamSize)),
+    players: Array.from({ length: 10 }, (_, i) => ({ name: names[i] || `Joueur ${i + 1}`, team: i < 5 ? 0 : 1 })),
+    enabled: PARTY_OPTIONAL.slice(), deal: [], sent: [], votes: [], result: [null, null], checks: {}
+  };
+  saveParty();
+}
+const activePlayers = () => party.players.slice(0, party.size);
+const teamsInPlay = () => [...new Set(activePlayers().map(p => p.team))].sort();
+
+function dealRoles() {
+  const players = activePlayers();
+  const deal = players.map(() => null);
+  for (const t of teamsInPlay()) {
+    const idx = players.map((p, i) => p.team === t ? i : -1).filter(i => i >= 0);
+    if (!idx.length) continue;
+    const order = shuffle(idx), pool = shuffle(party.enabled.filter(r => r !== "AME" || idx.length > 1));
+    order.forEach((pi, k) => deal[pi] = { role: k === 0 ? "TRICHEUR" : pool[k - 1] || "HONNETE" });
+    // l'Âme liée est liée à un autre joueur de son équipe
+    idx.forEach(pi => {
+      if (deal[pi].role === "AME") deal[pi].partner = players[rand(idx.filter(j => j !== pi))].name;
+    });
+  }
+  deal.forEach(d => d.seed = Math.floor(Math.random() * 2 ** 31));
+  Object.assign(party, { deal, phase: "dealt", sent: [], votes: players.map(() => -1), result: [null, null], checks: {} });
+  saveParty();
+}
+const secretLink = i => {
+  const p = activePlayers()[i], d = party.deal[i];
+  return `${pageUrl()}#r=${scramble(JSON.stringify({ g: party.id, n: p.name, r: d.role, s: d.seed, p: d.partner || "", t: teamsInPlay().length > 1 ? p.team : -1 }))}`;
+};
+
+/* ---------- calcul des points ---------- */
+function accusedIn(team) {
+  const players = activePlayers(), counts = {};
+  party.votes.forEach((v, i) => { if (v >= 0 && players[i].team === team) counts[v] = (counts[v] || 0) + 1; });
+  const best = Math.max(0, ...Object.values(counts));
+  const top = Object.keys(counts).filter(k => counts[k] === best);
+  return best > 0 && top.length === 1 ? +top[0] : -1;   // égalité = personne n'est accusé
+}
+function scoreOf(i) {
+  const players = activePlayers(), p = players[i], d = party.deal[i], c = party.checks[i] || {};
+  const win = party.result[p.team], tricheur = party.deal.findIndex((x, j) => x.role === "TRICHEUR" && players[j].team === p.team);
+  const accused = accusedIn(p.team), lines = [];
+  const add = (pts, why) => { if (pts) lines.push([pts, why]); };
+  if (d.role !== "TRICHEUR" && d.role !== "BLUFFEUR" && party.votes[i] === tricheur) add(1, "a voté contre le Tricheur");
+  switch (d.role) {
+    case "TRICHEUR": add(win === false ? 3 : 0, "équipe perdante"); add(accused !== i ? 2 : 0, "pas démasqué"); break;
+    case "PANTIN": add(win ? 2 : 0, "victoire"); add(c.a ? 2 : 0, "a obéi aux ordres"); break;
+    case "PILEFACE": add((c.a ? win === true : win === false) ? 3 : 0, `côté final ${c.a ? "Allié" : "Tricheur"} respecté`); break;
+    case "FLAMBEUR": add(win ? 2 : 0, "victoire"); add(c.a ? 1 : 0, "le plus de morts"); add(c.b ? 1 : 0, "le plus de dégâts"); break;
+    case "HIGHROLLER": add(win ? 2 : win === false ? -2 : 0, win ? "victoire" : "défaite"); add(c.a ? 2 : 0, "premier en kills, dégâts ou assists"); break;
+    case "BLUFFEUR": add(accused === i ? 3 : 0, "accusé au vote"); add(win ? 1 : win === false ? -1 : 0, win ? "victoire" : "défaite"); break;
+    case "AME": add(c.a ? 2 : 0, "lien respecté"); add(win ? 1 : 0, "victoire"); break;
+    case "HONNETE": add(win ? 2 : 0, "victoire"); break;
+  }
+  return { total: lines.reduce((s, [n]) => s + n, 0), lines };
+}
+const CHECKS = {
+  PANTIN: [["a", "A obéi à tous les ordres"]],
+  PILEFACE: [["a", "Était côté Allié à la fin"]],
+  FLAMBEUR: [["a", "Le plus de morts de l'équipe"], ["b", "Le plus de dégâts de l'équipe"]],
+  HIGHROLLER: [["a", "Premier en kills, dégâts ou assists"]],
+  AME: [["a", "A respecté le lien"]]
+};
+
+/* ---------- écran de l'hôte ---------- */
+function renderParty() {
+  if (!party) newParty();
+  const body = $("#partyBody"), players = activePlayers(), two = teamsInPlay().length > 1;
+  const teamTag = p => two ? `<span class="team-dot" style="background:${TEAM_COLORS[p.team]}" title="Équipe ${TEAM_NAMES[p.team]}"></span>` : "";
+
+  if (party.phase === "setup") {
+    body.innerHTML = `<div class="panel-paper">
+      <div class="team-head">
+        <span class="label" style="color:var(--ink)">1. Les joueurs</span>
+        <div class="size-pick" role="radiogroup" aria-label="Nombre de joueurs" id="partySize"><span>Joueurs</span>
+          ${[3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button role="radio" aria-checked="${n === party.size}" data-psize="${n}">${n}</button>`).join("")}
+        </div>
+        <p class="hint">Au-delà de 5 joueurs, répartis-les dans les deux équipes d'une partie personnalisée. Chaque équipe a son Tricheur.</p>
+      </div>
+      <div class="party-players">${players.map((p, i) => `<div class="party-player">
+        <label for="pn${i}">Joueur ${i + 1}</label>
+        <input type="text" id="pn${i}" data-pname="${i}" value="${esc(p.name)}" maxlength="24" autocomplete="off">
+        ${party.size > 5 ? `<div class="team-toggle" role="group" aria-label="Équipe de ${esc(p.name)}">
+          ${[0, 1].map(t => `<button data-pteam="${i}" data-team="${t}" aria-pressed="${p.team === t}">${TEAM_NAMES[t]}</button>`).join("")}</div>` : ""}
+      </div>`).join("")}</div>
+      <div class="party-step">
+        <h2>2. Les rôles en jeu</h2>
+        <p class="hint">Le Tricheur est toujours là. Les autres rôles actifs sont distribués au hasard, un seul exemplaire par équipe. S'il manque des rôles, les joueurs restants sont des Honnêtes joueurs.</p>
+        <div class="chips">${PARTY_OPTIONAL.map(k => `<button class="chip" aria-pressed="${party.enabled.includes(k)}" data-prole="${k}">${PARTY_ROLES[k].name}</button>`).join("")}</div>
+      </div>
+      <div class="party-actions"><button class="btn-chip" data-pact="deal">Distribuer les rôles</button></div>
+    </div>`;
+    return;
+  }
+
+  if (party.phase === "dealt") {
+    body.innerHTML = `<div class="panel-paper">
+      <div class="party-step" style="margin-top:0">
+        <h2>3. Envoie les liens secrets</h2>
+        <p class="hint">Envoie chaque lien en message privé (Discord…). Chacun ouvre le sien, découvre sa carte et appuie sur « La game commence » au chargement de la partie. N'ouvre que ton propre lien.</p>
+        <div class="link-list">${players.map((p, i) => `<div class="link-row">${teamTag(p)}<span class="who">${esc(p.name)}</span>
+          ${party.sent[i] ? `<span class="sent">Copié</span>` : ""}
+          <button class="btn btn-ink" data-plink="${i}">Copier son lien</button></div>`).join("")}</div>
+      </div>
+      <div class="party-step">
+        <h2>4. Après la game : le vote</h2>
+        <p class="hint">Débattez, puis chacun désigne qui il pense être le Tricheur de son équipe.</p>
+        <div class="vote-grid">${players.map((p, i) => `<div class="party-player">
+          <label for="pv${i}">${two ? `${TEAM_NAMES[p.team]} • ` : ""}${esc(p.name)} accuse</label>
+          <div class="role-pick" style="margin:0"><select id="pv${i}" data-pvote="${i}">
+            <option value="-1">Personne</option>
+            ${players.map((q, j) => j !== i && q.team === p.team ? `<option value="${j}" ${party.votes[i] === j ? "selected" : ""}>${esc(q.name)}</option>` : "").join("")}
+          </select></div></div>`).join("")}</div>
+      </div>
+      <div class="party-step">
+        <h2>5. Le résultat</h2>
+        ${teamsInPlay().map(t => `<div class="result-toggle" style="margin-bottom:8px"><span>${two ? `Équipe ${TEAM_NAMES[t]}` : "Votre équipe"} :</span>
+          <button class="chip" aria-pressed="${party.result[t] === true}" data-presult="${t}" data-win="1">Victoire</button>
+          <button class="chip" aria-pressed="${party.result[t] === false}" data-presult="${t}" data-win="0">Défaite</button></div>`).join("")}
+      </div>
+      <div class="party-actions">
+        <button class="btn-chip" data-pact="reveal">Révéler les cartes</button>
+        <button class="btn btn-ink" data-pact="reset">Recommencer</button>
+      </div>
+    </div>`;
+    return;
+  }
+
+  // phase "reveal" (les cartes ne sont distribuées en animation qu'à la première révélation)
+  const scores = players.map((_, i) => scoreOf(i));
+  const ranking = players.map((p, i) => ({ p, s: scores[i].total })).sort((a, b) => b.s - a.s);
+  body.innerHTML = `<div class="panel-paper">
+    <div class="party-step" style="margin-top:0">
+      <h2>Les cartes sur la table</h2>
+      <p class="hint">Coche ce qui s'est passé pendant la game : les points se mettent à jour.</p>
+      <div class="reveal-grid">${players.map((p, i) => {
+        const d = party.deal[i], R = PARTY_ROLES[d.role], sc = scores[i];
+        return `<div class="reveal-card${revealAnim ? "" : " still"}" style="animation-delay:${i * 80}ms">
+          <div class="role-line"><span class="suit" style="background:${R.color}">${R.suit}</span>
+            <div><div class="pname">${esc(p.name)}${two ? ` • ${TEAM_NAMES[p.team]}` : ""}</div><div class="role-name">${R.name}</div>
+            ${d.partner ? `<div class="pname">lié à ${esc(d.partner)}</div>` : ""}</div></div>
+          ${(CHECKS[d.role] || []).map(([k, lab]) => `<label><input type="checkbox" data-pcheck="${i}" data-k="${k}" ${party.checks[i]?.[k] ? "checked" : ""}>${lab}</label>`).join("")}
+          <div class="pts">${sc.total > 0 ? "+" : ""}${sc.total} pt${Math.abs(sc.total) > 1 ? "s" : ""}
+            <small>${sc.lines.map(([n, w]) => `${n > 0 ? "+" : ""}${n} ${w}`).join(" • ") || "aucun point"}</small></div>
+        </div>`; }).join("")}</div>
+    </div>
+    <div class="party-step">
+      <h2>Classement</h2>
+      <div class="podium">${ranking.map(r => `<div><span>${esc(r.p.name)}</span><span>${r.s} pt${Math.abs(r.s) > 1 ? "s" : ""}</span></div>`).join("")}</div>
+    </div>
+    <div class="party-actions">
+      <button class="btn-chip" data-pact="again">Rejouer avec les mêmes joueurs</button>
+      <button class="btn btn-ink" data-pact="back">Revenir au vote</button>
+    </div>
+  </div>`;
+}
+$("#partyBody").addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const d = b.dataset;
+  if (d.psize) { party.size = +d.psize; if (party.size <= 5) party.players.forEach(p => p.team = 0); else party.players.forEach((p, i) => p.team = i < Math.ceil(party.size / 2) ? 0 : 1); }
+  else if (d.pteam) party.players[+d.pteam].team = +d.team;
+  else if (d.prole) party.enabled = party.enabled.includes(d.prole) ? party.enabled.filter(r => r !== d.prole) : [...party.enabled, d.prole];
+  else if (d.plink) { await copy(secretLink(+d.plink), `Lien de ${activePlayers()[+d.plink].name} copié`); party.sent[+d.plink] = true; }
+  else if (d.presult) party.result[+d.presult] = d.win === "1";
+  else if (d.pact === "deal") {
+    if (teamsInPlay().some(t => activePlayers().filter(p => p.team === t).length < 2)) return toast("Chaque équipe doit avoir au moins 2 joueurs");
+    dealRoles(); chime();
+  }
+  else if (d.pact === "reveal") {
+    if (teamsInPlay().some(t => party.result[t] == null)) return toast("Indique d'abord victoire ou défaite");
+    party.phase = "reveal"; revealAnim = true; chime();
+  }
+  else if (d.pact === "back") party.phase = "dealt";
+  else if (d.pact === "reset" || d.pact === "again") {
+    if (d.pact === "reset" && !confirm("Recommencer ? Les rôles distribués seront perdus.")) return;
+    Object.assign(party, { phase: "setup", id: Math.random().toString(36).slice(2, 8), deal: [], sent: [], votes: [], result: [null, null], checks: {} });
+  }
+  else return;
+  saveParty(); renderParty(); revealAnim = false;
+});
+$("#partyBody").addEventListener("input", e => {
+  const i = e.target.dataset.pname; if (i == null) return;
+  party.players[+i].name = e.target.value.trim() || `Joueur ${+i + 1}`; saveParty();
+});
+$("#partyBody").addEventListener("change", e => {
+  const t = e.target;
+  if (t.dataset.pvote != null) party.votes[+t.dataset.pvote] = +t.value;
+  else if (t.dataset.pcheck != null) {
+    const i = +t.dataset.pcheck, k = t.dataset.k;
+    party.checks[i] = { ...party.checks[i], [k]: t.checked }; saveParty(); renderParty();
+    document.querySelector(`[data-pcheck="${i}"][data-k="${k}"]`)?.focus();
+    return;
+  }
+  else return;
+  saveParty();
+});
+
+/* ---------- page secrète du joueur ---------- */
+let secretTimer = null;
+function openSecret(token) {
+  let s;
+  try { s = JSON.parse(unscramble(token)); } catch { return false; }
+  const R = PARTY_ROLES[s.r]; if (!R || typeof s.n !== "string") return false;
+  document.body.classList.add("secret-mode");
+  document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "view-secret");
+  const startKey = `secret:${s.g}:${s.n}`, goal = R.goal.replaceAll("{p}", esc(s.p || "ton allié"));
+  $("#secretBody").innerHTML = `<div class="secret">
+    <div class="secret-who">${esc(s.n)}${s.t >= 0 ? `, équipe ${TEAM_NAMES[s.t]}` : ""} • ne montre pas cet écran</div>
+    <div class="card3d" id="secretCard" role="button" tabindex="0" aria-label="Retourner ma carte">
+      <div class="card3d-inner">
+        <div class="card-face card-back"><b>Partie<br>truquée</b><span>Touche pour voir ton rôle</span></div>
+        <div class="card-face card-front" style="color:${R.color}">
+          <span class="corner tl">${R.suit}</span><span class="corner br">${R.suit}</span>
+          <div class="big-suit">${R.suit}</div><h2>${R.name}</h2>
+          <p style="color:var(--ink)">${goal}</p>
+        </div>
+      </div>
+    </div>
+    <div class="secret-live" id="secretLive"></div>
+    <button class="btn" id="secretReset" hidden>Remettre le chrono à zéro</button>
+    <ul class="secret-points"><li>${R.points.join("</li><li>")}</li></ul>
+  </div>`;
+  const card = $("#secretCard");
+  const flip = () => card.classList.toggle("open");
+  card.addEventListener("click", flip);
+  card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } });
+
+  let last = null;
+  const tick = () => {
+    const start = store.get(startKey, null), live = $("#secretLive");
+    if (!live) return clearInterval(secretTimer);
+    if (!start) {
+      $("#secretReset").hidden = true;
+      if (live._h === "start") return;
+      live._h = "start";
+      live.innerHTML = `<h3>Prêt ?</h3><p>Appuie quand la partie se charge : les ordres et la pièce suivent le temps de jeu.</p>
+        <button class="btn-chip" id="secretStart">La game commence</button>`;
+      $("#secretStart").onclick = () => { store.set(startKey, Date.now()); beep(1000, .05); tick(); };
+      return;
+    }
+    const t = Date.now() - start, mmss = ms => `${Math.floor(ms / 60e3)}:${String(Math.floor(ms / 1e3) % 60).padStart(2, "0")}`;
+    let html = "", key = "";
+    if (s.r === "PANTIN") {
+      if (t < PANTIN_FIRST) { html = `<h3>Premier ordre dans</h3><div class="big">${mmss(PANTIN_FIRST - t)}</div>`; key = "wait"; }
+      else {
+        const k = Math.floor((t - PANTIN_FIRST) / PANTIN_EVERY), next = PANTIN_FIRST + (k + 1) * PANTIN_EVERY - t;
+        const order = PANTIN_ORDERS[Math.floor(seeded(s.s, k) * PANTIN_ORDERS.length)];
+        html = `<h3>Ordre n° ${k + 1}</h3><div class="big">${order}</div><div class="clock">Prochain ordre dans ${mmss(next)}</div>`; key = "o" + k;
+      }
+    } else if (s.r === "PILEFACE") {
+      const k = Math.floor(t / COIN_EVERY), ally = seeded(s.s, k) < .5, next = (k + 1) * COIN_EVERY - t;
+      html = `<h3>Ton côté actuel</h3><div class="big" style="color:${ally ? "#1f7a4c" : "var(--red)"}">${ally ? "Allié : fais gagner" : "Tricheur : fais perdre"}</div>
+        <div class="clock">La pièce est relancée dans ${mmss(next)}</div>`; key = "c" + k + ally;
+    } else {
+      html = `<h3>Temps de jeu</h3><div class="big">${mmss(t)}</div>`; key = "static";
+    }
+    $("#secretReset").hidden = false;
+    if (live._h !== html) { live.innerHTML = html; live._h = html; }   // ne redessine que si ça change
+    if (last !== null && key !== last && key !== "static") {
+      chime(); navigator.vibrate?.([200, 100, 200]);
+      live.classList.remove("flash"); void live.offsetWidth; live.classList.add("flash");
+      document.title = s.r === "PANTIN" ? "Nouvel ordre ! TrollPicks+" : "La pièce est relancée ! TrollPicks+";
+      setTimeout(() => document.title = "TrollPicks+", 6000);
+    }
+    last = key;
+  };
+  $("#secretReset").onclick = () => { if (confirm("Remettre le chrono à zéro ?")) { store.set(startKey, null); last = null; tick(); } };
+  clearInterval(secretTimer);
+  secretTimer = setInterval(tick, 1000);
+  tick();
+  return true;
+}
+
+/* =========================================================
    HISTORIQUE
 ========================================================= */
 function renderHistory() {
@@ -1868,6 +2319,7 @@ function showView(v, { push = true } = {}) {
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
   document.querySelectorAll(".view").forEach(s => s.hidden = s.id !== "view-" + v);
   if (v === "history") renderHistory();
+  if (v === "party") renderParty();
   if (v === "team") {
     if (lastTeam.length && $("#teamGrid").childElementCount !== lastTeam.length) renderTeam(lastTeam, false);
     focusTeamCard();
