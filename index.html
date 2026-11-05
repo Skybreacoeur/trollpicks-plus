@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrollPicks+</title>
+<meta name="description" content="La table de casino des troll picks League of Legends : champion, lane, build complet, objets situationnels, runes et sorts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --felt:#0f4a35;
+  --felt-deep:#0a3626;
+  --rail:#062519;
+  --cream:#f3ecdc;
+  --paper:#f7f1e3;
+  --paper-2:#ece3cf;
+  --paper-line:#d3c7ad;
+  --ink:#1b1714;
+  --ink-2:#6a6053;
+  --red:#cf2f2a;
+  --red-deep:#8e1d19;
+  --black:#1c1a19;
+  --gold:#e2b24a;
+  --muted:#9fc2b1;
+  --r-card:8px;
+  --r-sm:4px;
+  --gutter:clamp(16px,4vw,40px);
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --tile-w:104px;
+  --tile-gap:12px;
+  --display:Bungee,Impact,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
+body{
+  min-height:100vh;
+  font-family:Archivo,system-ui,sans-serif;
+  font-size:16px;line-height:1.5;color:var(--cream);
+  background-color:var(--felt);
+  background-image:
+    radial-gradient(ellipse 90% 70% at 50% 30%,transparent 40%,rgba(0,0,0,.45) 100%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.28'/></svg>");
+  background-attachment:fixed;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:disabled{cursor:not-allowed;opacity:.45}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--gutter)}
+[hidden]{display:none!important}
+
+/* ---------- header ---------- */
+header.top{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:28px 0 8px}
+.wordmark{font-family:var(--display);font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1;color:var(--cream);letter-spacing:-.01em}
+.wordmark b{font-weight:400;color:var(--red);text-shadow:0 3px 0 var(--red-deep)}
+.tabs{display:flex;gap:4px;margin-left:auto}
+.tab{padding:10px 14px;font-weight:800;color:var(--muted);border-bottom:3px solid transparent;transition:color .15s,border-color .15s}
+.tab:hover{color:var(--cream)}
+.tab[aria-selected="true"]{color:var(--cream);border-color:var(--gold)}
+.head-actions{display:flex;gap:6px}
+.icon-btn{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;color:var(--muted);transition:color .15s,background .15s}
+.icon-btn:hover{color:var(--cream);background:rgba(0,0,0,.25)}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn[aria-pressed="false"] .on{display:none}
+.icon-btn[aria-pressed="true"] .off{display:none}
+
+.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding:32px 0 24px}
+.intro h1{font-family:var(--display);font-weight:400;font-size:clamp(2rem,5.4vw,4rem);line-height:.95;max-width:14ch;text-wrap:balance}
+.intro p{max-width:36ch;color:var(--muted);font-weight:500}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:999px;font-weight:800;
+  color:var(--cream);box-shadow:inset 0 0 0 2px rgba(243,236,220,.55);
+  transition:background .15s,box-shadow .15s,transform .1s var(--ease-out);
+}
+.btn:hover:not(:disabled){background:rgba(0,0,0,.2);box-shadow:inset 0 0 0 2px var(--cream)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn-chip{
+  font-family:var(--display);font-weight:400;font-size:1.15rem;letter-spacing:.02em;
+  padding:16px 34px;color:var(--cream);background:var(--red);
+  box-shadow:0 5px 0 var(--red-deep),inset 0 0 0 3px rgba(255,255,255,.18);
+  transition:transform .08s,box-shadow .08s,background .15s;
+}
+.btn-chip:hover:not(:disabled){background:#dc3a34;box-shadow:0 5px 0 var(--red-deep),inset 0 0 0 3px rgba(255,255,255,.3)}
+.btn-chip:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--red-deep),inset 0 0 0 3px rgba(255,255,255,.18)}
+.btn-ink{color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.btn-ink:hover:not(:disabled){background:var(--paper-2);box-shadow:inset 0 0 0 2px var(--ink)}
+
+/* ---------- table ---------- */
+.view{padding-bottom:72px}
+.label{font-family:var(--display);font-size:1rem;color:var(--cream);letter-spacing:.02em}
+.row-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.pick-chip{font-weight:700;color:var(--muted)}
+.pick-chip strong{color:var(--gold)}
+
+.casino{position:relative;height:214px;border-radius:14px;background:var(--rail);
+  box-shadow:inset 0 6px 18px rgba(0,0,0,.6),0 0 0 6px #3a2614,0 0 0 8px #5b3d1f;overflow:hidden}
+.casino-track{position:absolute;top:20px;left:0;display:flex;gap:var(--tile-gap);will-change:transform}
+.casino::before,.casino::after{content:"";position:absolute;top:0;bottom:0;width:16%;z-index:2;pointer-events:none}
+.casino::before{left:0;background:linear-gradient(90deg,var(--rail),transparent)}
+.casino::after{right:0;background:linear-gradient(270deg,var(--rail),transparent)}
+.casino-frame{position:absolute;z-index:3;top:10px;bottom:10px;left:50%;width:calc(var(--tile-w) + 14px);transform:translateX(-50%);
+  border:3px solid var(--gold);border-radius:12px;pointer-events:none}
+.casino-frame::before,.casino-frame::after{content:"";position:absolute;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent}
+.casino-frame::before{top:-3px;border-top:12px solid var(--gold)}
+.casino-frame::after{bottom:-3px;border-bottom:12px solid var(--gold)}
+.tile{flex:0 0 var(--tile-w);width:var(--tile-w);height:174px;border-radius:var(--r-card);background:var(--paper);padding:5px;display:flex;flex-direction:column;gap:4px;
+  box-shadow:0 3px 8px rgba(0,0,0,.45)}
+.tile img{width:100%;height:136px;object-fit:cover;object-position:50% 15%;border-radius:4px;background:var(--paper-2)}
+.tile span{font-weight:800;font-size:.8rem;line-height:1.2;text-align:center;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.wheels{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:48px}
+.wheel-card{display:flex;flex-direction:column;align-items:center}
+.wheel-card .row-head{width:100%}
+.wheel-wrap{position:relative;width:min(100%,330px);aspect-ratio:1;margin-top:8px}
+.wheel-wrap canvas{width:100%;height:100%;border-radius:50%;will-change:transform;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
+.wheel-pointer{position:absolute;z-index:2;top:-10px;left:50%;transform:translateX(-50%);
+  border-left:15px solid transparent;border-right:15px solid transparent;border-top:28px solid var(--gold);filter:drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+.wheel-hub{position:absolute;inset:50% auto auto 50%;width:20%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f7dc8f,var(--gold) 45%,#8a6420);box-shadow:0 0 0 5px #3a2614,0 4px 10px rgba(0,0,0,.5)}
+.controls{display:flex;flex-wrap:wrap;gap:16px 12px;align-items:center;justify-content:center;padding:44px 0 8px}
+.controls .sub{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+/* ---------- ticket ---------- */
+.ticket-wrap{margin-top:56px}
+.ticket{position:relative;background:var(--paper);color:var(--ink);border-radius:10px;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.ticket.enter{animation:deal .55s var(--ease-out) both}
+@keyframes deal{from{opacity:0;transform:translateY(28px) rotate(-1deg)}to{opacity:1;transform:none}}
+.t-top{display:grid;grid-template-columns:240px 1fr;gap:32px;padding:28px}
+.t-art{border-radius:6px;overflow:hidden;background:var(--paper-2);aspect-ratio:308/460}
+.t-art img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+.t-head{position:relative;display:flex;flex-direction:column;min-width:0}
+.t-case{font-weight:700;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.champ-name{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,6.5vw,5.2rem);line-height:.92;margin:6px 0 4px;overflow-wrap:anywhere;text-wrap:balance}
+.champ-title{color:var(--ink-2);font-weight:600;font-size:1.05rem}
+.facts{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:8px 36px;margin:24px 0}
+.facts dt{font-size:.85rem;font-weight:700;color:var(--ink-2)}
+.facts dd{font-family:var(--display);font-size:1.35rem;line-height:1.1}
+.facts dd.hot{color:var(--red)}
+.sentence{font-size:1.25rem;font-weight:700;max-width:30ch;text-wrap:pretty;margin-top:auto}
+.stamp{
+  position:absolute;top:4px;right:0;font-family:var(--display);font-size:1.6rem;line-height:1;
+  color:var(--red);border:4px solid var(--red);border-radius:6px;padding:8px 14px 6px;
+  transform:rotate(-11deg);opacity:.9;mix-blend-mode:multiply;
+}
+.stamp small{display:block;font-family:Archivo,sans-serif;font-weight:800;font-size:.75rem;text-align:center;margin-top:4px}
+.stamp.green{color:#1f7a4c;border-color:#1f7a4c}
+.ticket.enter .stamp{animation:thud .45s .35s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes thud{from{opacity:0;transform:rotate(-11deg) scale(2.4)}to{opacity:.9;transform:rotate(-11deg) scale(1)}}
+
+.perf{position:relative;border-top:2px dashed var(--paper-line);margin:0 28px}
+.perf::before,.perf::after{content:"";position:absolute;top:-14px;width:26px;height:26px;border-radius:50%;background:var(--felt-deep)}
+.perf::before{left:-42px}.perf::after{right:-42px}
+.t-sec{padding:26px 28px}
+.t-sec h3{font-family:var(--display);font-weight:400;font-size:1.05rem;margin-bottom:16px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.t-sec h3 span{font-family:Archivo,sans-serif;font-weight:800;font-size:.95rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.starter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.starter-label{font-weight:800;font-size:.9rem;color:var(--ink-2)}
+.starter-item{display:flex;align-items:center;gap:8px;background:var(--paper-2);border-radius:999px;padding:4px 14px 4px 4px;font-size:.88rem;font-weight:700}
+.starter-item img{width:30px;height:30px;border-radius:50%}
+.items{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.item{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;padding:6px 4px;border-radius:6px;transition:background .15s}
+.item:hover{background:var(--paper-2)}
+.item img{width:64px;height:64px;border-radius:6px;box-shadow:0 0 0 2px var(--ink)}
+.item.core img{box-shadow:0 0 0 2px var(--ink),0 0 0 5px var(--gold)}
+.item-step{font-size:.75rem;font-weight:800;color:var(--ink-2)}
+.item-name{font-size:.86rem;font-weight:700;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.item-cost{font-size:.8rem;font-weight:800;color:var(--red-deep);font-variant-numeric:tabular-nums}
+.notes{list-style:none;margin-top:18px;display:grid;gap:4px;font-size:.9rem;color:var(--ink-2);font-weight:500}
+.notes li::before{content:"✓ ";color:#1f7a4c;font-weight:800}
+
+.situ{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.situ-card{background:var(--paper-2);border-radius:6px;padding:14px}
+.situ-card p{font-weight:800;font-size:.92rem;line-height:1.25;margin-bottom:10px}
+.situ-items{display:flex;flex-wrap:wrap;gap:8px}
+.situ-item{display:flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;padding:3px 10px 3px 3px;border-radius:6px;background:var(--paper);text-align:left;line-height:1.15}
+.situ-item img{width:34px;height:34px;border-radius:4px;flex:none}
+.situ-item.owned{opacity:.55}
+
+.t-cols{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:32px;padding:26px 28px 30px}
+.t-cols h3{font-family:var(--display);font-weight:400;font-size:1.05rem;margin-bottom:14px}
+.runes{display:flex;gap:16px;align-items:flex-start}
+.keystone{display:flex;flex-direction:column;align-items:center;gap:4px;width:88px;text-align:center;flex:none}
+.keystone img{width:68px;height:68px;background:var(--ink);border-radius:50%;padding:4px}
+.keystone span{font-weight:800;font-size:.85rem;line-height:1.2}
+.rune-rows{display:grid;gap:12px;min-width:0}
+.rune-tree{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rune-tree-name{font-weight:800;font-size:.8rem;color:var(--ink-2);width:100%}
+.rune{display:flex;align-items:center;gap:6px;background:var(--paper-2);border-radius:999px;padding:3px 10px 3px 3px;font-size:.82rem;font-weight:700}
+.rune img{width:26px;height:26px;background:var(--ink);border-radius:50%;padding:2px}
+.spells{display:flex;gap:12px;flex-wrap:wrap}
+.spell{display:flex;flex-direction:column;align-items:center;gap:6px;width:70px;text-align:center;font-size:.82rem;font-weight:700;line-height:1.2}
+.spell img{width:50px;height:50px;border-radius:6px;box-shadow:0 0 0 2px var(--ink)}
+.skill{position:relative}
+.skill .key{position:absolute;top:-8px;left:2px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--red);color:var(--cream);font-weight:800;font-size:.78rem}
+.skill-order{font-family:var(--display);font-size:1.5rem;margin-bottom:12px}
+.t-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:28px 0 0}
+
+/* ---------- team ---------- */
+.panel-paper{background:var(--paper);color:var(--ink);border-radius:10px;padding:28px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.team-form{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0 4px}
+.field label{display:block;font-size:.85rem;font-weight:800;color:var(--ink-2);margin-bottom:6px}
+input[type=text],input[type=search]{width:100%;padding:10px 12px;border-radius:6px;border:2px solid var(--paper-line);background:#fffaf0;color:var(--ink);font:inherit;font-weight:700}
+input[type=text]:focus,input[type=search]:focus{border-color:var(--ink);outline:none}
+.team-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:28px 0 8px}
+.team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:24px}
+.tcard{background:var(--paper);color:var(--ink);border-radius:var(--r-card);padding:8px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.tcard.reveal{animation:deal .5s var(--ease-out) both}
+.tcard-img{position:relative;aspect-ratio:308/400;border-radius:4px;overflow:hidden;background:var(--paper-2)}
+.tcard-img img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+.tcard-role{position:absolute;left:6px;top:6px;padding:3px 9px;border-radius:999px;background:var(--ink);color:var(--cream);font-weight:800;font-size:.78rem}
+.tcard-body{padding:0 4px 4px;display:grid;gap:8px}
+.tcard-player{font-size:.85rem;font-weight:800;color:var(--ink-2);overflow-wrap:anywhere}
+.tcard-champ{font-family:var(--display);font-size:1.15rem;line-height:1.05;overflow-wrap:anywhere}
+.tcard-build{font-weight:800;font-size:.85rem;color:var(--red-deep)}
+.mini-items{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+.mini-items img{width:100%;aspect-ratio:1;border-radius:3px}
+.mini-row{display:flex;gap:6px;align-items:center;font-size:.8rem;font-weight:800;color:var(--ink-2)}
+.mini-row img{width:26px;height:26px;border-radius:4px}
+.tcard .btn{padding:8px;font-size:.85rem}
+
+/* ---------- history ---------- */
+.hist-list{display:grid;gap:10px;margin-top:20px}
+.hrow{display:grid;grid-template-columns:52px 1.3fr 1fr 1.6fr auto;gap:16px;align-items:center;background:var(--paper);color:var(--ink);border-radius:8px;padding:10px 14px}
+.hrow > img{width:52px;height:52px;border-radius:6px;object-fit:cover}
+.hrow-name{font-family:var(--display);font-size:1.05rem;line-height:1.1}
+.hrow-meta{font-size:.85rem;color:var(--ink-2);font-weight:600}
+.hrow-build{font-weight:800;color:var(--red-deep)}
+.hrow .mini-items{max-width:240px}
+.empty{padding:56px 24px;text-align:center;color:var(--muted);font-weight:600}
+
+/* ---------- dialog ---------- */
+dialog{margin:auto;width:min(780px,calc(100% - 32px));max-height:calc(100% - 32px);background:var(--paper);color:var(--ink);border:0;border-radius:10px;padding:0;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(3,15,10,.72)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;position:sticky;top:0;background:var(--paper);z-index:1}
+.dlg-head h2{font-family:var(--display);font-weight:400;font-size:1.4rem}
+.dlg-head .icon-btn{color:var(--ink)}
+.dlg-head .icon-btn:hover{background:var(--paper-2)}
+.dlg-body{padding:0 24px 28px;display:grid;gap:28px}
+.set h3{font-weight:800;font-size:1.05rem}
+.set .hint{color:var(--ink-2);font-size:.92rem;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 14px;border-radius:999px;font-weight:700;color:var(--ink-2);box-shadow:inset 0 0 0 2px var(--paper-line);transition:background .15s,color .15s}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--cream);box-shadow:none}
+.ban-tools{display:flex;gap:8px;margin-bottom:10px}
+.ban-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;max-height:280px;overflow:auto;padding:2px}
+.ban{position:relative;border-radius:6px;overflow:hidden}
+.ban img{width:100%;aspect-ratio:1}
+.ban[aria-pressed="true"] img{filter:grayscale(1) brightness(.5)}
+.ban[aria-pressed="true"]::after{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 45%,var(--red) 45%,var(--red) 55%,transparent 55%)}
+
+/* ---------- tooltip / toast / status ---------- */
+#tip{position:fixed;z-index:50;max-width:280px;pointer-events:none;background:var(--ink);color:var(--cream);border-radius:6px;padding:10px 12px;font-size:.85rem;line-height:1.4;opacity:0;transition:opacity .12s;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#tip.on{opacity:1}
+#tip b{display:block;font-size:.95rem}
+#tip .c{color:var(--gold);font-weight:800}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:60;background:var(--ink);color:var(--cream);font-weight:800;padding:12px 20px;border-radius:999px;opacity:0;transition:opacity .2s,transform .2s var(--ease-out);pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.status{text-align:center;color:var(--muted);font-size:.85rem;font-weight:600;padding:12px 0}
+.status .btn{margin-left:8px}
+footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--gutter) 40px;max-width:760px;margin:0 auto;opacity:.8}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .t-cols{grid-template-columns:1fr 1fr}
+  .t-cols > :first-child{grid-column:1/-1}
+  .team-form{grid-template-columns:repeat(3,1fr)}
+  .team-grid{grid-template-columns:repeat(3,1fr)}
+  .items{grid-template-columns:repeat(3,1fr)}
+  .hrow{grid-template-columns:48px 1fr auto}
+  .hrow .mini-items,.hrow-build{display:none}
+}
+@media (max-width:680px){
+  :root{--tile-w:88px}
+  header.top{gap:8px}
+  .tabs{order:3;margin-left:0;width:100%}
+  .tab{flex:1;padding:10px 4px}
+  .head-actions{margin-left:auto}
+  .intro{padding:20px 0 20px}
+  .wheels{grid-template-columns:1fr;gap:36px}
+  .casino{height:180px}
+  .tile{height:146px}.tile img{height:110px}
+  .t-top{grid-template-columns:1fr;padding:18px;gap:18px}
+  .t-art{aspect-ratio:16/10}
+  .t-art img{object-position:50% 18%}
+  .stamp{top:-6px;font-size:1.2rem}
+  .facts{grid-template-columns:repeat(3,auto);gap:4px 20px}
+  .facts dd{font-size:1.1rem}
+  .perf{margin:0 18px}
+  .perf::before{left:-32px}.perf::after{right:-32px}
+  .t-sec{padding:22px 18px}
+  .t-cols{grid-template-columns:1fr;padding:22px 18px 26px;gap:26px}
+  .runes{flex-direction:column}
+  .keystone{flex-direction:row;width:auto;text-align:left}
+  .panel-paper{padding:18px}
+  .team-form{grid-template-columns:1fr 1fr}
+  .team-grid{grid-template-columns:1fr 1fr;gap:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="wordmark" aria-label="TrollPicks plus">TROLL<b>PICKS</b>+</div>
+    <nav class="tabs" role="tablist" aria-label="Modes">
+      <button class="tab" role="tab" aria-selected="true" data-view="solo">Solo</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="team">Équipe</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="history">Historique</button>
+    </nav>
+    <div class="head-actions">
+      <button class="icon-btn" id="soundBtn" aria-pressed="true" aria-label="Son">
+        <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+        <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Réglages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+  <!-- =============== SOLO =============== -->
+  <section class="view" id="view-solo" role="tabpanel">
+    <div class="intro">
+      <h1>Faites vos jeux, la faille paiera</h1>
+      <p>Un champion, une lane, un build. Le croupier sort un vrai build cohérent, avec les objets à adapter selon la game.</p>
+    </div>
+
+    <div class="row-head">
+      <span class="label">Ta victime</span>
+      <span class="pick-chip" id="chipChamp">Pas encore tirée</span>
+    </div>
+    <div class="casino" id="casino">
+      <div class="casino-track" id="casinoTrack"></div>
+      <div class="casino-frame"></div>
+    </div>
+
+    <div class="wheels">
+      <div class="wheel-card">
+        <div class="row-head"><span class="label">Ta lane</span><span class="pick-chip" id="chipRole">—</span></div>
+        <div class="wheel-wrap"><div class="wheel-pointer"></div><canvas id="roleWheel" width="660" height="660"></canvas><div class="wheel-hub"></div></div>
+      </div>
+      <div class="wheel-card">
+        <div class="row-head"><span class="label">Ton build</span><span class="pick-chip" id="chipBuild">—</span></div>
+        <div class="wheel-wrap"><div class="wheel-pointer"></div><canvas id="buildWheel" width="660" height="660"></canvas><div class="wheel-hub"></div></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-chip" id="spinAll" disabled>Chargement…</button>
+      <div class="sub">
+        <button class="btn" id="spinChamp" disabled>Champion seul</button>
+        <button class="btn" id="spinRole" disabled>Lane seule</button>
+        <button class="btn" id="spinBuild" disabled>Build seul</button>
+      </div>
+    </div>
+
+    <div class="ticket-wrap" id="result" hidden aria-live="polite"></div>
+  </section>
+
+  <!-- =============== TEAM =============== -->
+  <section class="view" id="view-team" role="tabpanel" hidden>
+    <div class="intro">
+      <h1>Toute l'équipe passe à la table</h1>
+      <p>Cinq joueurs, cinq lanes différentes, cinq champions uniques. Personne n'est épargné.</p>
+    </div>
+    <div class="panel-paper">
+      <span class="label" style="color:var(--ink)">Les joueurs</span>
+      <div class="team-form" id="teamForm"></div>
+    </div>
+    <div class="team-actions">
+      <button class="btn-chip" id="spinTeam" disabled>Distribuer</button>
+      <button class="btn" id="copyTeam" hidden>Copier le récap</button>
+    </div>
+    <div class="team-grid" id="teamGrid"></div>
+  </section>
+
+  <!-- =============== HISTORY =============== -->
+  <section class="view" id="view-history" role="tabpanel" hidden>
+    <div class="intro">
+      <h1>Le casier judiciaire</h1>
+      <button class="btn" id="clearHist">Vider l'historique</button>
+    </div>
+    <div class="hist-list" id="histList"></div>
+  </section>
+  </main>
+
+  <div class="status" id="status">Connexion à Data Dragon…</div>
+</div>
+
+<footer>
+  TrollPicks+ n'est pas approuvé par Riot Games et ne reflète pas les opinions de Riot Games ou de toute personne
+  officiellement impliquée dans la production ou la gestion de League of Legends. League of Legends et Riot Games
+  sont des marques de Riot Games, Inc. Données et images : Data Dragon.
+</footer>
+
+<!-- =============== SETTINGS =============== -->
+<dialog id="settings" aria-labelledby="setTitle">
+  <div class="dlg-head">
+    <h2 id="setTitle">Règles de la table</h2>
+    <button class="icon-btn" id="closeSettings" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="dlg-body">
+    <div class="set">
+      <h3>Classes de champions</h3>
+      <p class="hint">Seules les classes actives peuvent sortir. Aucune active = toutes.</p>
+      <div class="chips" id="setClasses"></div>
+    </div>
+    <div class="set">
+      <h3>Types de build sur la roue</h3>
+      <p class="hint">Au moins deux types restent actifs.</p>
+      <div class="chips" id="setBuilds"></div>
+    </div>
+    <div class="set">
+      <h3>Vitesse des animations</h3>
+      <div class="chips" id="setSpeed"></div>
+    </div>
+    <div class="set">
+      <h3>Champions bannis <span id="banCount"></span></h3>
+      <p class="hint">Clique sur un champion pour l'exclure du tirage.</p>
+      <div class="ban-tools">
+        <input type="search" id="banSearch" placeholder="Chercher un champion…" aria-label="Chercher un champion">
+        <button class="btn btn-ink" id="banClear">Tout débannir</button>
+      </div>
+      <div class="ban-grid" id="banGrid"></div>
+    </div>
+  </div>
+</dialog>
+
+<div id="tip" role="tooltip"></div>
+<div id="toast" role="status"></div>
+
+<script>
+/* =========================================================
+   CONFIG
+========================================================= */
+const DD = "https://ddragon.leagueoflegends.com";
+
+const ROLES = [
+  { key: "top", label: "Top" },
+  { key: "jungle", label: "Jungle" },
+  { key: "mid", label: "Mid" },
+  { key: "adc", label: "ADC" },
+  { key: "support", label: "Support" }
+];
+
+/* Situations de game pour les objets situationnels. */
+const SITUATIONS = {
+  ap:    "Beaucoup de dégâts magiques en face",
+  ad:    "Beaucoup de dégâts physiques en face",
+  heal:  "Contre les soins (Soraka, Aatrox, Vladimir…)",
+  tanks: "Contre les tanks et les gros PV",
+  burst: "Tu te fais one-shot",
+  cc:    "Trop de contrôles (stuns, roots)"
+};
+
+/* core = 1er item possible ; must = objet indispensable placé ensuite ;
+   items = reste de la liste ; situational = alternatives selon la game.
+   Les IDs absents du patch courant sont retirés au chargement. */
+const BUILDS = {
+  AP_BRUISER: {
+    label: "AP Bruiser", tag: "Fighter", stat: "magic",
+    core: [6653, 4633, 4629, 8010],
+    must: [],
+    items: [3116, 3157, 3102, 3152, 3165, 6657, 3135, 2510],
+    boots: [3020, 3111, 3047],
+    keystones: [8010, 8230, 8437, 8229],
+    secondary: [8400, 8200, 8300],
+    situational: { ap: [3102, 2504, 4401], ad: [3157, 3075], heal: [3165], tanks: [3135, 3137], cc: [3111] }
+  },
+  AP_ASSASSIN: {
+    label: "AP Assassin", tag: "Assassin", stat: "magic",
+    core: [4645, 3152, 6655, 3100],
+    must: [3089],
+    items: [3135, 3157, 4646, 3102, 3137, 4628, 2503],
+    boots: [3020, 3158],
+    keystones: [8112, 8128, 8229, 8369],
+    secondary: [8200, 8300, 8100],
+    situational: { ap: [3102], ad: [3157], heal: [3165], tanks: [3135, 3137], burst: [3157, 3102], cc: [3111] }
+  },
+  AD_BRUISER: {
+    label: "AD Bruiser", tag: "Fighter", stat: "attack",
+    core: [3078, 6610, 3071, 3074],
+    must: [],
+    items: [3053, 3161, 6333, 3748, 3181, 6631, 6692, 3156, 6609],
+    boots: [3047, 3111, 3158],
+    keystones: [8010, 8437, 8230],
+    secondary: [8400, 8000, 8300],
+    situational: { ap: [3156, 3065, 4401], ad: [6333, 3143], heal: [6609], tanks: [3071, 6694], burst: [3053, 6333], cc: [3111, 3053] }
+  },
+  AD_CRIT: {
+    label: "AD Crit", tag: "Marksman", stat: "attack",
+    core: [3032, 6676, 3508, 3095],
+    must: [3031],
+    items: [6675, 3094, 3036, 3033, 3072, 3085, 3046, 3026, 6673],
+    boots: [3006],
+    keystones: [8008, 8005, 8021],
+    secondary: [8100, 8300, 8400],
+    situational: { ap: [3156, 3139], ad: [3026, 6673], heal: [3033], tanks: [3036], burst: [3026, 6673, 3072], cc: [3139, 3111] }
+  },
+  AD_ASSASSIN: {
+    label: "AD Assassin", tag: "Assassin", stat: "attack",
+    core: [6697, 6698, 6699, 3142],
+    must: [],
+    items: [6695, 3814, 6694, 6696, 3179, 2520, 6692],
+    boots: [3158, 3009, 3047],
+    keystones: [8112, 8128, 9923, 8369],
+    secondary: [8000, 8200, 8300],
+    situational: { ap: [3814, 3156], ad: [3026, 6333], heal: [6609], tanks: [6694], burst: [3814, 3026], cc: [3111, 3814] }
+  },
+  TANK: {
+    label: "Tank", tag: "Tank", stat: "defense",
+    core: [3068, 3084, 6662, 2502],
+    must: [],
+    items: [6665, 3075, 3143, 3742, 3083, 8020, 2504, 6664, 3065, 4401, 3110],
+    boots: [3047, 3111],
+    keystones: [8437, 8439, 8465],
+    secondary: [8300, 8000, 8200],
+    situational: { ap: [2504, 4401, 3065, 8020], ad: [3143, 3075, 3110], heal: [3075], tanks: [6665, 3084], cc: [3111, 6665] }
+  },
+  ENCHANTER: {
+    label: "Enchanteur", tag: "Support", stat: "magic",
+    core: [6617, 6620, 2065, 6616],
+    must: [],
+    items: [3107, 3222, 4005, 3504, 3050, 3190],
+    boots: [3158, 3009, 3111],
+    keystones: [8214, 8465, 8351, 8229],
+    secondary: [8400, 8300, 8000],
+    situational: { ap: [3190, 3222], ad: [3190, 3050], heal: [3165], burst: [3190, 3107], cc: [3222, 3111] }
+  },
+  ON_HIT: {
+    label: "On-hit", tag: "Marksman", stat: "attack",
+    core: [3153, 3124, 6672, 3302],
+    must: [],
+    items: [3091, 3087, 6631, 3026, 3156, 3053],
+    boots: [3006, 3111],
+    keystones: [8008, 8005, 8010],
+    secondary: [8100, 8400, 8200],
+    situational: { ap: [3091, 3156], ad: [3026, 6333], heal: [6609, 3033], tanks: [3153, 3302], burst: [3026, 3053], cc: [3111, 3139] }
+  }
+};
+
+/* Objets qui partagent un effet unique (ou qu'il est inutile de cumuler). */
+const ITEM_GROUPS = [
+  [3036, 3033, 6694],                // Pénétration d'armure en %
+  [3053, 3156, 6673],                // Lien vital
+  [3078, 3100, 6662, 3508, 2510],    // Lame enchantée
+  [3074, 3748, 6698, 6631],          // Fendoir (hydres)
+  [3004, 3003, 3119],                // Charge de mana
+  [3102, 3814],                      // Invalidation
+  [3068, 6664],                      // Immolation
+  [3135, 3137],                      // Pénétration magique en %
+  [3165, 3033, 6609, 3075]           // Anti-soins : un seul suffit
+];
+
+const AP_BUILDS = ["AP_BRUISER", "AP_ASSASSIN", "ENCHANTER"];
+function starterFor(role, buildKey) {
+  const ap = AP_BUILDS.includes(buildKey), tank = buildKey === "TANK";
+  switch (role) {
+    case "support": return 3865;
+    case "jungle":
+      if (tank || buildKey === "ENCHANTER") return 1103;
+      if (buildKey.endsWith("ASSASSIN")) return 1102;
+      return 1101;
+    case "top": return tank || buildKey.endsWith("BRUISER") ? (ap ? 1056 : 1054) : (ap ? 1056 : 1055);
+    case "mid": return tank ? 1054 : ap ? rand([1056, 1082]) : rand([1055, 1036]);
+    case "adc": return tank ? 1054 : ap ? 1056 : rand([1055, 1086]);
+  }
+  return 1055;
+}
+const SUPPORT_UPGRADES = {
+  ENCHANTER: [3870, 3876], TANK: [3869, 3876], AD_CRIT: [3877, 3871], ON_HIT: [3877, 3871],
+  AD_BRUISER: [3877, 3869], AD_ASSASSIN: [3871, 3877], AP_ASSASSIN: [3871, 3870], AP_BRUISER: [3871, 3869]
+};
+
+const ROLE_SUMMS = {
+  top:     ["SummonerTeleport", "SummonerDot", "SummonerHaste"],
+  jungle:  ["SummonerSmite"],
+  mid:     ["SummonerDot", "SummonerTeleport", "SummonerBarrier", "SummonerBoost"],
+  adc:     ["SummonerHeal", "SummonerBoost", "SummonerBarrier"],
+  support: ["SummonerDot", "SummonerExhaust", "SummonerHeal"]
+};
+
+const CLASSES = { Fighter: "Combattants", Tank: "Tanks", Mage: "Mages", Assassin: "Assassins", Marksman: "Tireurs", Support: "Supports" };
+const SPEEDS = { slow: { label: "Suspense", f: 1.5 }, normal: { label: "Normale", f: 1 }, fast: { label: "Rapide", f: .35 }, instant: { label: "Instantanée", f: 0 } };
+
+const TROLL = [
+  "Tes mates vont adorer.", "Le lobby n'était pas prêt.", "Le theorycraft a officiellement dépassé les limites.",
+  "Fais confiance au process.", "Ça scale. Probablement.", "Ne montre surtout pas ça à ton coach.",
+  "Le report arrivera après la game.", "Une masterclass est statistiquement possible.", "Riot n'avait probablement pas prévu ça.",
+  "La soloQ vient de prendre des dégâts psychologiques.", "Trust le build.", "C'est légal tant que le Nexus n'explose pas.",
+  "Quelqu'un devait tester.", "La science exige des sacrifices.", "Ton jungler a déjà ouvert le chat.", "Le /ff 15 se prépare en silence."
+];
+const VIABLE = [
+  "Attends… c'est presque viable.", "Ça ressemble dangereusement à un vrai build.",
+  "Le troll a raté son coup : ça peut marcher.", "Même la roue a eu pitié de toi."
+];
+
+/* palette du tapis */
+const RED = "#c8322b", BLACK = "#1c1a19", GREEN = "#1d6b47";
+
+/* =========================================================
+   STATE + STORAGE
+========================================================= */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("tp+:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("tp+:" + k, JSON.stringify(v)); } catch {} }
+};
+
+let V = "";
+let CHAMPS = [], CHAMP_BY_ID = {}, ITEMS = {}, RUNE_TREES = [], RUNE_BY_ID = {}, SUMMS = {};
+const champDetail = {};
+
+const settings = Object.assign({ classes: [], builds: Object.keys(BUILDS), bans: [], speed: "normal", sound: true }, store.get("settings", {}));
+settings.builds = settings.builds.filter(k => BUILDS[k]);
+if (settings.builds.length < 2) settings.builds = Object.keys(BUILDS);
+if (window.matchMedia("(prefers-reduced-motion: reduce)").matches && !store.get("settings", null)) settings.speed = "fast";
+
+let history = store.get("history", []);
+let teamNames = store.get("team", ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4", "Joueur 5"]);
+const solo = { champ: null, role: null, build: null };
+let busy = false;
+let lastTeam = [];
+
+const $ = s => document.querySelector(s);
+const rand = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const speedF = () => SPEEDS[settings.speed]?.f ?? 1;
+const saveSettings = () => store.set("settings", settings);
+const gold = n => n.toLocaleString("fr-FR") + " PO";
+
+const imgChamp = c => `${DD}/cdn/${V}/img/champion/${c.image.full}`;
+const imgCard = c => `${DD}/cdn/img/champion/loading/${c.id}_0.jpg`;
+const imgItem = id => `${DD}/cdn/${V}/img/item/${id}.png`;
+const imgSpell = file => `${DD}/cdn/${V}/img/spell/${file}`;
+const imgRune = r => `${DD}/cdn/img/${r.icon}`;
+
+/* =========================================================
+   SOUND
+========================================================= */
+let actx = null;
+function beep(freq = 900, dur = .03, type = "triangle", vol = .05) {
+  if (!settings.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + dur);
+    o.connect(g).connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + dur);
+  } catch {}
+}
+function chime() { [660, 880, 1320].forEach((f, i) => setTimeout(() => beep(f, .25, "sine", .06), i * 90)); }
+
+/* =========================================================
+   DATA DRAGON
+========================================================= */
+async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new Error(url); return r.json(); }
+
+async function load() {
+  try {
+    const versions = await getJSON(`${DD}/api/versions.json`);
+    V = versions[0];
+    const [champ, item, runes, summ] = await Promise.all([
+      getJSON(`${DD}/cdn/${V}/data/fr_FR/champion.json`),
+      getJSON(`${DD}/cdn/${V}/data/fr_FR/item.json`),
+      getJSON(`${DD}/cdn/${V}/data/fr_FR/runesReforged.json`),
+      getJSON(`${DD}/cdn/${V}/data/fr_FR/summoner.json`)
+    ]);
+    CHAMPS = Object.values(champ.data).sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    CHAMPS.forEach(c => CHAMP_BY_ID[c.id] = c);
+    ITEMS = item.data;
+    RUNE_TREES = runes;
+    runes.forEach(t => t.slots.forEach(s => s.runes.forEach(r => RUNE_BY_ID[r.id] = { ...r, tree: t })));
+    SUMMS = summ.data;
+
+    const ok = id => ITEMS[id] && ITEMS[id].maps?.["11"] !== false;
+    for (const b of Object.values(BUILDS)) {
+      b.core = b.core.filter(ok); b.must = b.must.filter(ok); b.items = b.items.filter(ok);
+      b.boots = b.boots.filter(ok);
+      b.keystones = b.keystones.filter(id => RUNE_BY_ID[id]);
+      for (const k in b.situational) b.situational[k] = b.situational[k].filter(ok);
+    }
+    initAfterLoad();
+    $("#status").textContent = `${CHAMPS.length} champions • patch ${V.split(".").slice(0, 2).join(".")} • Data Dragon`;
+  } catch (e) {
+    console.error(e);
+    $("#status").innerHTML = `Impossible de joindre Data Dragon. Vérifie ta connexion. <button class="btn" onclick="location.reload()">Réessayer</button>`;
+    $("#spinAll").textContent = "Données indisponibles";
+  }
+}
+
+async function getChampDetail(id) {
+  if (champDetail[id]) return champDetail[id];
+  try { const d = await getJSON(`${DD}/cdn/${V}/data/fr_FR/champion/${id}.json`); return champDetail[id] = d.data[id]; }
+  catch { return null; }
+}
+
+/* =========================================================
+   GÉNÉRATION DU BUILD
+========================================================= */
+function eligibleChamps(exclude = []) {
+  const ban = new Set(settings.bans), ex = new Set(exclude);
+  let list = CHAMPS.filter(c => !ban.has(c.id) && !ex.has(c.id) &&
+    (settings.classes.length === 0 || c.tags.some(t => settings.classes.includes(t))));
+  if (!list.length) list = CHAMPS.filter(c => !ex.has(c.id));
+  return list;
+}
+const activeBuilds = () => Object.keys(BUILDS).filter(k => settings.builds.includes(k));
+
+const groupsOf = id => ITEM_GROUPS.map((g, i) => g.includes(id) ? i : -1).filter(i => i >= 0);
+const isMelee = champ => (champ.stats?.attackrange ?? 550) <= 325;
+const usesMana = champ => champ.partype === "Mana";
+const RANGED_ONLY = [3085];
+
+/* L'objet est-il utilisable par CE champion ? */
+function fitsChamp(champ, id) {
+  const it = ITEMS[id]; if (!it) return false;
+  if (!usesMana(champ) && it.tags.includes("Mana")) return false;
+  if (isMelee(champ) && RANGED_ONLY.includes(id)) return false;
+  return true;
+}
+
+function pickItems(champ, buildKey, role) {
+  const b = BUILDS[buildKey];
+  const notes = [];
+  const fits = id => fitsChamp(champ, id);
+
+  const all = [...b.core, ...b.must, ...b.items];
+  if (!usesMana(champ) && all.some(id => ITEMS[id]?.tags.includes("Mana")))
+    notes.push(`${champ.name} n'utilise pas de mana : objets à mana retirés`);
+  if (isMelee(champ) && all.some(id => RANGED_ONLY.includes(id)))
+    notes.push("Corps-à-corps : pas d'objets réservés aux distances");
+
+  const noBoots = champ.id === "Cassiopeia";
+  if (noBoots) notes.push("Cassiopeia ne peut pas acheter de bottes : un objet de plus");
+
+  let support = null;
+  if (role === "support") {
+    support = rand((SUPPORT_UPGRADES[buildKey] || [3869]).filter(id => ITEMS[id])) || null;
+    if (support) notes.push("Lane support : la quête de support occupe un emplacement");
+  }
+  if (role === "jungle") notes.push("Jungle : familier adapté au build et Châtiment");
+
+  const count = (noBoots ? 6 : 5) - (support ? 1 : 0);
+  const chosen = [];
+  const used = new Set();
+  const tryAdd = id => {
+    if (chosen.length >= count || chosen.includes(id) || !fits(id)) return false;
+    const gs = groupsOf(id);
+    if (gs.some(g => used.has(g))) return false;
+    if (chosen.some(c => ITEMS[c].name === ITEMS[id].name)) return false;
+    chosen.push(id); gs.forEach(g => used.add(g));
+    return true;
+  };
+
+  const core = b.core.filter(fits);
+  tryAdd(rand(core.length ? core : all.filter(fits)));
+  b.must.forEach(tryAdd);
+  shuffle([...b.core, ...b.items]).forEach(tryAdd);
+
+  // un tank sans résistance magique, ce n'est pas logique : on remplace le dernier objet
+  if (buildKey === "TANK" && !chosen.some(id => ITEMS[id].tags.includes("SpellBlock"))) {
+    const mr = shuffle(b.items.filter(id => ITEMS[id].tags.includes("SpellBlock") && fits(id)));
+    if (mr.length) {
+      const last = chosen.pop();
+      used.clear(); chosen.forEach(id => groupsOf(id).forEach(g => used.add(g)));
+      if (!mr.some(tryAdd)) { chosen.push(last); groupsOf(last).forEach(g => used.add(g)); }
+    }
+  }
+
+  const starter = starterFor(role, buildKey);
+  return { starter: ITEMS[starter] ? starter : null, support, boots: noBoots ? null : rand(b.boots), items: chosen, notes };
+}
+
+/* Alternatives selon la game : objets adaptés au champion, avec indication si déjà dans le build. */
+function situationalFor(pick) {
+  const champ = CHAMP_BY_ID[pick.champ], b = BUILDS[pick.build];
+  const owned = new Set([...pick.items, pick.boots]);
+  const out = [];
+  for (const [key, ids] of Object.entries(b.situational)) {
+    let list = ids.filter(id => fitsChamp(champ, id));
+    if (key === "cc" && champ.id === "Cassiopeia") list = list.filter(id => !ITEMS[id].tags.includes("Boots"));
+    if (!list.length) continue;
+    out.push({ key, label: SITUATIONS[key], items: list.map(id => ({ id, owned: owned.has(id) })) });
+  }
+  return out;
+}
+
+function pickRunes(buildKey) {
+  const b = BUILDS[buildKey];
+  const key = RUNE_BY_ID[rand(b.keystones)];
+  const tree = key.tree;
+  const minors = [1, 2, 3].map(i => rand(tree.slots[i].runes).id);
+  const secOptions = b.secondary.filter(t => t !== tree.id);
+  const secId = rand(secOptions.length ? secOptions : RUNE_TREES.map(t => t.id).filter(t => t !== tree.id));
+  const secTree = RUNE_TREES.find(t => t.id === secId);
+  const rows = shuffle([1, 2, 3]).slice(0, 2).sort();
+  const sec = rows.map(i => rand(secTree.slots[i].runes).id);
+  return { tree: tree.id, keystone: key.id, minors, secTree: secTree.id, sec };
+}
+function pickSumms(role) { return ["SummonerFlash", rand(ROLE_SUMMS[role].filter(k => SUMMS[k]))]; }
+
+function trollScore(champ, buildKey) {
+  const b = BUILDS[buildKey], info = champ.info || {};
+  let s = 45 + (champ.tags.includes(b.tag) ? -25 : 20);
+  if (b.stat === "magic" && info.magic <= 3) s += 20;
+  if (b.stat === "attack" && info.attack <= 3) s += 20;
+  if (b.stat === "defense" && info.defense <= 4) s += 15;
+  if (b.stat === "magic" && info.magic >= 8) s -= 15;
+  if (b.stat === "attack" && info.attack >= 8) s -= 15;
+  s += Math.round(Math.random() * 16 - 8);
+  return Math.max(4, Math.min(99, s));
+}
+
+function makePick(champ, role, buildKey, player = null) {
+  const score = trollScore(champ, buildKey);
+  return {
+    champ: champ.id, role, build: buildKey, player,
+    ...pickItems(champ, buildKey, role),
+    runes: pickRunes(buildKey), summs: pickSumms(role), skills: shuffle(["Q", "W", "E"]),
+    score, sentence: score < 30 ? rand(VIABLE) : rand(TROLL), ts: Date.now()
+  };
+}
+function addHistory(pick) { history.unshift(pick); history = history.slice(0, 40); store.set("history", history); }
+
+/* =========================================================
+   CASINO (rangée de cartes)
+========================================================= */
+const track = $("#casinoTrack");
+const casino = $("#casino");
+function tileHTML(c) { return `<div class="tile"><img src="${imgCard(c)}" alt="" draggable="false"><span>${esc(c.name)}</span></div>`; }
+function tileMetrics() {
+  const cs = getComputedStyle(document.documentElement);
+  const w = parseFloat(cs.getPropertyValue("--tile-w")) || 104, g = parseFloat(cs.getPropertyValue("--tile-gap")) || 12;
+  return { w, g, step: w + g };
+}
+function xFor(index) { const { w, step } = tileMetrics(); return casino.clientWidth / 2 - (index * step + w / 2); }
+let centerIndex = 7;
+function casinoPreview() {
+  centerIndex = 7;
+  track.innerHTML = shuffle(eligibleChamps()).slice(0, 15).map(tileHTML).join("");
+  track.style.transform = `translateX(${xFor(7)}px)`;
+}
+function spinChampion(winner) {
+  const TOTAL = 60, WIN = 52, pool = eligibleChamps();
+  const tiles = Array.from({ length: TOTAL }, (_, i) => i === WIN ? winner : rand(pool));
+  track.innerHTML = tiles.map(tileHTML).join("");
+  const { step, w } = tileMetrics();
+  const startX = xFor(3), endX = xFor(WIN) + (Math.random() - .5) * w * .7;
+  const dur = 5200 * speedF();
+  return new Promise(resolve => {
+    const finish = () => { centerIndex = WIN; track.style.transform = `translateX(${xFor(WIN)}px)`; resolve(winner); };
+    if (dur <= 0) { finish(); return; }
+    const t0 = performance.now(); let lastIdx = -1;
+    (function frame(t) {
+      const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 5);
+      const x = startX + (endX - startX) * e;
+      track.style.transform = `translateX(${x}px)`;
+      const idx = Math.floor((casino.clientWidth / 2 - x) / step);
+      if (idx !== lastIdx) { lastIdx = idx; beep(1100, .02); }
+      if (p < 1) requestAnimationFrame(frame);
+      else { track.style.transition = "transform .35s cubic-bezier(.22,1,.36,1)"; finish(); setTimeout(() => track.style.transition = "", 380); }
+    })(t0);
+  });
+}
+
+/* =========================================================
+   ROUES (roulette)
+========================================================= */
+class Wheel {
+  constructor(canvas) { this.c = canvas; this.ctx = canvas.getContext("2d"); this.rot = 0; this.segs = []; }
+  setSegments(segs) { this.segs = segs; this.draw(); }
+  draw() {
+    const { ctx, c, segs } = this;
+    const S = c.width, cx = S / 2, cy = S / 2;
+    const RIM = S / 2 - 4, R = RIM - 34;
+    const seg = Math.PI * 2 / segs.length;
+    ctx.clearRect(0, 0, S, S);
+    ctx.save(); ctx.translate(cx, cy);
+    // jante bois
+    const wood = ctx.createRadialGradient(0, 0, R, 0, 0, RIM);
+    wood.addColorStop(0, "#2e1c0d"); wood.addColorStop(.5, "#6b4724"); wood.addColorStop(1, "#3a2614");
+    ctx.beginPath(); ctx.arc(0, 0, RIM, 0, Math.PI * 2); ctx.fillStyle = wood; ctx.fill();
+    // diamants dorés
+    for (let i = 0; i < segs.length * 2; i++) {
+      const a = -Math.PI / 2 + i * seg / 2;
+      ctx.save(); ctx.rotate(a); ctx.translate(R + 17, 0); ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = i % 2 ? "#b88a33" : "#f0cf7a"; ctx.fillRect(-5, -5, 10, 10); ctx.restore();
+    }
+    segs.forEach((s, i) => {
+      const a0 = -Math.PI / 2 + i * seg, a1 = a0 + seg;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, R, a0, a1); ctx.closePath();
+      ctx.fillStyle = s.color; ctx.fill();
+      ctx.strokeStyle = "#e2b24a"; ctx.lineWidth = 3; ctx.stroke();
+      ctx.save(); ctx.rotate(a0 + seg / 2);
+      ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillStyle = "#f3ecdc";
+      const avail = R - 20 - R * .42;
+      let fs = segs.length > 6 ? 30 : 36;
+      ctx.font = `400 ${fs}px Bungee, Impact, sans-serif`;
+      const w = ctx.measureText(s.label.toUpperCase()).width;
+      if (w > avail) { fs = Math.floor(fs * avail / w); ctx.font = `400 ${fs}px Bungee, Impact, sans-serif`; }
+      ctx.fillText(s.label.toUpperCase(), R - 20, 2);
+      ctx.restore();
+    });
+    // cuvette intérieure
+    const inner = ctx.createRadialGradient(0, 0, 0, 0, 0, R * .42);
+    inner.addColorStop(0, "#5b3d1f"); inner.addColorStop(1, "#2e1c0d");
+    ctx.beginPath(); ctx.arc(0, 0, R * .36, 0, Math.PI * 2); ctx.fillStyle = inner; ctx.fill();
+    ctx.strokeStyle = "#e2b24a"; ctx.lineWidth = 3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.strokeStyle = "#e2b24a"; ctx.lineWidth = 4; ctx.stroke();
+    ctx.restore();
+  }
+  spinTo(index) {
+    const n = this.segs.length, seg = Math.PI * 2 / n, TWO = Math.PI * 2;
+    const center = (index + .5) * seg + (Math.random() - .5) * seg * .7;
+    const cur = ((this.rot % TWO) + TWO) % TWO;
+    const target = ((TWO - center) % TWO + TWO) % TWO;
+    let delta = target - cur; if (delta < 0) delta += TWO;
+    const dur = 4200 * speedF();
+    const from = this.rot, to = this.rot + delta + TWO * (dur ? 5 : 0);
+    return new Promise(resolve => {
+      if (dur <= 0) { this.rot = to; this.apply(); resolve(index); return; }
+      const t0 = performance.now(); let lastSeg = -1;
+      const frame = t => {
+        const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+        this.rot = from + (to - from) * e; this.apply();
+        const s = Math.floor((((-this.rot) % TWO + TWO) % TWO) / seg);
+        if (s !== lastSeg) { lastSeg = s; beep(700, .025, "square", .025); }
+        if (p < 1) requestAnimationFrame(frame); else resolve(index);
+      };
+      requestAnimationFrame(frame);
+    });
+  }
+  apply() { this.c.style.transform = `rotate(${this.rot}rad)`; }
+}
+function rouletteColors(n) {
+  const cols = Array.from({ length: n }, (_, i) => i % 2 ? BLACK : RED);
+  if (n % 2) cols[n - 1] = GREEN;
+  return cols;
+}
+const roleWheel = new Wheel($("#roleWheel"));
+const buildWheel = new Wheel($("#buildWheel"));
+function refreshBuildWheel() {
+  const keys = activeBuilds(), cols = rouletteColors(keys.length);
+  buildWheel.setSegments(keys.map((k, i) => ({ label: BUILDS[k].label, color: cols[i], key: k })));
+}
+
+/* =========================================================
+   SOLO
+========================================================= */
+function setBusy(v) {
+  busy = v;
+  ["#spinAll", "#spinChamp", "#spinRole", "#spinBuild", "#spinTeam"].forEach(s => $(s).disabled = v);
+  document.querySelectorAll("#result .btn, #result .btn-chip").forEach(b => b.disabled = v);
+}
+async function doChamp() {
+  const winner = rand(eligibleChamps());
+  $("#chipChamp").textContent = "…";
+  await spinChampion(winner);
+  solo.champ = winner;
+  $("#chipChamp").innerHTML = `<strong>${esc(winner.name)}</strong>`;
+  beep(1400, .08, "sine", .05);
+}
+async function doRole() {
+  $("#chipRole").textContent = "…";
+  const i = Math.floor(Math.random() * ROLES.length);
+  await roleWheel.spinTo(i);
+  solo.role = ROLES[i].key;
+  $("#chipRole").innerHTML = `<strong>${ROLES[i].label}</strong>`;
+}
+async function doBuild() {
+  $("#chipBuild").textContent = "…";
+  const segs = buildWheel.segs, i = Math.floor(Math.random() * segs.length);
+  await buildWheel.spinTo(i);
+  solo.build = segs[i].key;
+  $("#chipBuild").innerHTML = `<strong>${BUILDS[solo.build].label}</strong>`;
+}
+async function runSolo(which) {
+  if (busy) return;
+  setBusy(true);
+  try {
+    if (which === "all") { $("#result").hidden = true; await doChamp(); await Promise.all([doRole(), doBuild()]); }
+    else if (which === "champ") await doChamp();
+    else if (which === "role") await doRole();
+    else if (which === "build") await doBuild();
+    if (solo.champ && solo.role && solo.build) {
+      const pick = makePick(solo.champ, solo.role, solo.build);
+      addHistory(pick); chime();
+      await renderResult(pick);
+    }
+  } finally { setBusy(false); }
+}
+
+/* =========================================================
+   RENDU DU TICKET
+========================================================= */
+function itemTip(id) {
+  const it = ITEMS[id]; if (!it) return "";
+  const m = it.description.match(/<stats>([\s\S]*?)<\/stats>/);
+  const stats = (m ? m[1] : "").replace(/<br\s*\/?>/g, "\n").replace(/<[^>]+>/g, "").trim();
+  return JSON.stringify({ n: it.name, c: it.gold.total, s: stats });
+}
+function orderedItems(pick) {
+  const list = pick.items.slice();
+  if (pick.boots) list.splice(1, 0, pick.boots);
+  if (pick.support) list.unshift(pick.support);
+  return list;
+}
+function slotLabel(pick, id) {
+  if (id === pick.support) return "Quête support";
+  if (id === pick.boots) return "Bottes";
+  const n = pick.items.indexOf(id);
+  return n === 0 ? "1er objet" : `Objet ${n + 1}`;
+}
+const totalGold = pick => orderedItems(pick).reduce((s, id) => s + (ITEMS[id]?.gold.total || 0), 0);
+function itemHTML(pick, id) {
+  const it = ITEMS[id]; if (!it) return "";
+  const lab = slotLabel(pick, id);
+  return `<button class="item${lab === "1er objet" ? " core" : ""}" data-tip='${esc(itemTip(id))}' aria-label="${esc(it.name)}, ${it.gold.total} PO">
+    <span class="item-step">${lab}</span><img src="${imgItem(id)}" alt="" loading="lazy">
+    <span class="item-name">${esc(it.name)}</span><span class="item-cost">${gold(it.gold.total)}</span></button>`;
+}
+function runeHTML(id) { const r = RUNE_BY_ID[id]; return r ? `<span class="rune"><img src="${imgRune(r)}" alt="">${esc(r.name)}</span>` : ""; }
+
+async function renderResult(pick) {
+  const champ = CHAMP_BY_ID[pick.champ]; if (!champ) return;
+  const detail = await getChampDetail(champ.id);
+  const role = ROLES.find(r => r.key === pick.role), b = BUILDS[pick.build], r = pick.runes;
+  const key = RUNE_BY_ID[r.keystone], tree = RUNE_TREES.find(t => t.id === r.tree), sec = RUNE_TREES.find(t => t.id === r.secTree);
+  const spells = detail ? Object.fromEntries(["Q", "W", "E"].map((k, i) => [k, detail.spells[i]])) : null;
+  const guilty = pick.score >= 30;
+  const situ = situationalFor(pick);
+
+  const el = $("#result");
+  el.innerHTML = `
+  <article class="ticket enter">
+    <div class="t-top">
+      <div class="t-art"><img src="${imgCard(champ)}" alt="${esc(champ.name)}"></div>
+      <div class="t-head">
+        <div class="t-case">${pick.player ? esc(pick.player) + ", dossier" : "Dossier"} n° ${String(pick.ts).slice(-6)}</div>
+        <h2 class="champ-name">${esc(champ.name)}</h2>
+        <div class="champ-title">${esc(champ.title)}</div>
+        <dl class="facts">
+          <div><dt>Lane</dt><dd>${role.label}</dd></div>
+          <div><dt>Build</dt><dd>${b.label}</dd></div>
+          <div><dt>Troll</dt><dd class="hot">${pick.score} %</dd></div>
+        </dl>
+        <p class="sentence">« ${esc(pick.sentence)} »</p>
+        <div class="stamp${guilty ? "" : " green"}">${guilty ? "Coupable" : "Relaxé"}<small>Tribunal de la Faille</small></div>
+      </div>
+    </div>
+    <div class="perf"></div>
+    <section class="t-sec">
+      <h3>Le build, dans l'ordre d'achat <span>${gold(totalGold(pick))}</span></h3>
+      ${pick.starter ? `<div class="starter"><span class="starter-label">Départ</span>
+        ${[pick.starter, 2003].map(id => ITEMS[id] ? `<button class="starter-item" data-tip='${esc(itemTip(id))}'><img src="${imgItem(id)}" alt="">${esc(ITEMS[id].name)}${id === 2003 && pick.role !== "jungle" ? " ×2" : ""}</button>` : "").join("")}
+      </div>` : ""}
+      <div class="items">${orderedItems(pick).map(id => itemHTML(pick, id)).join("")}</div>
+      ${pick.notes?.length ? `<ul class="notes">${pick.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+    </section>
+    ${situ.length ? `<div class="perf"></div>
+    <section class="t-sec">
+      <h3>Selon la game <span>remplace un objet de fin de liste</span></h3>
+      <div class="situ">${situ.map(s => `<div class="situ-card"><p>${esc(s.label)}</p><div class="situ-items">
+        ${s.items.map(x => `<button class="situ-item${x.owned ? " owned" : ""}" data-tip='${esc(itemTip(x.id))}'><img src="${imgItem(x.id)}" alt="">${esc(ITEMS[x.id].name)}${x.owned ? "<br>(déjà pris)" : ""}</button>`).join("")}
+      </div></div>`).join("")}</div>
+    </section>` : ""}
+    <div class="perf"></div>
+    <div class="t-cols">
+      <section>
+        <h3>Runes</h3>
+        <div class="runes">
+          <div class="keystone"><img src="${imgRune(key)}" alt=""><span>${esc(key.name)}</span></div>
+          <div class="rune-rows">
+            <div class="rune-tree"><span class="rune-tree-name">${esc(tree.name)}</span>${r.minors.map(runeHTML).join("")}</div>
+            <div class="rune-tree"><span class="rune-tree-name">${esc(sec.name)}</span>${r.sec.map(runeHTML).join("")}</div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h3>Sorts</h3>
+        <div class="spells">${pick.summs.map(k => SUMMS[k] ? `<div class="spell"><img src="${imgSpell(SUMMS[k].image.full)}" alt=""><span>${esc(SUMMS[k].name)}</span></div>` : "").join("")}</div>
+      </section>
+      <section>
+        <h3>Montée</h3>
+        <div class="skill-order">${pick.skills.join(" › ")}</div>
+        <div class="spells">${spells ? pick.skills.map(k => `<div class="spell skill"><span class="key">${k}</span><img src="${imgSpell(spells[k].image.full)}" alt=""><span>${esc(spells[k].name)}</span></div>`).join("") : ""}</div>
+      </section>
+    </div>
+  </article>
+  <div class="t-actions">
+    <button class="btn-chip" data-act="again">Relancer le désastre</button>
+    <button class="btn" data-act="items">Autres objets, même pick</button>
+    <button class="btn" data-act="copy">Copier le récap</button>
+  </div>`;
+  el.hidden = false;
+  el._pick = pick;
+  el.scrollIntoView({ behavior: speedF() ? "smooth" : "auto", block: "start" });
+}
+
+function recap(pick) {
+  const c = CHAMP_BY_ID[pick.champ], role = ROLES.find(r => r.key === pick.role), r = pick.runes;
+  const situ = situationalFor(pick).map(s => `  ${s.label} : ${s.items.filter(x => !x.owned).map(x => ITEMS[x.id].name).join(" / ") || "déjà dans le build"}`);
+  return [
+    `${pick.player ? pick.player + " — " : ""}${c.name} ${role.label} • ${BUILDS[pick.build].label} (troll ${pick.score}%)`,
+    `Départ : ${pick.starter ? ITEMS[pick.starter]?.name : "—"}`,
+    `Objets : ${orderedItems(pick).map(id => ITEMS[id]?.name).join(", ")}`,
+    `Selon la game :`, ...situ,
+    `Runes : ${RUNE_BY_ID[r.keystone].name} + ${r.minors.map(id => RUNE_BY_ID[id].name).join(", ")} | ${r.sec.map(id => RUNE_BY_ID[id].name).join(", ")}`,
+    `Sorts : ${pick.summs.map(k => SUMMS[k]?.name).join(" + ")} • Max ${pick.skills.join(" > ")}`
+  ].join("\n");
+}
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("Récap copié"); }
+  catch { toast("Copie impossible dans ce navigateur"); }
+}
+let toastT;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 1800); }
+
+$("#result").addEventListener("click", async e => {
+  const act = e.target.closest("[data-act]")?.dataset.act; if (!act || busy) return;
+  const pick = $("#result")._pick;
+  if (act === "again") runSolo("all");
+  if (act === "copy") copy(recap(pick));
+  if (act === "items") {
+    const c = CHAMP_BY_ID[pick.champ];
+    const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build), skills: shuffle(["Q", "W", "E"]), ts: Date.now() };
+    addHistory(np); await renderResult(np);
+  }
+});
+
+/* =========================================================
+   ÉQUIPE
+========================================================= */
+function renderTeamForm() {
+  $("#teamForm").innerHTML = teamNames.map((n, i) => `<div class="field"><label for="tn${i}">Joueur ${i + 1}</label>
+    <input type="text" id="tn${i}" value="${esc(n)}" maxlength="24" autocomplete="off"></div>`).join("");
+}
+$("#teamForm").addEventListener("input", e => {
+  const i = +e.target.id.slice(2);
+  teamNames[i] = e.target.value.trim() || `Joueur ${i + 1}`;
+  store.set("team", teamNames);
+});
+function teamCardHTML(p, i) {
+  const c = CHAMP_BY_ID[p.champ], role = ROLES.find(r => r.key === p.role), key = RUNE_BY_ID[p.runes.keystone];
+  return `<article class="tcard reveal" style="animation-delay:${i * 90}ms">
+    <div class="tcard-img"><img src="${imgCard(c)}" alt="" data-final="${imgCard(c)}"><span class="tcard-role">${role.label}</span></div>
+    <div class="tcard-body">
+      <div class="tcard-player">${esc(p.player)}</div>
+      <div class="tcard-champ">${esc(c.name)}</div>
+      <div class="tcard-build">${BUILDS[p.build].label} • troll ${p.score} %</div>
+      <div class="mini-items">${orderedItems(p).map(id => `<img src="${imgItem(id)}" alt="${esc(ITEMS[id]?.name || "")}" data-tip='${esc(itemTip(id))}' tabindex="0">`).join("")}</div>
+      <div class="mini-row"><img src="${imgRune(key)}" alt="" style="background:var(--ink);border-radius:50%">${p.summs.map(k => `<img src="${imgSpell(SUMMS[k].image.full)}" alt="">`).join("")}<span>${p.skills.join("›")}</span></div>
+      <button class="btn btn-ink" data-team="${i}">Voir le ticket</button>
+    </div>
+  </article>`;
+}
+async function spinTeam() {
+  if (busy) return;
+  setBusy(true);
+  try {
+    const roles = shuffle(ROLES.map(r => r.key)), used = [], builds = activeBuilds();
+    lastTeam = teamNames.map((name, i) => { const c = rand(eligibleChamps(used)); used.push(c.id); return makePick(c, roles[i], rand(builds), name); });
+    lastTeam.slice().reverse().forEach(addHistory);
+    const grid = $("#teamGrid");
+    grid.innerHTML = lastTeam.map(teamCardHTML).join("");
+    const pool = eligibleChamps(), imgs = [...grid.querySelectorAll(".tcard-img img")], f = speedF();
+    if (f > 0) {
+      await Promise.all(imgs.map((img, i) => new Promise(res => {
+        const end = performance.now() + (900 + i * 350) * f;
+        (function tick() {
+          if (performance.now() >= end) { img.src = img.dataset.final; beep(1300, .06, "sine", .04); return res(); }
+          img.src = imgChamp(rand(pool)); beep(900, .015); setTimeout(tick, 80);
+        })();
+      })));
+    }
+    chime();
+    $("#copyTeam").hidden = false;
+  } finally { setBusy(false); }
+}
+$("#spinTeam").addEventListener("click", spinTeam);
+$("#copyTeam").addEventListener("click", () => copy(lastTeam.map(recap).join("\n\n")));
+$("#teamGrid").addEventListener("click", e => {
+  const i = e.target.closest("[data-team]")?.dataset.team; if (i == null) return;
+  showView("solo"); renderResult(lastTeam[+i]);
+});
+
+/* =========================================================
+   HISTORIQUE
+========================================================= */
+function renderHistory() {
+  const list = $("#histList");
+  if (!history.length) { list.innerHTML = `<div class="empty">Casier vierge pour l'instant. Lance la roue en Solo ou en Équipe.</div>`; $("#clearHist").hidden = true; return; }
+  $("#clearHist").hidden = false;
+  list.innerHTML = history.map((p, i) => {
+    const c = CHAMP_BY_ID[p.champ]; if (!c || !BUILDS[p.build]) return "";
+    const role = ROLES.find(r => r.key === p.role), d = new Date(p.ts);
+    return `<div class="hrow">
+      <img src="${imgChamp(c)}" alt="">
+      <div><div class="hrow-name">${esc(c.name)}</div><div class="hrow-meta">${p.player ? esc(p.player) + ", " : ""}${role.label}, le ${d.toLocaleDateString("fr-FR")} à ${d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</div></div>
+      <div class="hrow-build">${BUILDS[p.build].label}</div>
+      <div class="mini-items">${orderedItems(p).map(id => `<img src="${imgItem(id)}" alt="" loading="lazy">`).join("")}</div>
+      <button class="btn btn-ink" data-hist="${i}">Revoir</button>
+    </div>`;
+  }).join("");
+}
+$("#histList").addEventListener("click", e => {
+  const i = e.target.closest("[data-hist]")?.dataset.hist; if (i == null) return;
+  showView("solo"); renderResult(history[+i]);
+});
+$("#clearHist").addEventListener("click", () => {
+  if (!confirm("Effacer tout l'historique ?")) return;
+  history = []; store.set("history", history); renderHistory();
+});
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+function showView(v) {
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
+  document.querySelectorAll(".view").forEach(s => s.hidden = s.id !== "view-" + v);
+  if (v === "history") renderHistory();
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
+
+/* =========================================================
+   RÉGLAGES
+========================================================= */
+const dlg = $("#settings");
+const chip = (label, pressed, data) => `<button class="chip" aria-pressed="${pressed}" ${data}>${esc(label)}</button>`;
+function renderSettings() {
+  $("#setClasses").innerHTML = Object.entries(CLASSES).map(([k, l]) => chip(l, settings.classes.includes(k), `data-class="${k}"`)).join("");
+  $("#setBuilds").innerHTML = Object.entries(BUILDS).map(([k, b]) => chip(b.label, settings.builds.includes(k), `data-build="${k}"`)).join("");
+  $("#setSpeed").innerHTML = Object.entries(SPEEDS).map(([k, s]) => chip(s.label, settings.speed === k, `data-speed="${k}"`)).join("");
+  renderBans();
+}
+function renderBans() {
+  const q = $("#banSearch").value.trim().toLowerCase(), ban = new Set(settings.bans);
+  $("#banGrid").innerHTML = CHAMPS.filter(c => !q || c.name.toLowerCase().includes(q)).map(c =>
+    `<button class="ban" aria-pressed="${ban.has(c.id)}" data-ban="${c.id}" title="${esc(c.name)}" aria-label="${esc(c.name)}"><img src="${imgChamp(c)}" alt="" loading="lazy"></button>`).join("");
+  $("#banCount").textContent = settings.bans.length ? `(${settings.bans.length})` : "";
+}
+dlg.addEventListener("click", e => {
+  if (e.target === dlg) { dlg.close(); return; }
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.class) {
+    const k = t.dataset.class;
+    settings.classes = settings.classes.includes(k) ? settings.classes.filter(x => x !== k) : [...settings.classes, k];
+    t.setAttribute("aria-pressed", settings.classes.includes(k));
+  }
+  if (t.dataset.build) {
+    const k = t.dataset.build;
+    if (settings.builds.includes(k)) {
+      if (settings.builds.length <= 2) { toast("Garde au moins deux types de build"); return; }
+      settings.builds = settings.builds.filter(x => x !== k);
+    } else settings.builds = [...settings.builds, k];
+    t.setAttribute("aria-pressed", settings.builds.includes(k));
+    refreshBuildWheel(); solo.build = null; $("#chipBuild").textContent = "—";
+  }
+  if (t.dataset.speed) { settings.speed = t.dataset.speed; renderSettings(); }
+  if (t.dataset.ban) {
+    const k = t.dataset.ban;
+    settings.bans = settings.bans.includes(k) ? settings.bans.filter(x => x !== k) : [...settings.bans, k];
+    t.setAttribute("aria-pressed", settings.bans.includes(k));
+    $("#banCount").textContent = settings.bans.length ? `(${settings.bans.length})` : "";
+  }
+  saveSettings();
+});
+$("#banSearch").addEventListener("input", renderBans);
+$("#banClear").addEventListener("click", () => { settings.bans = []; saveSettings(); renderBans(); });
+$("#settingsBtn").addEventListener("click", () => { renderSettings(); dlg.showModal(); });
+$("#closeSettings").addEventListener("click", () => dlg.close());
+dlg.addEventListener("close", () => { if (!busy) casinoPreview(); });
+
+const soundBtn = $("#soundBtn");
+soundBtn.setAttribute("aria-pressed", settings.sound);
+soundBtn.addEventListener("click", () => {
+  settings.sound = !settings.sound; saveSettings();
+  soundBtn.setAttribute("aria-pressed", settings.sound);
+  if (settings.sound) beep(1000, .05);
+});
+
+/* =========================================================
+   TOOLTIP OBJETS
+========================================================= */
+const tip = $("#tip");
+function showTip(el) {
+  try {
+    const d = JSON.parse(el.dataset.tip);
+    tip.innerHTML = `<b>${esc(d.n)}</b><span class="c">${gold(d.c)}</span><div>${esc(d.s).replace(/\n/g, "<br>")}</div>`;
+    const r = el.getBoundingClientRect();
+    tip.classList.add("on");
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let x = r.left + r.width / 2 - tw / 2, y = r.top - th - 10;
+    if (y < 8) y = r.bottom + 10;
+    x = Math.max(8, Math.min(innerWidth - tw - 8, x));
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  } catch {}
+}
+const hideTip = () => tip.classList.remove("on");
+document.addEventListener("pointerover", e => { const el = e.target.closest("[data-tip]"); el ? showTip(el) : hideTip(); });
+document.addEventListener("focusin", e => { const el = e.target.closest("[data-tip]"); el ? showTip(el) : hideTip(); });
+document.addEventListener("scroll", hideTip, { passive: true });
+
+/* =========================================================
+   INIT
+========================================================= */
+function initAfterLoad() {
+  const cols = rouletteColors(ROLES.length);
+  roleWheel.setSegments(ROLES.map((r, i) => ({ label: r.label, color: cols[i], key: r.key })));
+  refreshBuildWheel();
+  casinoPreview();
+  $("#spinAll").textContent = "Tout tirer";
+  setBusy(false);
+  renderTeamForm();
+}
+$("#spinAll").addEventListener("click", () => runSolo("all"));
+$("#spinChamp").addEventListener("click", () => runSolo("champ"));
+$("#spinRole").addEventListener("click", () => runSolo("role"));
+$("#spinBuild").addEventListener("click", () => runSolo("build"));
+addEventListener("resize", () => { if (!busy) track.style.transform = `translateX(${xFor(centerIndex)}px)`; });
+document.fonts?.ready.then(() => { if (roleWheel.segs.length) { roleWheel.draw(); buildWheel.draw(); } });
+
+load();
+</script>
+</body>
+</html>
