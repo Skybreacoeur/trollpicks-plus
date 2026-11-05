@@ -317,8 +317,65 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
   .team-form{grid-template-columns:1fr 1fr}
   .team-grid{grid-template-columns:1fr 1fr;gap:12px}
 }
+
+/* ---------- verdict, navigation du ticket, équipe ---------- */
+.verdict{display:flex;flex-wrap:wrap;gap:6px;margin:-12px 0 18px}
+.verdict span{font-size:.82rem;font-weight:800;padding:3px 10px;border-radius:999px;background:#dcebdc;color:#1f5c3a}
+.verdict span.bad{background:#f5d9d3;color:var(--red-deep)}
+.verdict span.mid{background:var(--paper-2);color:var(--ink-2)}
+.t-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.t-nav .btn{padding:9px 16px;font-size:.92rem}
+.t-nav .spacer{flex:1}
+.t-nav [data-empty]{visibility:hidden}
+
+.team-head{display:flex;justify-content:space-between;align-items:center;gap:12px 20px;flex-wrap:wrap}
+.team-head .hint{color:var(--ink-2);font-size:.92rem;font-weight:500;width:100%;margin-top:-4px}
+.size-pick{display:flex;align-items:center;gap:6px;font-weight:800;color:var(--ink-2);font-size:.9rem}
+.size-pick button{width:40px;height:40px;border-radius:50%;font-family:var(--display);font-size:1rem;color:var(--ink);
+  box-shadow:inset 0 0 0 2px var(--paper-line);transition:background-color .15s ease,color .15s ease,box-shadow .15s ease}
+.size-pick button[aria-checked="true"]{background:var(--red);color:var(--cream);box-shadow:0 3px 0 var(--red-deep)}
+.team-form{grid-template-columns:repeat(var(--n,5),1fr)}
+.role-pick{margin-top:8px}
+.role-pick select{width:100%;appearance:none;-webkit-appearance:none;font:inherit;font-weight:700;font-size:.9rem;color:var(--ink-2);
+  padding:8px 30px 8px 12px;border-radius:6px;border:2px solid var(--paper-line);cursor:pointer;
+  background:#fffaf0 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236a6053' stroke-width='2'/></svg>") no-repeat right 10px center;
+  transition:background-color .15s ease,color .15s ease,border-color .15s ease}
+.role-pick select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.role-pick select.locked{background-color:var(--ink);border-color:var(--ink);color:var(--cream);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23f3ecdc' stroke-width='2'/></svg>")}
+.team-grid{grid-template-columns:repeat(var(--n,5),minmax(0,220px));justify-content:center}
+.tcard{position:relative}
+.tcard-role .lock{margin-left:4px;opacity:.8}
+.tcard.focus::after{content:"";position:absolute;inset:-5px;border:3px solid var(--gold);border-radius:12px;pointer-events:none;animation:ring 1.4s var(--ease-out) both}
+@keyframes ring{0%{opacity:0;transform:scale(1.04)}20%{opacity:1;transform:scale(1)}70%{opacity:1}100%{opacity:0}}
+@media (max-width:980px){
+  .team-form{grid-template-columns:repeat(3,1fr)}
+  .team-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+}
+@media (max-width:680px){
+  .team-form{grid-template-columns:1fr 1fr}
+  .team-grid{grid-template-columns:1fr 1fr}
+  .t-nav .btn{padding:8px 12px;font-size:.85rem}
+}
+
+/* ---------- mouvement ---------- */
+/* changement d'onglet : simple fondu court (action fréquente) */
+.view{transition:opacity .16s var(--ease-out),transform .16s var(--ease-out)}
+@starting-style{.view{opacity:0;transform:translateY(6px)}}
+/* objets du ticket : distribués un par un après l'arrivée du ticket */
+.ticket.enter .item{animation:pop .3s var(--ease-out) both;animation-delay:calc(260ms + var(--i,0) * 50ms)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+
+/* réduire les animations : on garde les fondus, on retire les déplacements */
 @media (prefers-reduced-motion:reduce){
-  *{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
+  @keyframes deal{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0}to{opacity:1}}
+  @keyframes thud{from{opacity:0}to{opacity:.9}}
+  @keyframes ring{0%,100%{opacity:0}25%,70%{opacity:1}}
+  .view{transition:opacity .16s ease}
+  @starting-style{.view{opacity:0;transform:none}}
+  .btn:active:not(:disabled),.btn-chip:active:not(:disabled){transform:none}
+  #toast,#toast.on{transform:translate(-50%,0);transition:opacity .2s ease}
 }
 </style>
 </head>
@@ -387,10 +444,20 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
   <section class="view" id="view-team" role="tabpanel" hidden>
     <div class="intro">
       <h1>Toute l'équipe passe à la table</h1>
-      <p>Cinq joueurs, cinq lanes différentes, cinq champions uniques. Personne n'est épargné.</p>
+      <p>De 2 à 5 joueurs, chacun sa lane et son champion. Personne n'est épargné.</p>
     </div>
     <div class="panel-paper">
-      <span class="label" style="color:var(--ink)">Les joueurs</span>
+      <div class="team-head">
+        <span class="label" style="color:var(--ink)">Les joueurs</span>
+        <div class="size-pick" role="radiogroup" aria-label="Nombre de joueurs" id="teamSize">
+          <span>Joueurs</span>
+          <button role="radio" aria-checked="false" data-size="2">2</button>
+          <button role="radio" aria-checked="false" data-size="3">3</button>
+          <button role="radio" aria-checked="false" data-size="4">4</button>
+          <button role="radio" aria-checked="false" data-size="5">5</button>
+        </div>
+        <p class="hint">Choisis un rôle pour le verrouiller. Sinon, la roue décide.</p>
+      </div>
       <div class="team-form" id="teamForm"></div>
     </div>
     <div class="team-actions">
@@ -609,6 +676,115 @@ const ROLE_SUMMS = {
   support: ["SummonerDot", "SummonerExhaust", "SummonerHeal"]
 };
 
+/* Builds du moment relevés sur OP.GG (patch 16.22) pour les champions les plus joués.
+   core = les 3 premiers objets dans l'ordre ; items = objets 4 à 6 ; utilisé quand le build tiré est le leur. */
+const META_PATCH = "16.22";
+const CHAMP_META = {
+  Aatrox: { role: "top", build: "AD_BRUISER", core: [6692,6610,6333], items: [3053,3156,2517,3026,3065,3742], boots: [3047,3111], keystone: 8010 },
+  Darius: { role: "top", build: "AD_BRUISER", core: [3142,3742,6333], items: [4401,3053,3143,3026,6665], boots: [3047,3111], keystone: 8010 },
+  Garen: { role: "top", build: "AD_BRUISER", core: [6631,3046,3033], items: [3742,3031,4401,3053,3142,3026], boots: [3006,3009], keystone: 8010 },
+  Sett: { role: "top", build: "AD_BRUISER", core: [6631,3071,2501], items: [3053,3161,3083,3742,3181], boots: [3047,3111], keystone: 8010 },
+  Mordekaiser: { role: "top", build: "AP_BRUISER", core: [3116,4633,6653], items: [3065,3075,3157,6665,3073,4629], boots: [3047,3111], keystone: 8010 },
+  Malphite: { role: "top", build: "TANK", core: [3068,3075,3110], items: [6665,3143,2504,3157], boots: [3047,3111], keystone: 8229 },
+  Jax: { role: "top", build: "AD_BRUISER", core: [3078,6610,3157], items: [6333,3053,3026,3110,3742], boots: [3047,3111], keystone: 8008 },
+  Fiora: { role: "top", build: "AD_BRUISER", core: [3074,3078,6333], items: [2517,3156,3026,3181], boots: [3047,3111], keystone: 8005 },
+  Camille: { role: "top", build: "AD_BRUISER", core: [3078,3074,6333], items: [3053,3026,3161,2501], boots: [3047,3111], keystone: 8437 },
+  Riven: { role: "top", build: "AD_BRUISER", core: [6696,2517,6333], items: [3156,3036,3026,6610,6695], boots: [3158,3047], keystone: 8010 },
+  LeeSin: { role: "jungle", build: "AD_BRUISER", core: [6692,3071,6333], items: [3026,3156,3053], boots: [3047,3111], keystone: 8010 },
+  Kayn: { role: "jungle", build: "AD_ASSASSIN", core: [6699,3071,6333], items: [3814,6694,3026,3142], boots: [3158,3047], keystone: 8128 },
+  Viego: { role: "jungle", build: "AD_CRIT", core: [6672,6676,6673], items: [3036,3031,3026,6333], boots: [3047,3111], keystone: 8010 },
+  Khazix: { role: "jungle", build: "AD_ASSASSIN", core: [3179,6699,2520], items: [6694,3814,6695,3026,3142], boots: [3158,3111], keystone: 8369 },
+  Graves: { role: "jungle", build: "AD_CRIT", core: [6697,6676,3036], items: [6673,3031,3026,3072], boots: [3047,3111], keystone: 8128 },
+  MasterYi: { role: "jungle", build: "AD_CRIT", core: [6672,6676,3036], items: [6333,3031,3026,6673,3073], boots: [3006,3111], keystone: 9923 },
+  Vi: { role: "jungle", build: "AD_BRUISER", core: [3078,3071,6333], items: [3026,3053,3142,6673], boots: [3047,3111], keystone: 8010 },
+  Warwick: { role: "jungle", build: "AD_BRUISER", core: [6631,3153,6333], items: [3065,3075,3053,3026], boots: [3047,3111], keystone: 8008 },
+  Amumu: { role: "jungle", build: "TANK", core: [6653,3068,8020], items: [6665,3075,3143,2504,4401], boots: [3047,3111], keystone: 8010 },
+  Nocturne: { role: "jungle", build: "AD_ASSASSIN", core: [6698,6696,6699], items: [3026,3036,6333,3073], boots: [3047,3111], keystone: 9923 },
+  Ahri: { role: "mid", build: "AP_ASSASSIN", core: [3118,4645,3157], items: [3089,3135,4646,4629], boots: [3020,3158], keystone: 8112 },
+  Yasuo: { role: "mid", build: "AD_CRIT", core: [6673,3031,6333], items: [3026,3036,3072,3091,3046], boots: [3006,3111], keystone: 8008 },
+  Yone: { role: "mid", build: "AD_CRIT", core: [6673,3031,6333], items: [3026,3033,3091,3046], boots: [3006,3111], keystone: 8008 },
+  Sylas: { role: "mid", build: "AP_BRUISER", core: [3152,4633,3157], items: [3089,4645,3135,3102,3100], boots: [3020,3158], keystone: 8010 },
+  Zed: { role: "mid", build: "AD_ASSASSIN", core: [6699,2520,3036], items: [3814,6694,2517,6695,3142,3026], boots: [3158,3111], keystone: 8369 },
+  Katarina: { role: "mid", build: "AP_ASSASSIN", core: [3100,4645,3157], items: [3089,6333,3135,4646,3115], boots: [3020,3111], keystone: 8112 },
+  Lux: { role: "mid", build: "AP_ASSASSIN", core: [6655,4646,4645], items: [3089,3157,3135,3102], boots: [3020,3158], keystone: 8229 },
+  Syndra: { role: "mid", build: "AP_ASSASSIN", core: [6655,4645,3089], items: [3157,3135,4629,3152], boots: [3020,3158], keystone: 8229 },
+  Akali: { role: "mid", build: "AP_ASSASSIN", core: [3146,4645,3157], items: [3089,3135,3100,4646], boots: [3020,3111], keystone: 8112 },
+  Viktor: { role: "mid", build: "AP_ASSASSIN", core: [2503,3100,3157], items: [3089,3135], boots: [3020,3158], keystone: 8992 },
+  Jinx: { role: "adc", build: "AD_CRIT", core: [2523,3085,3031], items: [3036,3033,3026,3072,3139], boots: [3006,3008], keystone: 8008 },
+  Kaisa: { role: "adc", build: "ON_HIT", core: [6672,3124,3302], items: [3157,3115,3089,3026], boots: [3006,3008], keystone: 8008 },
+  Ezreal: { role: "adc", build: "AD_BRUISER", core: [3004,3078,3161], items: [6694,2517,3110,3026,3156], boots: [3158,3008], keystone: 8008 },
+  Caitlyn: { role: "adc", build: "AD_CRIT", core: [2523,3031,3036], items: [3094,3033,3026,3072,3139], boots: [3006,3009], keystone: 8008 },
+  Ashe: { role: "adc", build: "AD_CRIT", core: [2523,3046,3031], items: [3036,3033,3026,3072,3085], boots: [3006,3009], keystone: 8008 },
+  MissFortune: { role: "adc", build: "AD_CRIT", core: [3072,6676,3031], items: [3036,3033,3094,3026], boots: [3009,3006], keystone: 8005 },
+  Vayne: { role: "adc", build: "ON_HIT", core: [3153,3124,3302], items: [6665,3073,3031,3139,3026], boots: [3006,3008], keystone: 8008 },
+  Jhin: { role: "adc", build: "AD_CRIT", core: [6697,3046,3031], items: [3036,3094,3026,3072,3095], boots: [3009,3047], keystone: 8021 },
+  Lucian: { role: "adc", build: "AD_CRIT", core: [3508,6675,3031], items: [3036,3033,3026,3072,3156], boots: [3008,3006], keystone: 8005 },
+  Samira: { role: "adc", build: "AD_CRIT", core: [6676,3031,3036], items: [6673,3072,3026,3139], boots: [3008,3047], keystone: 8010 },
+  Thresh: { role: "support", build: "TANK", core: [3190,3109,3050], items: [3075,2524,3110,2525], boots: [3009,3158], keystone: 8439 },
+  Lulu: { role: "support", build: "ENCHANTER", core: [3504,6617,2065], items: [3107,3190,6616], boots: [3158,3009], keystone: 8214 },
+  Nami: { role: "support", build: "ENCHANTER", core: [6620,6617,3504], items: [3107,3222,6616,2065,6621], boots: [3158,3009], keystone: 8214 },
+  Leona: { role: "support", build: "TANK", core: [3190,3109,2524], items: [3075,2525,2504,3110,3107], boots: [3047,3111], keystone: 8439 },
+  Nautilus: { role: "support", build: "TANK", core: [3190,3109,2524], items: [3075,2504,3143], boots: [3047,3111], keystone: 8439 },
+  Karma: { role: "support", build: "ENCHANTER", core: [6620,6617,3107], items: [2065,6621,3222], boots: [3158,3009], keystone: 8214 },
+  Blitzcrank: { role: "support", build: "TANK", core: [3190,3050,2524], items: [3109,3075,2065,2522], boots: [3009,3158], keystone: 8351 },
+  Morgana: { role: "support", build: "AP_BRUISER", core: [6653,3157,3116], items: [3165,4005,3089], boots: [3158,3020], keystone: 8229 },
+  Senna: { role: "support", build: "AD_CRIT", core: [3071,3087,3094], items: [3031,6609,2523,3026], boots: [3009,3006], keystone: 8992 },
+  Pyke: { role: "support", build: "AD_ASSASSIN", core: [3179,3142,3814], items: [6696,3026,6699,6673], boots: [3009,3158], keystone: 9923 },
+};
+
+/* Profil de chaque champion pour le taux de troll : "lanes | builds méta | builds jouables".
+   Lanes : t top, j jungle, m mid, a ADC, s support (la première est la lane principale).
+   Builds : APB AP Bruiser, APA AP Assassin, ADB AD Bruiser, CRIT AD Crit, ADA AD Assassin,
+   TANK, ENCH Enchanteur, HIT On-hit. Un champion absent est déduit de ses classes Riot. */
+const PROFILES = {
+  Aatrox: "t|ADB|ADA", Ahri: "m|APA|APB", Akali: "m t|APA|APB", Akshan: "m t|CRIT|ADA HIT", Alistar: "s|TANK|",
+  Ambessa: "t m|ADB|ADA", Amumu: "j s|TANK|APB", Anivia: "m|APA|APB", Annie: "m s|APA|APB", Aphelios: "a|CRIT|HIT",
+  Ashe: "a s|CRIT|HIT", AurelionSol: "m|APA|APB", Aurora: "m t|APA|APB", Azir: "m|APA|HIT APB", Bard: "s|ENCH|HIT TANK",
+  Belveth: "j|HIT|ADB", Blitzcrank: "s|TANK|APB", Brand: "s m j|APB|APA", Braum: "s|TANK|", Briar: "j|ADB|ADA",
+  Caitlyn: "a|CRIT|ADA", Camille: "t|ADB|ADA", Cassiopeia: "m t|APB|APA", Chogath: "t m|TANK|APB APA", Corki: "m a|CRIT|ADB",
+  Darius: "t|ADB|TANK", Diana: "j m|APA|APB", Draven: "a|CRIT|ADA", DrMundo: "t j|TANK|ADB", Ekko: "j m|APA|APB TANK",
+  Elise: "j|APA|APB", Evelynn: "j|APA|APB", Ezreal: "a|ADB|CRIT APA", Fiddlesticks: "j s|APB|APA", Fiora: "t|ADB|ADA",
+  Fizz: "m j|APA|APB", Galio: "m s|TANK|APB APA", Gangplank: "t m|CRIT|ADB", Garen: "t|ADB|CRIT TANK", Gnar: "t|ADB|TANK HIT",
+  Gragas: "j t s m|APB|TANK APA", Graves: "j|CRIT|ADA", Gwen: "t j|APB|HIT APA", Hecarim: "j|ADB|TANK", Heimerdinger: "m s t|APA|APB",
+  Hwei: "m s|APA|APB", Illaoi: "t|ADB|TANK", Irelia: "t m|HIT|ADB", Ivern: "j|ENCH|APB", Janna: "s|ENCH|",
+  JarvanIV: "j|ADB|ADA TANK", Jax: "t j|ADB|HIT APB", Jayce: "t m|ADA|ADB", Jhin: "a|CRIT|ADA", Jinx: "a|CRIT|HIT",
+  Kaisa: "a|HIT|CRIT APA", Kalista: "a|HIT|CRIT", Karma: "s m|ENCH|APA APB", Karthus: "j m|APA|APB", Kassadin: "m|APA|APB",
+  Katarina: "m|APA|HIT APB", Kayle: "t m|HIT|APA", Kayn: "j|ADA|ADB", Kennen: "t|APA|APB HIT", Khazix: "j|ADA|ADB",
+  Kindred: "j|CRIT|HIT", Kled: "t|ADB|ADA", KogMaw: "a|HIT|APA CRIT", KSante: "t|TANK|ADB", Leblanc: "m|APA|APB",
+  LeeSin: "j|ADB|ADA", Leona: "s|TANK|", Lillia: "j|APB|TANK", Lissandra: "m|APA|APB TANK", Locke: "m j|ADA|ADB",
+  Lucian: "a m|CRIT|ADA", Lulu: "s|ENCH|APA HIT", Lux: "m s|APA|APB ENCH", Malphite: "t s|TANK|APA", Malzahar: "m|APB|APA",
+  Maokai: "s j t|TANK|APB", MasterYi: "j|CRIT|HIT ADA", Mel: "m s|APA|APB", Milio: "s|ENCH|", MissFortune: "a|CRIT|ADA",
+  MonkeyKing: "t j|ADB|ADA", Mordekaiser: "t j|APB|TANK", Morgana: "s m j|APB|ENCH APA", Naafiri: "m j|ADA|ADB", Nami: "s|ENCH|APA",
+  Nasus: "t|ADB|TANK HIT", Nautilus: "s|TANK|", Neeko: "m s|APA|APB", Nidalee: "j|APA|APB", Nilah: "a|CRIT|ADB",
+  Nocturne: "j|ADA|ADB", Nunu: "j|TANK|APB APA", Olaf: "t j|ADB|TANK", Orianna: "m|APA|APB", Ornn: "t|TANK|",
+  Pantheon: "s m t|ADA|ADB", Poppy: "t j s|TANK|ADB", Pyke: "s|ADA|", Qiyana: "m j|ADA|ADB", Quinn: "t|CRIT|ADA HIT",
+  Rakan: "s|TANK|ENCH APA", Rammus: "j|TANK|", RekSai: "j|ADB|ADA", Rell: "s|TANK|", Renata: "s|ENCH|",
+  Renekton: "t|ADB|ADA", Rengar: "j t|ADA|ADB CRIT", Riven: "t|ADB|ADA", Rumble: "t m j|APB|APA", Ryze: "m t|APB|APA",
+  Samira: "a|CRIT|ADA", Sejuani: "j|TANK|", Senna: "s a|CRIT|ADA ENCH", Seraphine: "s a m|ENCH|APA APB", Sett: "t s|ADB|TANK",
+  Shaco: "j s|ADA|APA HIT", Shen: "t s|TANK|ADB", Shyvana: "j t|APB|ADB HIT", Singed: "t|TANK|APB", Sion: "t|TANK|ADB",
+  Sivir: "a|CRIT|HIT", Skarner: "j t|TANK|ADB", Smolder: "a m|CRIT|ADB", Sona: "s|ENCH|APA", Soraka: "s|ENCH|",
+  Swain: "s m t|APB|TANK", Sylas: "m j t|APB|APA", Syndra: "m|APA|APB", TahmKench: "t s|TANK|APB", Taliyah: "j m|APA|APB",
+  Talon: "m j|ADA|ADB", Taric: "s|TANK|ENCH", Teemo: "t|APA|HIT APB", Thresh: "s|TANK|ENCH", Tristana: "a m|CRIT|ADA",
+  Trundle: "j t|ADB|TANK HIT", Tryndamere: "t|CRIT|HIT", TwistedFate: "m|APA|HIT", Twitch: "a|HIT|CRIT APA", Udyr: "j t|ADB|APB TANK",
+  Urgot: "t|ADB|TANK", Varus: "a m|HIT|ADA CRIT", Vayne: "a t|HIT|CRIT", Veigar: "m s|APA|APB", Velkoz: "s m|APA|APB",
+  Vex: "m|APA|APB", Vi: "j|ADB|ADA", Viego: "j|CRIT|ADB HIT", Viktor: "m|APA|APB", Vladimir: "m t|APB|APA",
+  Volibear: "t j|ADB|TANK HIT APB", Warwick: "j t|ADB|TANK HIT", Xayah: "a|CRIT|HIT", Xerath: "m s|APA|APB", XinZhao: "j|ADB|CRIT TANK",
+  Yasuo: "m t a|CRIT|ADB", Yone: "m t|CRIT|ADB HIT", Yorick: "t|ADB|TANK", Yunara: "a|HIT|CRIT", Yuumi: "s|ENCH|APA",
+  Zaahen: "t j|ADB|ADA", Zac: "j t s|TANK|APB", Zed: "m j|ADA|ADB", Zeri: "a|CRIT|HIT", Ziggs: "m a|APA|APB",
+  Zilean: "s m|ENCH|APA", Zoe: "m s|APA|APB", Zyra: "s j|APB|APA"
+};
+const SHORT = { APB: "AP_BRUISER", APA: "AP_ASSASSIN", ADB: "AD_BRUISER", CRIT: "AD_CRIT", ADA: "AD_ASSASSIN", TANK: "TANK", ENCH: "ENCHANTER", HIT: "ON_HIT" };
+const LANE = { t: "top", j: "jungle", m: "mid", a: "adc", s: "support" };
+/* Profil déduit des classes Riot pour un champion qui n'est pas dans la table (nouveau champion). */
+const TAG_PROFILE = {
+  Marksman: "a|CRIT|HIT", Mage: "m|APA|APB", Assassin: "m j|ADA|APA", Fighter: "t j|ADB|ADA", Tank: "t s|TANK|ADB", Support: "s|ENCH|APA"
+};
+function profileOf(champ) {
+  const raw = PROFILES[champ.id] || TAG_PROFILE[champ.tags[0]] || "m|APA|";
+  const [lanes, meta, viable] = raw.split("|").map(s => s.split(" ").filter(Boolean));
+  return { lanes: lanes.map(l => LANE[l]), meta: meta.map(b => SHORT[b]), viable: viable.map(b => SHORT[b]) };
+}
+
 const CLASSES = { Fighter: "Combattants", Tank: "Tanks", Mage: "Mages", Assassin: "Assassins", Marksman: "Tireurs", Support: "Supports" };
 const SPEEDS = { slow: { label: "Suspense", f: 1.5 }, normal: { label: "Normale", f: 1 }, fast: { label: "Rapide", f: .35 }, instant: { label: "Instantanée", f: 0 } };
 
@@ -622,6 +798,10 @@ const TROLL = [
 const VIABLE = [
   "Attends… c'est presque viable.", "Ça ressemble dangereusement à un vrai build.",
   "Le troll a raté son coup : ça peut marcher.", "Même la roue a eu pitié de toi."
+];
+const META_LINES = [
+  "Ce n'est même pas un troll pick, c'est la méta.", "La roue t'a donné un vrai main. Aucune excuse.",
+  "Si tu perds avec ça, c'est toi le troll.", "Pick validé par les tryhards."
 ];
 
 /* palette du tapis */
@@ -646,6 +826,9 @@ if (window.matchMedia("(prefers-reduced-motion: reduce)").matches && !store.get(
 
 let history = store.get("history", []);
 let teamNames = store.get("team", ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4", "Joueur 5"]);
+let teamSize = Math.min(5, Math.max(2, +store.get("teamSize", 5) || 5));
+let teamRoles = store.get("teamRoles", ["", "", "", "", ""]);   // "" = rôle au hasard
+let teamFocus = null;   // carte à remettre en avant au retour d'un ticket
 const solo = { champ: null, role: null, build: null };
 let busy = false;
 let lastTeam = [];
@@ -815,8 +998,10 @@ function notesFor(champ, buildKey, role, hasSupport) {
   if (champ.id === "Cassiopeia") notes.push("Cassiopeia ne peut pas acheter de bottes : un objet de plus");
   if (hasSupport) notes.push("Lane support : la quête de support occupe un emplacement");
   if (role === "jungle") notes.push("Jungle : familier adapté au build et Châtiment");
+  if (metaFor(champ, buildKey)) notes.push(`Build du moment de ${champ.name} (OP.GG, patch ${META_PATCH})`);
   return notes;
 }
+const metaFor = (champ, buildKey) => CHAMP_META[champ.id]?.build === buildKey ? CHAMP_META[champ.id] : null;
 
 function pickItems(champ, buildKey, role) {
   const b = BUILDS[buildKey];
@@ -838,9 +1023,16 @@ function pickItems(champ, buildKey, role) {
     return true;
   };
 
-  const core = b.core.filter(fits);
-  tryAdd(rand(core.length ? core : all.filter(fits)));
-  b.must.forEach(tryAdd);
+  const meta = metaFor(champ, buildKey), live = list => list.filter(id => ITEMS[id]);
+  if (meta) {
+    // build du moment : les 3 premiers objets dans l'ordre, puis les objets de fin au choix
+    live(meta.core).forEach(tryAdd);
+    shuffle(live(meta.items)).forEach(tryAdd);
+  } else {
+    const core = b.core.filter(fits);
+    tryAdd(rand(core.length ? core : all.filter(fits)));
+    b.must.forEach(tryAdd);
+  }
   shuffle([...b.core, ...b.items]).forEach(tryAdd);
 
   // un tank sans résistance magique, ce n'est pas logique : on remplace le dernier objet
@@ -854,7 +1046,8 @@ function pickItems(champ, buildKey, role) {
   }
 
   const starter = starterFor(role, buildKey);
-  return { starter: ITEMS[starter] ? starter : null, support, boots: noBoots ? null : rand(b.boots) || null, items: chosen, notes };
+  const bootsPool = meta && live(meta.boots).length ? live(meta.boots) : b.boots;
+  return { starter: ITEMS[starter] ? starter : null, support, boots: noBoots ? null : rand(bootsPool) || null, items: chosen, notes };
 }
 
 /* Alternatives selon la game : objets adaptés au champion, avec indication si déjà dans le build. */
@@ -871,9 +1064,9 @@ function situationalFor(pick) {
   return out;
 }
 
-function pickRunes(buildKey) {
-  const b = BUILDS[buildKey];
-  const key = RUNE_BY_ID[rand(b.keystones)];
+function pickRunes(buildKey, champ = null) {
+  const b = BUILDS[buildKey], meta = champ && metaFor(champ, buildKey);
+  const key = RUNE_BY_ID[meta && RUNE_BY_ID[meta.keystone] ? meta.keystone : rand(b.keystones)];
   const tree = key.tree;
   const minors = [1, 2, 3].map(i => rand(tree.slots[i].runes).id);
   const secOptions = b.secondary.filter(t => t !== tree.id);
@@ -885,25 +1078,46 @@ function pickRunes(buildKey) {
 }
 function pickSumms(role) { return ["SummonerFlash", rand(ROLE_SUMMS[role].filter(k => SUMMS[k]))]; }
 
-function trollScore(champ, buildKey) {
-  const b = BUILDS[buildKey], info = champ.info || {};
-  let s = 45 + (champ.tags.includes(b.tag) ? -25 : 20);
-  if (b.stat === "magic" && info.magic <= 3) s += 20;
-  if (b.stat === "attack" && info.attack <= 3) s += 20;
-  if (b.stat === "defense" && info.defense <= 4) s += 15;
-  if (b.stat === "magic" && info.magic >= 8) s -= 15;
-  if (b.stat === "attack" && info.attack >= 8) s -= 15;
-  s += Math.round(Math.random() * 16 - 8);
-  return Math.max(4, Math.min(99, s));
+/* Taux de troll = à quel point la lane ET le build s'éloignent de ce que le champion joue vraiment.
+   Chaque partie donne un risque entre 0 et 1 ; on les combine : 1 - (1 - lane) × (1 - build). */
+function trollParts(champ, role, buildKey) {
+  const p = profileOf(champ), b = BUILDS[buildKey], info = champ.info || {};
+  let lane, laneLabel;
+  if (p.lanes[0] === role) { lane = 0; laneLabel = "lane principale"; }
+  else if (p.lanes.includes(role)) { lane = .12; laneLabel = "lane secondaire"; }
+  else {
+    laneLabel = "hors de sa lane";
+    lane = role === "adc" && isMelee(champ) ? .7 : .55;
+  }
+  let build, buildLabel;
+  if (p.meta.includes(buildKey)) { build = 0; buildLabel = "build méta"; }
+  else if (p.viable.includes(buildKey)) { build = .18; buildLabel = "build jouable"; }
+  else {
+    buildLabel = "build troll";
+    // Riot note l'attaque et la magie de 1 à 10 (0 = non renseigné)
+    if (b.stat === "magic" && info.magic && info.magic <= 3) build = .85;
+    else if (b.stat === "attack" && info.attack && info.attack <= 3) build = .85;
+    else if (buildKey === "ENCHANTER" && !champ.tags.includes("Support")) build = .8;
+    else if (["AD_CRIT", "ON_HIT"].includes(buildKey) && isMelee(champ) && !champ.tags.includes("Marksman")) build = .7;
+    else if (buildKey === "TANK" && !champ.tags.some(t => t === "Tank" || t === "Fighter")) build = .7;
+    else build = .55;
+  }
+  return { lane, build, laneLabel, buildLabel };
 }
+function trollScore(champ, role, buildKey) {
+  const t = trollParts(champ, role, buildKey);
+  const s = 100 * (1 - (1 - t.lane) * (1 - t.build)) + Math.round(Math.random() * 6 - 3);
+  return Math.max(2, Math.min(99, Math.round(s)));
+}
+const sentenceFor = score => rand(score < 12 ? META_LINES : score < 30 ? VIABLE : TROLL);
 
 function makePick(champ, role, buildKey, player = null) {
-  const score = trollScore(champ, buildKey);
+  const score = trollScore(champ, role, buildKey);
   return {
     champ: champ.id, role, build: buildKey, player,
     ...pickItems(champ, buildKey, role),
-    runes: pickRunes(buildKey), summs: pickSumms(role), skills: shuffle(["Q", "W", "E"]),
-    score, sentence: score < 30 ? rand(VIABLE) : rand(TROLL), ts: Date.now()
+    runes: pickRunes(buildKey, champ), summs: pickSumms(role), skills: shuffle(["Q", "W", "E"]),
+    score, sentence: sentenceFor(score), ts: Date.now()
   };
 }
 function addHistory(pick) { history.unshift(pick); history = history.slice(0, 40); store.set("history", history); }
@@ -915,7 +1129,7 @@ function addHistory(pick) { history.unshift(pick); history = history.slice(0, 40
 ========================================================= */
 const b64e = s => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const b64d = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)));
-const SENTENCES = [...TROLL, ...VIABLE];
+const SENTENCES = [...TROLL, ...VIABLE, ...META_LINES]; // ajouter à la fin seulement : les liens gardent les index
 
 function packPick(p) {
   const r = p.runes;
@@ -934,9 +1148,9 @@ function unpackPick(a) {
   let runes = Array.isArray(ru) ? { tree: ru[0], keystone: ru[1], minors: ru[2], secTree: ru[3], sec: ru[4] } : null;
   if (!runes || !rune(runes.keystone) || !treeOk(runes.tree) || !treeOk(runes.secTree)
       || !Array.isArray(runes.minors) || !runes.minors.every(rune) || !Array.isArray(runes.sec) || !runes.sec.every(rune))
-    runes = pickRunes(build);
+    runes = pickRunes(build, champ);
   const sup = item(support);
-  const sc = Number.isInteger(score) ? Math.max(0, Math.min(99, score)) : trollScore(champ, build);
+  const sc = Number.isInteger(score) ? Math.max(0, Math.min(99, score)) : trollScore(champ, role, build);
   return {
     champ: champ.id, role, build,
     player: typeof player === "string" && player.trim() ? player.trim().slice(0, 24) : null,
@@ -947,7 +1161,7 @@ function unpackPick(a) {
     summs: Array.isArray(summs) && summs.length === 2 && summs.every(k => typeof k === "string" && SUMMS.hasOwnProperty(k)) ? summs : pickSumms(role),
     skills: typeof skills === "string" && /^(?!.*(.).*\1)[QWE]{3}$/.test(skills) ? skills.split("") : shuffle(["Q", "W", "E"]),
     score: sc,
-    sentence: SENTENCES[sentIdx] || rand(sc < 30 ? VIABLE : TROLL),
+    sentence: SENTENCES[sentIdx] || sentenceFor(sc),
     ts: Number.isFinite(ts) ? ts : Date.now(),
     shared: true
   };
@@ -1166,16 +1380,33 @@ function slotLabel(pick, id) {
   return n === 0 ? "1er objet" : `Objet ${n + 1}`;
 }
 const totalGold = pick => orderedItems(pick).reduce((s, id) => s + (ITEMS[id]?.gold.total || 0), 0);
-function itemHTML(pick, id) {
+function itemHTML(pick, id, i = 0) {
   const it = ITEMS[id]; if (!it) return "";
   const lab = slotLabel(pick, id);
-  return `<button class="item${lab === "1er objet" ? " core" : ""}" data-tip='${esc(itemTip(id))}' aria-label="${esc(it.name)}, ${it.gold.total} PO">
+  return `<button class="item${lab === "1er objet" ? " core" : ""}" style="--i:${i}" data-tip='${esc(itemTip(id))}' aria-label="${esc(it.name)}, ${it.gold.total} PO">
     <span class="item-step">${lab}</span><img src="${imgItem(id)}" alt="" loading="lazy">
     <span class="item-name">${esc(it.name)}</span><span class="item-cost">${gold(it.gold.total)}</span></button>`;
 }
 function runeHTML(id) { const r = RUNE_BY_ID[id]; return r ? `<span class="rune"><img src="${imgRune(r)}" alt="">${esc(r.name)}</span>` : ""; }
 
-async function renderResult(pick) {
+function ticketNavHTML(ctx) {
+  if (!ctx) return "";
+  if (ctx.from === "history") return `<nav class="t-nav" aria-label="Navigation du ticket"><button class="btn" data-act="back">‹ Retour à l'historique</button></nav>`;
+  const prev = lastTeam[ctx.i - 1], next = lastTeam[ctx.i + 1];
+  return `<nav class="t-nav" aria-label="Navigation du ticket">
+    <button class="btn" data-act="back">‹ Retour à l'équipe</button><span class="spacer"></span>
+    <button class="btn" data-act="prev" ${prev ? "" : "data-empty disabled"} aria-label="Ticket précédent">‹ ${esc(prev?.player || "")}</button>
+    <button class="btn" data-act="next" ${next ? "" : "data-empty disabled"} aria-label="Ticket suivant">${esc(next?.player || "")} ›</button>
+  </nav>`;
+}
+function verdictHTML(champ, pick) {
+  const t = trollParts(champ, pick.role, pick.build);
+  const cls = v => v === 0 ? "" : v < .3 ? " mid" : " bad";
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+  return `<p class="verdict"><span class="${cls(t.lane).trim()}">${cap(t.laneLabel)}</span><span class="${cls(t.build).trim()}">${cap(t.buildLabel)}</span></p>`;
+}
+
+async function renderResult(pick, ctx = null) {
   const champ = CHAMP_BY_ID[pick.champ]; if (!champ) return;
   const detail = await getChampDetail(champ.id);
   const role = ROLES.find(r => r.key === pick.role), b = BUILDS[pick.build], r = pick.runes;
@@ -1185,7 +1416,7 @@ async function renderResult(pick) {
   const situ = situationalFor(pick);
 
   const el = $("#result");
-  el.innerHTML = `
+  el.innerHTML = `${ticketNavHTML(ctx)}
   <article class="ticket enter">
     <div class="t-top">
       <div class="t-art"><img src="${imgCard(champ)}" alt="${esc(champ.name)}"></div>
@@ -1198,6 +1429,7 @@ async function renderResult(pick) {
           <div><dt>Build</dt><dd>${b.label}</dd></div>
           <div><dt>Troll</dt><dd class="hot">${pick.score} %</dd></div>
         </dl>
+        ${verdictHTML(champ, pick)}
         <p class="sentence">« ${esc(pick.sentence)} »</p>
         <div class="stamp${guilty ? "" : " green"}">${guilty ? "Coupable" : "Relaxé"}<small>Tribunal de la Faille</small></div>
       </div>
@@ -1208,7 +1440,7 @@ async function renderResult(pick) {
       ${pick.starter ? `<div class="starter"><span class="starter-label">Départ</span>
         ${[pick.starter, 2003].map(id => ITEMS[id] ? `<button class="starter-item" data-tip='${esc(itemTip(id))}'><img src="${imgItem(id)}" alt="">${esc(ITEMS[id].name)}${id === 2003 && pick.role !== "jungle" ? " ×2" : ""}</button>` : "").join("")}
       </div>` : ""}
-      <div class="items">${orderedItems(pick).map(id => itemHTML(pick, id)).join("")}</div>
+      <div class="items">${orderedItems(pick).map((id, i) => itemHTML(pick, id, i)).join("")}</div>
       ${pick.notes?.length ? `<ul class="notes">${pick.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
     </section>
     ${situ.length ? `<div class="perf"></div>
@@ -1254,6 +1486,7 @@ async function renderResult(pick) {
   </div>`;
   el.hidden = false;
   el._pick = pick;
+  el._ctx = ctx;
   el.scrollIntoView({ behavior: speedF() ? "smooth" : "auto", block: "start" });
 }
 
@@ -1284,7 +1517,13 @@ function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.ad
 
 $("#result").addEventListener("click", async e => {
   const act = e.target.closest("[data-act]")?.dataset.act; if (!act || busy) return;
-  const pick = $("#result")._pick;
+  const pick = $("#result")._pick, ctx = $("#result")._ctx;
+  if (act === "back") return goBack(ctx);
+  if (act === "prev" || act === "next") {
+    const j = ctx.i + (act === "next" ? 1 : -1); if (!lastTeam[j]) return;
+    nav.replaceState({ view: "solo", from: "team", i: j }, "", pageUrl());
+    return renderResult(lastTeam[j], { from: "team", i: j });
+  }
   if (act === "again") runSolo("all");
   if (act === "copy") copy(recap(pick));
   if (act === "link") copy(pickLink(pick), "Lien copié : colle-le à tes potes");
@@ -1292,8 +1531,10 @@ $("#result").addEventListener("click", async e => {
   if (act === "dl") saveTicketImage(pick);
   if (act === "items") {
     const c = CHAMP_BY_ID[pick.champ];
-    const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build), skills: shuffle(["Q", "W", "E"]), ts: Date.now(), shared: false };
-    addHistory(np); clearHash(); await renderResult(np);
+    const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build, c), skills: shuffle(["Q", "W", "E"]), ts: Date.now(), shared: false };
+    addHistory(np); clearHash();
+    if (ctx?.from === "team") { lastTeam[ctx.i] = np; $("#teamGrid").innerHTML = ""; }   // la grille sera redessinée au retour
+    await renderResult(np, ctx?.from === "team" ? ctx : null);
   }
 });
 
@@ -1489,18 +1730,49 @@ async function saveTicketImage(pick, done = "Image enregistrée") {
    ÉQUIPE
 ========================================================= */
 function renderTeamForm() {
-  $("#teamForm").innerHTML = teamNames.map((n, i) => `<div class="field"><label for="tn${i}">Joueur ${i + 1}</label>
-    <input type="text" id="tn${i}" value="${esc(n)}" maxlength="24" autocomplete="off"></div>`).join("");
+  document.querySelectorAll("#teamSize [data-size]").forEach(b => b.setAttribute("aria-checked", +b.dataset.size === teamSize));
+  const form = $("#teamForm");
+  form.style.setProperty("--n", teamSize);
+  form.innerHTML = teamNames.slice(0, teamSize).map((n, i) => `<div class="field">
+    <label for="tn${i}">Joueur ${i + 1}</label>
+    <input type="text" id="tn${i}" data-name="${i}" value="${esc(n)}" maxlength="24" autocomplete="off">
+    <div class="role-pick"><select id="tr${i}" data-role="${i}" aria-label="Rôle du joueur ${i + 1}">
+      <option value="">Rôle au hasard</option>
+      ${ROLES.map(r => `<option value="${r.key}">${r.label}</option>`).join("")}
+    </select></div>
+  </div>`).join("");
+  syncRoleSelects();
+}
+/* Un rôle verrouillé par un joueur n'est plus proposé aux autres. */
+function syncRoleSelects() {
+  const taken = teamRoles.slice(0, teamSize);
+  document.querySelectorAll("#teamForm select").forEach(sel => {
+    const i = +sel.dataset.role;
+    sel.value = teamRoles[i] || "";
+    sel.classList.toggle("locked", !!sel.value);
+    [...sel.options].forEach(o => o.disabled = !!o.value && taken.some((r, j) => j !== i && r === o.value));
+  });
 }
 $("#teamForm").addEventListener("input", e => {
-  const i = +e.target.id.slice(2);
-  teamNames[i] = e.target.value.trim() || `Joueur ${i + 1}`;
+  const i = e.target.dataset.name; if (i == null) return;
+  teamNames[i] = e.target.value.trim() || `Joueur ${+i + 1}`;
   store.set("team", teamNames);
+});
+$("#teamForm").addEventListener("change", e => {
+  const i = e.target.dataset.role; if (i == null) return;
+  teamRoles[i] = e.target.value;
+  store.set("teamRoles", teamRoles);
+  syncRoleSelects();
+});
+$("#teamSize").addEventListener("click", e => {
+  const n = +e.target.closest("[data-size]")?.dataset.size; if (!n) return;
+  teamSize = n; store.set("teamSize", n);
+  renderTeamForm();
 });
 function teamCardHTML(p, i) {
   const c = CHAMP_BY_ID[p.champ], role = ROLES.find(r => r.key === p.role), key = RUNE_BY_ID[p.runes.keystone];
-  return `<article class="tcard reveal" style="animation-delay:${i * 90}ms">
-    <div class="tcard-img"><img src="${imgCard(c)}" alt="" data-final="${imgCard(c)}"><span class="tcard-role">${role.label}</span></div>
+  return `<article class="tcard reveal" data-card="${i}" style="animation-delay:${i * 70}ms">
+    <div class="tcard-img"><img src="${imgCard(c)}" alt="" data-final="${imgCard(c)}"><span class="tcard-role">${role.label}${p.locked ? `<span class="lock" aria-label="rôle choisi">(choisi)</span>` : ""}</span></div>
     <div class="tcard-body">
       <div class="tcard-player">${esc(p.player)}</div>
       <div class="tcard-champ">${esc(c.name)}</div>
@@ -1515,8 +1787,14 @@ async function spinTeam() {
   if (busy) return;
   setBusy(true);
   try {
-    const roles = shuffle(ROLES.map(r => r.key)), used = [], builds = activeBuilds();
-    const team = teamNames.map((name, i) => { const c = rand(eligibleChamps(used)); used.push(c.id); return makePick(c, roles[i], rand(builds), name); });
+    const locks = teamRoles.slice(0, teamSize).map(r => ROLES.some(x => x.key === r) ? r : "");
+    const free = shuffle(ROLES.map(r => r.key).filter(r => !locks.includes(r)));
+    const roles = locks.map(r => r || free.pop());
+    const used = [], builds = activeBuilds();
+    const team = teamNames.slice(0, teamSize).map((name, i) => {
+      const c = rand(eligibleChamps(used)); used.push(c.id);
+      return { ...makePick(c, roles[i], rand(builds), name), locked: !!locks[i] };
+    });
     team.slice().reverse().forEach(addHistory);
     clearHash();
     await renderTeam(team, true);
@@ -1526,7 +1804,9 @@ async function spinTeam() {
 async function renderTeam(team, animate) {
   lastTeam = team;
   const grid = $("#teamGrid");
+  grid.style.setProperty("--n", team.length);
   grid.innerHTML = team.map(teamCardHTML).join("");
+  if (!animate) grid.querySelectorAll(".tcard").forEach(c => c.classList.remove("reveal"));
   $("#copyTeam").hidden = $("#linkTeam").hidden = false;
   const pool = eligibleChamps(), imgs = [...grid.querySelectorAll(".tcard-img img")], f = speedF();
   if (!animate || f === 0) return;
@@ -1543,7 +1823,7 @@ $("#copyTeam").addEventListener("click", () => copy(lastTeam.map(recap).join("\n
 $("#linkTeam").addEventListener("click", () => copy(teamLink(lastTeam), "Lien de l'équipe copié"));
 $("#teamGrid").addEventListener("click", e => {
   const i = e.target.closest("[data-team]")?.dataset.team; if (i == null) return;
-  showView("solo"); renderResult(lastTeam[+i]);
+  openTicket(lastTeam[+i], { from: "team", i: +i });
 });
 
 /* =========================================================
@@ -1567,7 +1847,7 @@ function renderHistory() {
 }
 $("#histList").addEventListener("click", e => {
   const i = e.target.closest("[data-hist]")?.dataset.hist; if (i == null) return;
-  showView("solo"); renderResult(history[+i]);
+  openTicket(history[+i], { from: "history", i: +i });
 });
 $("#clearHist").addEventListener("click", () => {
   if (!confirm("Effacer tout l'historique ?")) return;
@@ -1577,11 +1857,54 @@ $("#clearHist").addEventListener("click", () => {
 /* =========================================================
    NAVIGATION
 ========================================================= */
-function showView(v) {
+/* Chaque onglet et chaque ticket ouvert depuis l'équipe ou l'historique crée une étape
+   dans l'historique du navigateur : le bouton (ou le geste) retour fonctionne. */
+const nav = window.history;
+nav.scrollRestoration = "manual";
+let currentView = "solo";
+function showView(v, { push = true } = {}) {
+  const changed = v !== currentView;
+  currentView = v;
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
   document.querySelectorAll(".view").forEach(s => s.hidden = s.id !== "view-" + v);
   if (v === "history") renderHistory();
+  if (v === "team") {
+    if (lastTeam.length && $("#teamGrid").childElementCount !== lastTeam.length) renderTeam(lastTeam, false);
+    focusTeamCard();
+  }
+  if (push && changed) nav.pushState({ view: v }, "", pageUrl());
 }
+function focusTeamCard() {
+  if (teamFocus == null) return;
+  const card = document.querySelector(`#teamGrid [data-card="${teamFocus}"]`);
+  teamFocus = null;
+  if (!card) return;
+  card.classList.remove("reveal", "focus");
+  void card.offsetWidth;   // relance l'animation si on revient deux fois sur la même carte
+  card.classList.add("focus");
+  card.scrollIntoView({ behavior: speedF() ? "smooth" : "auto", block: "center" });
+}
+/* Ouvre un ticket depuis l'équipe ou l'historique, avec retour possible. */
+function openTicket(pick, ctx) {
+  showView("solo", { push: false });
+  nav.pushState({ view: "solo", from: ctx.from, i: ctx.i }, "", pageUrl());
+  renderResult(pick, ctx);
+}
+function goBack(ctx) {
+  if (nav.state?.from === ctx.from) nav.back();
+  else { teamFocus = ctx.from === "team" ? ctx.i : null; showView(ctx.from); }
+}
+addEventListener("popstate", e => {
+  const s = e.state || { view: "solo" };
+  const prev = $("#result")._ctx;
+  if (s.from === "team" && lastTeam[s.i]) { showView("solo", { push: false }); renderResult(lastTeam[s.i], { from: "team", i: s.i }); return; }
+  if (s.from === "history" && history[s.i]) { showView("solo", { push: false }); renderResult(history[s.i], { from: "history", i: s.i }); return; }
+  if (s.view === "team" && prev?.from === "team") teamFocus = prev.i;
+  showView(s.view || "solo", { push: false });
+  if (s.view === "history" && prev?.from === "history")
+    document.querySelector(`#histList [data-hist="${prev.i}"]`)?.closest(".hrow")?.scrollIntoView({ block: "center" });
+});
+nav.replaceState({ view: "solo" }, "", location.href);
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
 
 /* =========================================================
