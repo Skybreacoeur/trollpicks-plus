@@ -567,6 +567,20 @@ details.on-auto .on-pc{color:var(--muted)}
 details.on-auto .clock{color:var(--muted)}
 p.on-auto-ok{color:var(--muted);font-weight:800}
 
+/* bans personnels */
+.on-mybans{display:grid;gap:6px;width:100%}
+.on-mybans-label{font-size:.85rem;font-weight:800;color:var(--ink-2)}
+.on-mybans-list{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.on-ban-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 3px;border-radius:999px;background:var(--ink);color:var(--cream);font-weight:800;font-size:.85rem}
+.on-ban-chip img{width:24px;height:24px;border-radius:50%;filter:grayscale(1)}
+.on-ban-chip span{opacity:.6;font-size:1rem;line-height:1}
+@media (hover:hover) and (pointer:fine){.on-ban-chip:hover span{opacity:1}}
+#onBanAdd{max-width:220px;padding:7px 12px;font-size:.9rem}
+.on-picks .on-mybans-label{color:var(--muted)}
+.on-picks .on-mybans{max-width:330px;margin:12px auto 0}
+.on-seat .on-ban{width:20px;height:20px;border-radius:50%;filter:grayscale(1) brightness(.85);box-shadow:0 0 0 2px var(--red);margin-left:-2px}
+.on-seat .on-ban:first-of-type{margin-left:4px}
+
 /* ---------- mouvement ---------- */
 /* changement d'onglet : simple fondu court (action fréquente) */
 .view{transition:opacity .16s var(--ease-out),transform .16s var(--ease-out)}
@@ -2269,7 +2283,8 @@ function sbClient() {
   return sbPromise ||= new Promise((res, rej) => {
     const sc = document.createElement("script");
     sc.src = SB_LIB; sc.async = true;
-    sc.onload = () => res(window.supabase.createClient(SB_URL, SB_KEY));
+    // worker : le battement qui garde la connexion ouverte n'est pas ralenti quand l'onglet est en arrière-plan
+    sc.onload = () => res(window.supabase.createClient(SB_URL, SB_KEY, { realtime: { worker: true } }));
     sc.onerror = () => { sbPromise = null; rej(new Error("module en ligne indisponible")); };
     document.head.append(sc);
   });
@@ -2311,13 +2326,15 @@ const newCode = () => Array.from(crypto.getRandomValues(new Uint8Array(4)), b =>
 const isHost = () => room?.state?.host === ME.id;
 const memberName = id => room?.members.find(m => m.id === id)?.name || room?.state?.game?.players.find(p => p.id === id)?.name || "?";
 
-async function joinRoom(rawCode, asHost = false) {
+/* keep : ce qu'on avait avant une reconnexion (état de la salle, mon rôle…), pour ne rien perdre à l'écran. */
+async function joinRoom(rawCode, asHost = false, keep = null) {
   const code = cleanCode(rawCode);
   if (code.length !== 4) return toast("Le code d'une salle fait 4 caractères");
   if (!ME.name) { toast("Choisis d'abord ton pseudo"); $("#onName")?.focus(); return; }
   if (!window.crypto?.subtle) return toast("Ce navigateur ne permet pas les salles sécurisées");
   await leaveRoom(false);
-  room = { code, connecting: true, members: [], state: null, offset: 0, cardOpen: false, last: {}, waitedTooLong: false };
+  room = { code, connecting: !keep?.state, members: [], state: keep?.state || null, offset: keep?.offset || 0, myRole: keep?.myRole || null,
+    cardOpen: keep?.cardOpen || false, last: keep?.last || {}, waitedTooLong: false, scriptSeen: keep?.scriptSeen || 0 };
   renderOnline();
   let client;
   try { client = await sbClient(); }
@@ -2343,26 +2360,59 @@ async function joinRoom(rawCode, asHost = false) {
       store.set("lastRoom", code);
       nav.replaceState(nav.state, "", `${pageUrl()}#salle=${code}`);
       if (asHost) { room.state = freshState(); pushState(); }
+      else if (keep?.state?.host === ME.id) { pushState(); }   // l'hôte revient : il rediffuse son état
       else {
         send("hello", { from: ME.id });
         setTimeout(() => { if (room?.ch === ch && !room.state) { room.waitedTooLong = true; renderOnline(); } }, 5000);
       }
       renderOnline();
-    } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-      toast("Connexion à la salle perdue, nouvel essai…");
+    } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+      if (!ch._leaving) scheduleRejoin(ch);
     }
   });
   ticker.add(onlineTick);
 }
+/* Connexion coupée (réseau, veille du PC…) : on rejoint la salle tout seul, en gardant ce qui est affiché. */
+function scheduleRejoin(ch) {
+  if (!room || room.ch !== ch || room.rejoining) return;
+  room.rejoining = true;
+  toast("Reconnexion à la salle…");
+  setTimeout(() => {
+    if (!room || room.ch !== ch) return;
+    const { code, state, myRole, cardOpen, last, offset, scriptSeen } = room;
+    joinRoom(code, false, { state, myRole, cardOpen, last, offset, scriptSeen });
+  }, 1500);
+}
+addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && room?.ch && !room.connecting && room.ch.state !== "joined") scheduleRejoin(room.ch);
+});
 async function leaveRoom(forget = true) {
   ticker.remove(onlineTick);
-  if (room?.pcCh) { try { await room.client.removeChannel(room.pcCh); } catch {} }
-  if (room?.ch) { try { await room.ch.untrack(); await room.client.removeChannel(room.ch); } catch {} }
+  if (room?.ch) room.ch._leaving = true;
+  // un canal déjà coupé peut ne jamais répondre : on n'attend pas plus de 1,5 seconde
+  const within = p => Promise.race([Promise.resolve(p).catch(() => {}), new Promise(r => setTimeout(r, 1500))]);
+  if (room?.pcCh) await within(room.client.removeChannel(room.pcCh));
+  if (room?.ch) { await within(room.ch.untrack()); await within(room.client.removeChannel(room.ch)); }
   room = null; onlineTeam = [];
   if (forget) { store.set("lastRoom", null); if (location.hash.startsWith("#salle=")) clearHash(); }
 }
 function send(event, payload) { room?.ch?.send({ type: "broadcast", event, payload }); }
-function trackMe() { return room.ch.track({ id: ME.id, name: ME.name, pub: room.keys.pub, lane: room.lane || "", at: room.at }); }
+/* Bans personnels : jusqu'à 3 champions que ce joueur ne veut pas jouer (gardés d'une salle à l'autre). */
+const MAX_MY_BANS = 3;
+const myBans = () => (store.get("myBans", []) || []).filter(id => CHAMP_BY_ID[id]).slice(0, MAX_MY_BANS);
+const cleanBans = list => (Array.isArray(list) ? list : []).filter(id => typeof id === "string" && CHAMP_BY_ID[id]).slice(0, MAX_MY_BANS);
+function setMyBans(list) {
+  store.set("myBans", cleanBans(list));
+  if (room?.ch) { trackMe(); act("bans", { bans: myBans() }); }
+  renderOnline();
+}
+/* Champions possibles pour ce joueur : réglages de l'hôte, champions déjà pris, et ses propres bans. */
+function eligibleFor(p, used) {
+  const bans = new Set(cleanBans(p?.bans));
+  const list = eligibleChamps(used).filter(c => !bans.has(c.id));
+  return list.length ? list : eligibleChamps(used);
+}
+function trackMe() { return room.ch.track({ id: ME.id, name: ME.name, pub: room.keys.pub, lane: room.lane || "", bans: myBans(), at: room.at }); }
 
 function freshState() {
   return { v: 0, host: ME.id, activity: "lobby", teams: {}, enabled: PARTY_OPTIONAL.slice(), withPicks: false, events: true, picks: null, game: null };
@@ -2509,6 +2559,11 @@ function onAct(a) {
   const st = room.state;
   if (a.kind === "gamestart") return onGameStart({ gameTime: a.gameTime });
   if (a.kind === "gameend") return onGameEnd();
+  if (a.kind === "bans") {
+    const m = room.members.find(x => x.id === a.from);
+    if (m) { m.bans = cleanBans(a.bans); renderOnline(); }
+    return;
+  }
   if (a.kind === "lane") {   // plus rapide que la présence, qui met 1 à 2 secondes à arriver
     const m = room.members.find(x => x.id === a.from);
     if (m) m.lane = ROLES.some(r => r.key === a.lane) ? a.lane : "";
@@ -2518,7 +2573,7 @@ function onAct(a) {
     const x = st.picks.list.find(l => l.pid === a.from); if (!x) return;
     const old = unpackPick(x.pack); if (!old) return;
     const used = st.picks.list.map(l => l.pack[0]);
-    const c = rand(eligibleChamps(used));
+    const c = rand(eligibleFor(room.members.find(m => m.id === a.from), used));
     x.pack = packPick({ ...makePick(c, old.role, rand(activeBuilds()), old.player), locked: x.locked });
     st.picks.jokers[a.from] = true;
     st.picks.flash = { pid: a.from, at: Date.now() };
@@ -2540,7 +2595,7 @@ function onMeRole(m) {
 const allSeats = () => room.members;
 function roomPlayers() {
   const seats = allSeats().slice(0, 10), many = seats.length > 5;
-  return seats.map((m, i) => ({ id: m.id, name: m.name, lane: m.lane || "", team: many ? (room.state.teams[m.id] ?? (i % 2)) : 0 }));
+  return seats.map((m, i) => ({ id: m.id, name: m.name, lane: m.lane || "", bans: cleanBans(m.bans), team: many ? (room.state.teams[m.id] ?? (i % 2)) : 0 }));
 }
 /* Tire un troll pick par joueur : lanes uniques par équipe, lanes verrouillées respectées si possible. */
 function drawFor(players) {
@@ -2550,7 +2605,7 @@ function drawFor(players) {
     tp.forEach(p => locks.push(ROLES.some(r => r.key === p.lane) && !locks.includes(p.lane) ? p.lane : ""));
     const free = shuffle(ROLES.map(r => r.key).filter(r => !locks.includes(r)));
     tp.forEach((p, k) => {
-      const role = locks[k] || free.pop() || rand(ROLES).key, c = rand(eligibleChamps(used));
+      const role = locks[k] || free.pop() || rand(ROLES).key, c = rand(eligibleFor(p, used));
       used.push(c.id);
       out.push({ pid: p.id, team: t, locked: !!locks[k], pack: packPick({ ...makePick(c, role, rand(builds), p.name) }) });
     });
@@ -2628,12 +2683,23 @@ function roomBarHTML() {
       <span>Salle</span><b>${room.code}</b>${COPY_ICON}
     </button>
     <div class="on-seats" aria-label="Joueurs connectés">${room.members.map(m => `<span class="on-seat${m.id === ME.id ? " me" : ""}${m.id === st.host ? " host" : ""}">
-      <i aria-hidden="true">${esc((m.name || "?").trim().charAt(0).toUpperCase())}</i>${esc(m.name)}${m.id === st.host ? `<small>hôte</small>` : ""}</span>`).join("")}</div>
+      <i aria-hidden="true">${esc((m.name || "?").trim().charAt(0).toUpperCase())}</i>${esc(m.name)}${m.id === st.host ? `<small>hôte</small>` : ""}${cleanBans(m.bans).map(id => `<img class="on-ban" src="${imgChamp(CHAMP_BY_ID[id])}" alt="${esc(CHAMP_BY_ID[id].name)} banni" title="${esc(CHAMP_BY_ID[id].name)} banni">`).join("")}</span>`).join("")}</div>
     <div class="on-bar-actions">
       <button class="btn" data-on="invite">Inviter</button>
       <button class="btn" data-rules>Règles</button>
       <button class="btn on-quit" data-on="leave">Quitter</button>
     </div>
+  </div>`;
+}
+function myBansHTML() {
+  const bans = myBans();
+  return `<div class="on-mybans">
+    <span class="on-mybans-label">Tes bans ${bans.length}/${MAX_MY_BANS}</span>
+    <div class="on-mybans-list">${bans.map(id => `<button class="on-ban-chip" data-unban="${id}" aria-label="Retirer ${esc(CHAMP_BY_ID[id].name)} de tes bans">
+      <img src="${imgChamp(CHAMP_BY_ID[id])}" alt="">${esc(CHAMP_BY_ID[id].name)}<span aria-hidden="true">×</span></button>`).join("")}
+      ${bans.length < MAX_MY_BANS ? `<input type="text" id="onBanAdd" list="onChampList" placeholder="Bannir un champion…" autocomplete="off" aria-label="Bannir un champion">` : ""}
+    </div>
+    <datalist id="onChampList">${CHAMPS.filter(c => !bans.includes(c.id)).map(c => `<option value="${esc(c.name)}"></option>`).join("")}</datalist>
   </div>`;
 }
 function laneSelectHTML() {
@@ -2652,13 +2718,13 @@ function teamsEditorHTML() {
 function lobbyHTML() {
   const st = room.state, host = isHost(), n = allSeats().length;
   if (!host) return `<div class="panel-paper on-waiting">
-    <h2 class="on-title">${esc(memberName(st.host))} prépare la partie…</h2>${laneSelectHTML()}</div>`;
+    <h2 class="on-title">${esc(memberName(st.host))} prépare la partie…</h2>${laneSelectHTML()}${myBansHTML()}</div>`;
   const opt = (key, label, on) => `<button class="chip on-opt" aria-pressed="${on}" data-on-opt="${key}">${label}</button>`;
   return `<div class="on-modes">
     <section class="on-mode">
       <h2>Troll picks</h2>
       <p class="on-sub">Un pick par joueur, un joker chacun.</p>
-      ${laneSelectHTML()}
+      ${laneSelectHTML()}${myBansHTML()}
       <button class="btn-chip" data-on="draw">Tirer</button>
     </section>
     <section class="on-mode">
@@ -2688,7 +2754,7 @@ function picksHTML() {
       ${mine ? `<button class="btn-chip" data-on="joker" ${used ? "disabled" : ""}>${used ? "Joker utilisé" : "Utiliser mon joker"}</button>` : `<p class="hint" style="color:var(--muted)">Tu es arrivé après le tirage : tu regardes.</p>`}
       ${isHost() ? `<button class="btn" data-on="draw">Nouveau tirage</button><button class="btn" data-on="lobby">Retour au salon</button>` : ""}
     </div>
-    ${laneSelectHTML()}
+    ${laneSelectHTML()}${myBansHTML()}
   </div>`;
 }
 /* La première fois qu'un tirage s'affiche, les visages défilent avant de s'arrêter (comme en mode Équipe). */
@@ -2825,6 +2891,7 @@ $("#onlineBody").addEventListener("click", async e => {
   const b = e.target.closest("button, #onCard"); if (!b) return;
   if (b.id === "onCard") { room.cardOpen = !room.cardOpen; b.classList.toggle("open", room.cardOpen); return; }
   const d = b.dataset, st = room?.state;
+  if (d.unban) return setMyBans(myBans().filter(x => x !== d.unban));
   if (d.oticket != null) return openTicket(onlineTeam[+d.oticket], { from: "online", i: +d.oticket });
   switch (d.on) {
     case "create": return joinRoom(newCode(), true);
@@ -2869,6 +2936,13 @@ $("#onlineBody").addEventListener("change", e => {
     if (k && !PC_KEY_RE.test(k)) return toast("La clé ressemble à ABCD-EF23");
     store.set("pcKey", k); listenPc(); renderOnline();
     return toast(k ? "PC lié à TrollPicks+" : "PC délié");
+  }
+  if (t.id === "onBanAdd") {
+    const name = t.value.trim().toLowerCase();
+    const c = CHAMPS.find(x => x.name.toLowerCase() === name) || CHAMPS.find(x => x.name.toLowerCase().startsWith(name));
+    if (!name) return;
+    if (!c) { t.value = ""; return toast("Champion introuvable"); }
+    return setMyBans([...myBans(), c.id]);
   }
   if (t.id === "onLane") {
     room.lane = t.value; store.set("lane:" + room.code, t.value);

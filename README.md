@@ -12,9 +12,10 @@ Champion, lane et type de build tirés à la roue, puis un build complet et coh�
 ## En ligne
 Une salle à code (4 caractères ou lien d'invitation), rejointe depuis chaque PC.
 - Troll picks en direct : un pick par joueur, lanes verrouillables, un joker par joueur.
+- Bans personnels : chacun bannit jusqu'à 3 champions qu'il ne veut pas jouer (gardés dans son navigateur, visibles par toute la salle). Ils ne s'appliquent qu'à ses propres tirages, jokers et troll pick imposé. Les réglages (bans globaux, classes, builds) restent ceux de l'hôte, qui tire pour tout le monde.
 - Partie truquée : rôles secrets de 3 à 10 joueurs, un Tricheur par équipe (Pantin, Pile ou Face, Flambeur, High Roller, Bluffeur, Âme liée, Honnête joueur), événements pour tous (désactivables), vote depuis chaque PC, révélation et points. Inspirée du concept Among Legends de Solary, avec des rôles et visuels propres au site.
 
-Technique : Supabase Realtime (diffusion et présence, sans base de données). L'hôte fait foi et diffuse l'état de la salle ; les rôles sont chiffrés pour chaque joueur (ECDH P-256 + AES-GCM) ; si l'hôte part, le joueur arrivé le plus tôt reprend la main. `index.html` ne contient que la clé publique (publishable) du projet.
+Technique : Supabase Realtime (diffusion et présence, sans base de données). L'hôte fait foi et diffuse l'état de la salle ; les rôles sont chiffrés pour chaque joueur (ECDH P-256 + AES-GCM) ; si l'hôte part, le joueur arrivé le plus tôt reprend la main. Le battement de la connexion tourne dans un worker (option realtime worker) pour ne pas être coupé quand le site est en arrière-plan, et une connexion perdue se rétablit toute seule en gardant l'état de la salle. `index.html` ne contient que la clé publique (publishable) du projet.
 
 Pendant la game : son d'alerte, notifications Windows (à activer), chrono dans un worker pour ne pas être ralenti quand LoL est au premier plan.
 
