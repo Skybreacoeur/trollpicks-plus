@@ -414,11 +414,54 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
 .secret-live h3{font-family:var(--display);font-weight:400;font-size:1.05rem}
 .secret-live .big{font-family:var(--display);font-size:1.5rem;line-height:1.1}
 .secret-live .clock{font-variant-numeric:tabular-nums;font-weight:800;color:var(--ink-2)}
+.secret-live .done{color:#1f7a4c;font-weight:800}
+.secret-live .btn-chip{justify-self:start}
+.coin{animation:coinspin .8s var(--ease-out)}
+@keyframes coinspin{from{transform:perspective(400px) rotateX(0)}to{transform:perspective(400px) rotateX(720deg)}}
 .secret-live.flash{animation:flash .9s var(--ease-out)}
 @keyframes flash{0%{box-shadow:0 0 0 0 var(--gold)}30%{box-shadow:0 0 0 6px var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
 .secret-points{width:100%;color:var(--muted);font-size:.9rem;text-align:left}
 .secret-points li{margin-left:18px}
 body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
+
+/* ---------- cartes de rôle (maquette Figma) ---------- */
+.rcard{position:relative;container-type:inline-size;width:100%;aspect-ratio:5/7;background:var(--paper);color:var(--ink);
+  border-radius:7% / 5%;overflow:hidden;text-align:center;
+  display:flex;flex-direction:column;align-items:center}
+.rcard::before{content:"";position:absolute;inset:4.8cqw 4.8cqw 13.6cqw;border:max(1px,.8cqw) solid var(--rc);border-bottom:0;
+  border-radius:4.8cqw 4.8cqw 0 0;opacity:.55;pointer-events:none}
+.rcard::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 max(2px,1.2cqw) var(--ink);pointer-events:none}
+.rc-corner{position:absolute;font-weight:800;font-size:10.4cqw;line-height:1;color:var(--rc)}
+.rc-corner.tl{top:7cqw;left:9cqw}
+.rc-corner.br{bottom:16.5cqw;right:9cqw;transform:rotate(180deg)}
+.rc-art{width:53cqw;height:auto;margin-top:18cqw;flex:none}
+.rc-name{font-family:var(--display);font-weight:400;font-size:8.8cqw;line-height:1;margin-top:5cqw;padding:0 8cqw;text-transform:uppercase}
+.rc-text{font-weight:600;font-size:5.2cqw;line-height:1.35;color:var(--ink-2);margin-top:3cqw;padding:0 12cqw;text-wrap:pretty}
+.rc-band{position:absolute;left:0;right:0;bottom:0;height:13.6cqw;background:var(--rc);color:var(--paper);
+  font-family:var(--display);font-size:4.4cqw;display:grid;place-items:center}
+.rcard.full .rc-art{width:40cqw;margin-top:13cqw}
+.rcard.full .rc-name{font-size:8cqw;margin-top:3cqw}
+.rcard.full .rc-text{font-size:4.6cqw;color:var(--ink);padding:0 10cqw}
+.card-face.rc-host{padding:0;background:none;display:block}
+.rc-host .rcard{height:100%;aspect-ratio:auto;border-radius:16px}
+.cb-chip{width:42%;aspect-ratio:1;border-radius:50%;background:var(--ink);display:grid;place-items:center;
+  box-shadow:0 0 0 7px var(--paper),0 0 0 11px var(--red),0 0 0 13px var(--paper)}
+.cb-chip span{font-family:var(--display);font-size:1.6rem;color:var(--gold)}
+.reveal-card .suit.art{background:var(--paper);box-shadow:inset 0 0 0 3px var(--rc);padding:4px}
+.reveal-card .suit.art img{width:100%;height:100%;object-fit:contain}
+.rule-card{width:96px;flex:none}
+.rule-card .rc-text{display:none}
+
+/* ---------- règles ---------- */
+.rule-steps{display:grid;gap:10px;padding-left:20px;line-height:1.45}
+.rule-roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:10px}
+.rule-role{display:flex;gap:12px;align-items:flex-start;background:var(--paper-2);border-radius:8px;padding:12px}
+.rule-role .suit{width:38px;height:50px;border-radius:6px;display:grid;place-items:center;font-size:1.4rem;color:#fff;flex:none}
+.rule-role h3{font-family:var(--display);font-weight:400;font-size:1rem;line-height:1.1;margin-bottom:4px}
+.rule-role h3 small{font-family:Archivo,sans-serif;font-weight:700;font-size:.75rem;color:var(--ink-2)}
+.rule-role p{font-size:.9rem;line-height:1.4;margin-bottom:6px}
+.rule-role ul{font-size:.82rem;color:var(--ink-2);padding-left:16px;display:grid;gap:2px}
+.secret > .btn[data-rules]{justify-self:center}
 
 /* ---------- en ligne ---------- */
 .on-home{display:grid;gap:22px}
@@ -435,6 +478,7 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 .on-bar{display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap;margin-bottom:20px}
 .on-code{display:flex;align-items:baseline;gap:10px}
 .on-code span{font-weight:800;color:var(--muted)}
+.on-code .on-copy{padding:7px 14px;font-size:.85rem;align-self:center}
 .on-code b{font-family:var(--display);font-weight:400;font-size:2.2rem;letter-spacing:.08em;color:var(--gold);line-height:1}
 .on-members{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
 .on-member{background:rgba(0,0,0,.25);color:var(--cream);font-weight:800;font-size:.88rem;padding:5px 12px;border-radius:999px;overflow-wrap:anywhere}
@@ -477,6 +521,7 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
   .btn:active:not(:disabled),.btn-chip:active:not(:disabled){transform:none}
   #toast,#toast.on{transform:translate(-50%,0);transition:opacity .2s ease}
   .card3d-inner{transition:none}
+  .coin{animation:none}
   @keyframes flash{0%,100%{opacity:1}50%{opacity:.6}}
 }
 </style>
@@ -576,7 +621,7 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
   <section class="view" id="view-online" role="tabpanel" hidden>
     <div class="intro">
       <h1>Toute la bande à la même table</h1>
-      <p>Crée une salle, envoie le code à tes potes : troll picks en direct ou Partie truquée, chacun sur son téléphone.</p>
+      <p>Crée une salle, envoie le code à tes potes : troll picks en direct ou Partie truquée, chacun sur son PC, à côté de la game.</p>
     </div>
     <div id="onlineBody"></div>
   </section>
@@ -585,7 +630,7 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
   <section class="view" id="view-party" role="tabpanel" hidden>
     <div class="intro">
       <h1>La partie est truquée</h1>
-      <button class="btn" data-goto="online">‹ Retour à En ligne</button>
+      <div class="party-actions" style="margin:0"><button class="btn" data-goto="online">‹ Retour à En ligne</button><button class="btn" data-rules>Règles et rôles</button></div>
       <p>Des rôles secrets pendant une vraie game, de 3 à 10 joueurs. Un tricheur dans chaque équipe, un vote à la fin, et des points pour tout le monde.</p>
     </div>
     <div id="partyBody"></div>
@@ -616,6 +661,16 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 </footer>
 
 <!-- =============== SETTINGS =============== -->
+<dialog id="rules" aria-labelledby="rulesTitle">
+  <div class="dlg-head">
+    <h2 id="rulesTitle">Règles de la Partie truquée</h2>
+    <button class="icon-btn" data-close-rules aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="dlg-body" id="rulesBody"></div>
+</dialog>
+
 <dialog id="settings" aria-labelledby="setTitle">
   <div class="dlg-head">
     <h2 id="setTitle">Règles de la table</h2>
@@ -991,6 +1046,12 @@ function beep(freq = 900, dur = .03, type = "triangle", vol = .05) {
     o.start(); o.stop(actx.currentTime + dur);
   } catch {}
 }
+/* Chrome n'autorise le son qu'après un clic sur la page : on prépare le son dès le premier clic. */
+addEventListener("pointerdown", () => {
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch {}
+});
+/* Alerte de partie : plus forte et plus longue que les sons d'interface, pour passer par-dessus la game. */
+function alertSound() { [880, 1175, 880, 1175].forEach((f, i) => setTimeout(() => beep(f, .22, "square", .12), i * 170)); }
 function chime() { [660, 880, 1320].forEach((f, i) => setTimeout(() => beep(f, .25, "sine", .06), i * 90)); }
 
 /* =========================================================
@@ -2011,11 +2072,58 @@ const PARTY_ROLES = {
   AME:        { name: "L'Âme liée", suit: "♥", color: "#c2417a",
     goal: "Ton destin est lié à {p}. Chaque fois que {p} meurt, tu dois mourir aussi, le plus vite possible. Et gagne la partie.",
     points: ["+2 si tu as respecté le lien", "+1 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] },
+  CONTREBANDIER: { name: "Le Contrebandier", suit: "♠", color: "#6b4e2e",
+    goal: "Gagne la partie en accomplissant en douce les missions qui s'affichent ici, une toutes les 5 à 7 minutes. Personne ne doit comprendre ce que tu fabriques.",
+    points: ["+1 par mission réussie (clique sur « Fait » quand c'est fait)", "+1 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] },
   HONNETE:    { name: "L'Honnête joueur", suit: "♠", color: "#1f7a4c",
     goal: "Aucun pouvoir, aucune consigne. Gagne la partie et démasque le Tricheur.",
     points: ["+2 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] }
 };
-const PARTY_OPTIONAL = ["PANTIN", "PILEFACE", "FLAMBEUR", "HIGHROLLER", "BLUFFEUR", "AME"];
+const PARTY_OPTIONAL = ["PANTIN", "PILEFACE", "FLAMBEUR", "HIGHROLLER", "BLUFFEUR", "AME", "CONTREBANDIER"];
+const SMUGGLER_MISSIONS = [
+  "Vole un camp de la jungle ennemie.",
+  "Meurs sous une tour ennemie, sans que ce soit pendant un combat d'équipe.",
+  "Rappelle à la base au milieu d'une lane, sous les yeux d'un adversaire.",
+  "Pose 2 balises dans la jungle ennemie.",
+  "Prends un camp de ton propre jungler sans qu'il s'en rende compte.",
+  "Utilise un sort d'invocateur sans raison visible.",
+  "Sois présent sur un objectif (dragon, héraut, baron) sans lui faire de dégâts.",
+  "Fais l'emote de rire devant un adversaire.",
+  "Reste 30 secondes dans un buisson de la rivière.",
+  "Achève un sbire avec ton ultime.",
+  "Achète un objet qui n'a rien à faire dans ton build, puis revends-le.",
+  "Va saluer (emote) l'équipe ennemie dans sa propre jungle."
+];
+const SMUGGLER_FIRST = 3 * 60e3;
+/* Cartes dessinées dans Figma (fichier « TrollPicks+ — Cartes de la Partie truquée ») :
+   l'illustration de chaque rôle est exportée en SVG dans cartes/, le reste de la carte est en HTML. */
+const ROLE_ART = { TRICHEUR: "tricheur", HONNETE: "honnete", PANTIN: "pantin", PILEFACE: "pileface", FLAMBEUR: "flambeur",
+  HIGHROLLER: "highroller", BLUFFEUR: "bluffeur", AME: "ame", CONTREBANDIER: "contrebandier" };
+const ROLE_TAG = {
+  TRICHEUR: "Fais perdre ton équipe. Sans te faire prendre.",
+  HONNETE: "Aucun pouvoir. Gagne et démasque le Tricheur.",
+  PANTIN: "Obéis aux ordres. Un nouveau toutes les 4 minutes.",
+  PILEFACE: "La pièce choisit ton camp, toutes les 7 minutes.",
+  FLAMBEUR: "Meurs le plus, frappe le plus. Et gagne.",
+  HIGHROLLER: "Tu mises gros : tu dois gagner, sinon tu perds.",
+  BLUFFEUR: "Fais-toi accuser au vote. Et gagne quand même.",
+  AME: "Quand ton allié meurt, tu meurs aussi.",
+  CONTREBANDIER: "Des missions en douce. Personne ne doit voir."
+};
+const roleArt = key => `cartes/${ROLE_ART[key]}.svg`;
+const shortName = name => name.replace(/^(Le |La |L')/, "");
+/* full : carte du joueur en jeu (objectif complet, illustration plus petite) */
+function roleCardHTML(key, text = ROLE_TAG[key], full = false) {
+  const R = PARTY_ROLES[key];
+  return `<div class="rcard${full ? " full" : ""}" style="--rc:${R.color}">
+    <span class="rc-corner tl" aria-hidden="true">${R.suit}</span><span class="rc-corner br" aria-hidden="true">${R.suit}</span>
+    <img class="rc-art" src="${roleArt(key)}" alt="" width="132" height="132">
+    <b class="rc-name">${shortName(R.name)}</b>
+    <p class="rc-text">${text}</p>
+    <span class="rc-band" aria-hidden="true">Partie truquée</span>
+  </div>`;
+}
+const CARD_BACK = `<div class="cb-chip" aria-hidden="true"><span>TP+</span></div><b>Partie<br>truquée</b><span>Clique pour voir ton rôle</span>`;
 const PANTIN_ORDERS = [
   "Rentre à la base maintenant, même si tout va bien.",
   "Va voir la lane la plus proche et reste-y 1 minute.",
@@ -2119,6 +2227,7 @@ function scoreOf(i, P = localP()) {
     case "HIGHROLLER": add(win ? 2 : win === false ? -2 : 0, win ? "victoire" : "défaite"); add(c.a ? 2 : 0, "premier en kills, dégâts ou assists"); break;
     case "BLUFFEUR": add(accused === i ? 3 : 0, "accusé au vote"); add(win ? 1 : win === false ? -1 : 0, win ? "victoire" : "défaite"); break;
     case "AME": add(c.a ? 2 : 0, "lien respecté"); add(win ? 1 : 0, "victoire"); break;
+    case "CONTREBANDIER": add(c.n || 0, `${c.n || 0} mission${c.n > 1 ? "s" : ""} réussie${c.n > 1 ? "s" : ""}`); add(win ? 1 : 0, "victoire"); break;
     case "HONNETE": add(win ? 2 : 0, "victoire"); break;
   }
   return { total: lines.reduce((s, [n]) => s + n, 0), lines };
@@ -2138,10 +2247,12 @@ function revealHTML(P, opts = {}) {
           <div><div class="pname">${esc(p.name)}</div><div class="role-name">Carte pas encore montrée</div></div></div></div>`;
         const attr = opts.check?.(i);
         return `<div class="reveal-card${opts.animate ? "" : " still"}" style="animation-delay:${i * 80}ms">
-          <div class="role-line"><span class="suit" style="background:${R.color}">${R.suit}</span>
+          <div class="role-line"><span class="suit art" style="--rc:${R.color}"><img src="${roleArt(d.role)}" alt=""></span>
             <div><div class="pname">${esc(p.name)}${two ? ` • ${TEAM_NAMES[p.team]}` : ""}</div><div class="role-name">${R.name}</div>
             ${d.partner ? `<div class="pname">lié à ${esc(d.partner)}</div>` : ""}</div></div>
-          ${(CHECKS[d.role] || []).map(([k, lab]) => `<label><input type="checkbox" ${attr ? `${attr} data-k="${k}"` : "disabled"} ${P.checks[i]?.[k] ? "checked" : ""}>${lab}</label>`).join("")}
+          ${(CHECKS[d.role] || []).map(([k, lab, type]) => type === "count"
+            ? `<label>${lab} <span class="role-pick" style="margin:0"><select ${attr ? `${attr} data-k="${k}"` : "disabled"}>${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => `<option ${(P.checks[i]?.[k] || 0) === n ? "selected" : ""}>${n}</option>`).join("")}</select></span></label>`
+            : `<label><input type="checkbox" ${attr ? `${attr} data-k="${k}"` : "disabled"} ${P.checks[i]?.[k] ? "checked" : ""}>${lab}</label>`).join("")}
           <div class="pts">${pts(sc.total)}
             <small>${sc.lines.map(([n, w]) => `${n > 0 ? "+" : ""}${n} ${w}`).join(" • ") || "aucun point"}</small></div>
         </div>`; }).join("")}</div>
@@ -2156,7 +2267,8 @@ const CHECKS = {
   PILEFACE: [["a", "Était côté Allié à la fin"]],
   FLAMBEUR: [["a", "Le plus de morts de l'équipe"], ["b", "Le plus de dégâts de l'équipe"]],
   HIGHROLLER: [["a", "Premier en kills, dégâts ou assists"]],
-  AME: [["a", "A respecté le lien"]]
+  AME: [["a", "A respecté le lien"]],
+  CONTREBANDIER: [["n", "Missions réussies", "count"]]
 };
 
 /* ---------- écran de l'hôte ---------- */
@@ -2265,7 +2377,7 @@ $("#partyBody").addEventListener("change", e => {
   if (t.dataset.pvote != null) party.votes[+t.dataset.pvote] = +t.value;
   else if (t.dataset.pcheck != null) {
     const i = +t.dataset.pcheck, k = t.dataset.k;
-    party.checks[i] = { ...party.checks[i], [k]: t.checked }; saveParty(); renderParty();
+    party.checks[i] = { ...party.checks[i], [k]: t.type === "checkbox" ? t.checked : +t.value }; saveParty(); renderParty();
     document.querySelector(`[data-pcheck="${i}"][data-k="${k}"]`)?.focus();
     return;
   }
@@ -2273,22 +2385,124 @@ $("#partyBody").addEventListener("change", e => {
   saveParty();
 });
 
+/* ---------- battement d'horloge ----------
+   Chrome ralentit les minuteurs d'un onglet en arrière-plan (jusqu'à une fois par minute).
+   Pendant la game, LoL est au premier plan : un worker garde un battement à la seconde. */
+const ticker = (() => {
+  const subs = new Set(), run = () => subs.forEach(f => { try { f(); } catch (e) { console.error(e); } });
+  try {
+    const w = new Worker(URL.createObjectURL(new Blob(["setInterval(() => postMessage(0), 1000)"], { type: "text/javascript" })));
+    w.onmessage = run;
+  } catch { setInterval(run, 1000); }
+  return { add: f => subs.add(f), remove: f => subs.delete(f) };
+})();
+
+/* ---------- notifications Windows ---------- */
+const canNotify = () => "Notification" in window;
+function notifyBtnHTML() {
+  if (!canNotify()) return "";
+  if (Notification.permission === "default") return `<button class="btn notif-btn" data-notif>Activer les notifications Windows</button>`;
+  if (Notification.permission === "denied") return `<p class="hint notif-btn">Notifications bloquées : autorise-les via le cadenas de la barre d'adresse.</p>`;
+  return "";
+}
+document.addEventListener("click", async e => {
+  if (!e.target.closest("[data-notif]")) return;
+  const r = await Notification.requestPermission();
+  document.querySelectorAll(".notif-btn").forEach(b => b.remove());
+  toast(r === "granted" ? "Notifications activées" : "Notifications refusées");
+  if (r === "granted") new Notification("TrollPicks+", { body: "Les ordres, missions et événements s'afficheront ici pendant la game." });
+});
+/* Son + notification (si l'onglet n'est pas visible) quand il se passe quelque chose. */
+function gameAlert(title, body) {
+  alertSound();
+  if (document.hidden && canNotify() && Notification.permission === "granted") {
+    try { new Notification(title, { body: body || "", tag: "trollpicks-" + title }); } catch {}
+  }
+  document.title = `${title} TrollPicks+`;
+  setTimeout(() => document.title = "TrollPicks+", 8000);
+}
+
 /* ---------- ce qui change pendant la game, selon le rôle ---------- */
 const mmss = ms => `${Math.floor(Math.max(0, ms) / 60e3)}:${String(Math.floor(Math.max(0, ms) / 1e3) % 60).padStart(2, "0")}`;
-function liveState(role, seed, t) {
+/* html : contenu stable (redessiné seulement s'il change) ; clock : texte du compte à rebours ;
+   key : change quand il se passe quelque chose (son + vibration) ; notice : titre de l'onglet à ce moment-là. */
+const CLOCK = '<div class="clock" data-clock></div>';
+function smugglerSlot(seed, t) {
+  let at = SMUGGLER_FIRST, k = -1;
+  while (at <= t) { k++; at += (5 + 2 * seeded(seed, 500 + k)) * 60e3; }
+  return { k, next: at - t };
+}
+function liveState(role, seed, t, done = new Set()) {
   if (role === "PANTIN") {
-    if (t < PANTIN_FIRST) return { html: `<h3>Premier ordre dans</h3><div class="big">${mmss(PANTIN_FIRST - t)}</div>`, key: "wait" };
+    if (t < PANTIN_FIRST) return { html: `<h3>Premier ordre dans</h3><div class="big" data-clock></div>`, clock: mmss(PANTIN_FIRST - t), key: "wait" };
     const k = Math.floor((t - PANTIN_FIRST) / PANTIN_EVERY), next = PANTIN_FIRST + (k + 1) * PANTIN_EVERY - t;
     const order = PANTIN_ORDERS[Math.floor(seeded(seed, k) * PANTIN_ORDERS.length)];
-    return { html: `<h3>Ordre n° ${k + 1}</h3><div class="big">${order}</div><div class="clock">Prochain ordre dans ${mmss(next)}</div>`, key: "o" + k };
+    return { html: `<h3>Ordre n° ${k + 1}</h3><div class="big">${order}</div>${CLOCK}`, clock: `Prochain ordre dans ${mmss(next)}`, key: "o" + k, notice: "Nouvel ordre !", text: order };
   }
   if (role === "PILEFACE") {
-    const k = Math.floor(t / COIN_EVERY), ally = seeded(seed, k) < .5, next = (k + 1) * COIN_EVERY - t;
-    return { html: `<h3>Ton côté actuel</h3><div class="big" style="color:${ally ? "#1f7a4c" : "var(--red)"}">${ally ? "Allié : fais gagner" : "Tricheur : fais perdre"}</div>
-      <div class="clock">La pièce est relancée dans ${mmss(next)}</div>`, key: "c" + k + ally };
+    const k = Math.floor(t / COIN_EVERY), ally = seeded(seed, k) < .5, next = (k + 1) * COIN_EVERY - t, warn = next <= 30e3;
+    return {
+      html: `<h3>Ton côté actuel</h3><div class="big coin" style="color:${ally ? "#1f7a4c" : "var(--red)"}">${ally ? "Allié : fais gagner" : "Tricheur : fais perdre"}</div>${CLOCK}`,
+      clock: warn ? `Attention : la pièce tourne dans ${mmss(next)} !` : `La pièce est relancée dans ${mmss(next)}`,
+      key: "c" + k + (warn ? "w" : ""), notice: warn ? "La pièce va tourner !" : "La pièce est relancée !",
+      text: warn ? "Dans 30 secondes, ton côté peut changer." : (ally ? "Côté Allié : fais gagner ton équipe." : "Côté Tricheur : fais perdre ton équipe.")
+    };
   }
-  return { html: `<h3>Temps de jeu</h3><div class="big">${mmss(t)}</div>`, key: "static" };
+  if (role === "CONTREBANDIER") {
+    const { k, next } = smugglerSlot(seed, t);
+    if (k < 0) return { html: `<h3>Première mission dans</h3><div class="big" data-clock></div>`, clock: mmss(next), key: "wait" };
+    const mission = SMUGGLER_MISSIONS[Math.floor(seeded(seed, 700 + k) * SMUGGLER_MISSIONS.length)];
+    return {
+      html: `<h3>Mission n° ${k + 1}</h3><div class="big">${mission}</div>
+        ${done.has(k) ? `<p class="done">Mission accomplie</p>` : `<button class="btn-chip" data-mission="${k}">Fait !</button>`}
+        ${CLOCK}<p class="clock">Missions réussies : ${done.size}</p>`,
+      clock: `Mission suivante dans ${mmss(next)}`, key: "m" + k, notice: "Nouvelle mission !", text: mission
+    };
+  }
+  return { html: `<h3>Temps de jeu</h3><div class="big" data-clock></div>`, clock: mmss(t), key: "static" };
 }
+function paintLive(el, L) {
+  if (el._h !== L.html) { el.innerHTML = L.html; el._h = L.html; }
+  const c = el.querySelector("[data-clock]");
+  if (c && c.textContent !== L.clock) c.textContent = L.clock;
+}
+const missionKey = id => "missions:" + id;
+const missionsDone = id => new Set(store.get(missionKey(id), []));
+function markMission(id, k) { const d = missionsDone(id); d.add(+k); store.set(missionKey(id), [...d]); beep(1300, .08, "sine", .05); }
+
+/* ---------- fenêtre des règles ---------- */
+const ROLE_ORDER = ["TRICHEUR", "HONNETE", ...PARTY_OPTIONAL];
+function rulesHTML() {
+  const card = k => {
+    const R = PARTY_ROLES[k];
+    return `<div class="rule-role">
+      <div class="rule-card">${roleCardHTML(k)}</div>
+      <div><h3>${R.name}${k === "TRICHEUR" ? " <small>toujours en jeu</small>" : ""}</h3>
+        <p>${R.goal.replaceAll("{p}", "un allié tiré au sort")}</p>
+        <ul>${R.points.map(p => `<li>${p}</li>`).join("")}</ul></div>
+    </div>`;
+  };
+  return `<div class="set">
+      <h3>Comment ça se passe</h3>
+      <ol class="rule-steps">
+        <li><b>Distribution.</b> Chaque joueur découvre son rôle secret sur sa page TrollPicks+, dans son navigateur. Il y a un Tricheur par équipe, les autres rôles sont tirés au hasard (un exemplaire de chaque par équipe).</li>
+        <li><b>La game.</b> Vous jouez une vraie partie de League. Chacun suit l'objectif de son rôle sans se trahir. Certains rôles reçoivent des ordres, des missions ou une pièce qui tourne : la page joue un son et envoie une notification Windows, même quand LoL est au premier plan.</li>
+        <li><b>Événements pour tous</b> (en salle en ligne) : toutes les 8 minutes à partir de 5 minutes, une contrainte ou une rumeur s'affiche chez tout le monde.</li>
+        <li><b>Le débat.</b> Après la game, discutez en vocal : qui a joué bizarrement ?</li>
+        <li><b>Le vote.</b> Chacun accuse en secret un joueur de son équipe. Le plus accusé est démasqué ; en cas d'égalité, personne ne l'est.</li>
+        <li><b>La révélation.</b> Les cartes se retournent, l'hôte coche ce qui s'est passé (le plus de morts, ordres respectés…) et le classement s'affiche.</li>
+      </ol>
+    </div>
+    <div class="set">
+      <h3>Les rôles</h3>
+      <div class="rule-roles">${ROLE_ORDER.map(card).join("")}</div>
+    </div>
+    <p class="hint">Un conseil : ne montre jamais ton écran, et joue « normal » autant que possible. Le but est de faire douter les autres.</p>`;
+}
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-rules]")) { $("#rulesBody").innerHTML = rulesHTML(); $("#rules").showModal(); }
+  if (e.target.closest("[data-close-rules]") || e.target === $("#rules")) $("#rules").close();
+});
 
 /* ---------- page secrète du joueur ---------- */
 let secretTimer = null;
@@ -2300,20 +2514,18 @@ function openSecret(token) {
   document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "view-secret");
   const startKey = `secret:${s.g}:${s.n}`, goal = R.goal.replaceAll("{p}", esc(s.p || "ton allié"));
   $("#secretBody").innerHTML = `<div class="secret">
-    <div class="secret-who">${esc(s.n)}${s.t >= 0 ? `, équipe ${TEAM_NAMES[s.t]}` : ""} • ne montre pas cet écran</div>
+    <div class="secret-who">${esc(s.n)}${s.t >= 0 ? `, équipe ${TEAM_NAMES[s.t]}` : ""} • ne montre pas cet écran (attention au partage d'écran sur Discord)</div>
     <div class="card3d" id="secretCard" role="button" tabindex="0" aria-label="Retourner ma carte">
       <div class="card3d-inner">
-        <div class="card-face card-back"><b>Partie<br>truquée</b><span>Touche pour voir ton rôle</span></div>
-        <div class="card-face card-front" style="color:${R.color}">
-          <span class="corner tl">${R.suit}</span><span class="corner br">${R.suit}</span>
-          <div class="big-suit">${R.suit}</div><h2>${R.name}</h2>
-          <p style="color:var(--ink)">${goal}</p>
-        </div>
+        <div class="card-face card-back">${CARD_BACK}</div>
+        <div class="card-face card-front rc-host">${roleCardHTML(s.r, goal, true)}</div>
       </div>
     </div>
     <div class="secret-live" id="secretLive"></div>
+    ${notifyBtnHTML()}
     <button class="btn" id="secretReset" hidden>Remettre le chrono à zéro</button>
     <ul class="secret-points"><li>${R.points.join("</li><li>")}</li></ul>
+    <button class="btn" data-rules>Règles et rôles</button>
   </div>`;
   const card = $("#secretCard");
   const flip = () => card.classList.toggle("open");
@@ -2323,30 +2535,33 @@ function openSecret(token) {
   let last = null;
   const tick = () => {
     const start = store.get(startKey, null), live = $("#secretLive");
-    if (!live) return clearInterval(secretTimer);
+    if (!live) return ticker.remove(tick);
     if (!start) {
       $("#secretReset").hidden = true;
       if (live._h === "start") return;
       live._h = "start";
-      live.innerHTML = `<h3>Prêt ?</h3><p>Appuie quand la partie se charge : les ordres et la pièce suivent le temps de jeu.</p>
+      live.innerHTML = `<h3>Prêt ?</h3><p>Clique quand la partie se charge. Garde cet onglet ouvert pendant la game : un son et une notification te préviennent.</p>
         <button class="btn-chip" id="secretStart">La game commence</button>`;
       $("#secretStart").onclick = () => { store.set(startKey, Date.now()); beep(1000, .05); tick(); };
       return;
     }
-    const { html, key } = liveState(s.r, s.s, Date.now() - start);
+    const L = liveState(s.r, s.s, Date.now() - start, missionsDone(startKey)), key = L.key;
     $("#secretReset").hidden = false;
-    if (live._h !== html) { live.innerHTML = html; live._h = html; }   // ne redessine que si ça change
-    if (last !== null && key !== last && key !== "static") {
-      chime(); navigator.vibrate?.([200, 100, 200]);
+    paintLive(live, L);
+    if (last !== null && key !== last && key !== "static" && key !== "wait") {
+      gameAlert(L.notice || "Nouveau !", L.text);
       live.classList.remove("flash"); void live.offsetWidth; live.classList.add("flash");
-      document.title = s.r === "PANTIN" ? "Nouvel ordre ! TrollPicks+" : "La pièce est relancée ! TrollPicks+";
-      setTimeout(() => document.title = "TrollPicks+", 6000);
     }
     last = key;
   };
+  $("#secretLive").addEventListener("click", e => {
+    const m = e.target.closest("[data-mission]"); if (!m) return;
+    markMission(startKey, m.dataset.mission); tick();
+  });
   $("#secretReset").onclick = () => { if (confirm("Remettre le chrono à zéro ?")) { store.set(startKey, null); last = null; tick(); } };
-  clearInterval(secretTimer);
-  secretTimer = setInterval(tick, 1000);
+  if (secretTimer) ticker.remove(secretTimer);
+  secretTimer = tick;
+  ticker.add(tick);
   tick();
   return true;
 }
@@ -2471,11 +2686,10 @@ async function joinRoom(rawCode, asHost = false) {
       toast("Connexion à la salle perdue, nouvel essai…");
     }
   });
-  clearInterval(onlineTimer);
-  onlineTimer = setInterval(onlineTick, 1000);
+  ticker.add(onlineTick);
 }
 async function leaveRoom(forget = true) {
-  clearInterval(onlineTimer);
+  ticker.remove(onlineTick);
   if (room?.ch) { try { await room.ch.untrack(); await room.client.removeChannel(room.ch); } catch {} }
   room = null; onlineTeam = [];
   if (forget) { store.set("lastRoom", null); if (location.hash.startsWith("#salle=")) clearHash(); }
@@ -2513,7 +2727,7 @@ async function afterState() {
   }
   if (!g) room.myRole = null;
   if (g?.phase === "reveal" && room.myRole?.gid === g.id && !g.roles[ME.id]) {
-    const mine = { pid: ME.id, role: room.myRole.role, partner: room.myRole.partner || "" };
+    const mine = { pid: ME.id, role: room.myRole.role, partner: room.myRole.partner || "", done: missionsDone(g.id).size };
     if (isHost()) onMeRole(mine); else send("me-role", mine);
   }
   const pk = room.state.picks;
@@ -2585,6 +2799,8 @@ function onMeRole(m) {
   const g = room?.state?.game;
   if (!isHost() || !g || g.phase !== "reveal" || !PARTY_ROLES[m?.role] || !g.players.some(p => p.id === m.pid)) return;
   g.roles[m.pid] = { role: m.role, partner: String(m.partner || "").slice(0, 24) };
+  if (m.role === "CONTREBANDIER" && g.checks[m.pid]?.n == null)
+    g.checks[m.pid] = { ...g.checks[m.pid], n: Math.max(0, Math.min(8, Math.floor(+m.done) || 0)) };
   pushState();
 }
 
@@ -2642,9 +2858,9 @@ function renderOnline() {
   if (room.connecting || !room.state) {
     body.innerHTML = `<div class="panel-paper on-wait">
       ${room.waitedTooLong
-        ? `<h2 class="on-title">Personne dans la salle ${room.code}</h2><p class="hint">L'hôte n'est pas connecté, ou le code est faux. Vérifie le code, ou crée ta propre salle.</p>`
+        ? `<h2 class="on-title">Personne dans la salle ${room.code}</h2><p class="hint">L'hôte n'est pas connecté, ou le code est faux. Si toute la bande a fermé la page, l'un de vous peut reprendre la salle et devenir l'hôte.</p>`
         : `<h2 class="on-title">Connexion à la salle ${room.code}…</h2>`}
-      <div class="party-actions"><button class="btn btn-ink" data-on="leave">Quitter</button></div></div>`;
+      <div class="party-actions">${room.waitedTooLong ? `<button class="btn-chip" data-on="takeover">Reprendre la salle</button>` : ""}<button class="btn btn-ink" data-on="leave">Quitter</button></div></div>`;
     return;
   }
   const st = room.state;
@@ -2679,11 +2895,13 @@ function onlineHomeHTML() {
 function roomBarHTML() {
   const st = room.state;
   return `<div class="on-bar">
-    <div class="on-code"><span>Salle</span><b>${room.code}</b></div>
+    <div class="on-code"><span>Salle</span><b>${room.code}</b>
+      <button class="btn on-copy" data-on="copycode" aria-label="Copier le code ${room.code}">Copier le code</button></div>
     <div class="on-members" aria-label="Joueurs connectés">${room.members.map(m => `<span class="on-member${m.id === ME.id ? " me" : ""}">
       ${esc(m.name)}${m.id === st.host ? ` <small>hôte</small>` : ""}${m.id === ME.id ? ` <small>toi</small>` : ""}</span>`).join("")}</div>
     <div class="on-bar-actions">
       <button class="btn" data-on="invite">Copier l'invitation</button>
+      <button class="btn" data-rules>Règles</button>
       <button class="btn" data-on="leave">Quitter</button>
     </div>
   </div>`;
@@ -2716,7 +2934,7 @@ function lobbyHTML() {
       </div>
       <div class="on-choice">
         <h2>Partie truquée</h2>
-        <p>Rôles secrets, événements pour tous, vote sur chaque téléphone. À partir de 3 joueurs.</p>
+        <p>Rôles secrets, événements pour tous, vote depuis chaque PC. À partir de 3 joueurs.</p>
         <div class="chips">${PARTY_OPTIONAL.map(k => `<button class="chip" aria-pressed="${st.enabled.includes(k)}" data-orole="${k}">${PARTY_ROLES[k].name}</button>`).join("")}</div>
         <label class="on-check"><input type="checkbox" data-on-withpicks ${st.withPicks ? "checked" : ""}> Imposer aussi un troll pick à chacun</label>
         <button class="btn-chip" data-on="deal" ${n < 3 ? "disabled" : ""}>Distribuer les rôles</button>
@@ -2773,11 +2991,8 @@ function myCardHTML(R, mr) {
   const goal = R.goal.replaceAll("{p}", esc(mr.partner || "ton allié"));
   return `<div class="card3d${room.cardOpen ? " open" : ""}" id="onCard" role="button" tabindex="0" aria-label="Retourner ma carte">
     <div class="card3d-inner">
-      <div class="card-face card-back"><b>Partie<br>truquée</b><span>Touche pour voir ton rôle</span></div>
-      <div class="card-face card-front" style="color:${R.color}">
-        <span class="corner tl">${R.suit}</span><span class="corner br">${R.suit}</span>
-        <div class="big-suit">${R.suit}</div><h2>${R.name}</h2><p style="color:var(--ink)">${goal}</p>
-      </div>
+      <div class="card-face card-back">${CARD_BACK}</div>
+      <div class="card-face card-front rc-host">${roleCardHTML(mr.role, goal, true)}</div>
     </div></div>`;
 }
 function truqueHTML() {
@@ -2823,9 +3038,9 @@ function truqueHTML() {
 
   // phases "dealt" (en attente du départ) et "live" (game en cours)
   return `<div class="on-truque">
-    ${R ? `<div class="secret">${myCardHTML(R, mr)}<ul class="secret-points"><li>${R.points.join("</li><li>")}</li></ul></div>`
+    ${R ? `<div class="secret">${myCardHTML(R, mr)}<ul class="secret-points"><li>${R.points.join("</li><li>")}</li></ul><button class="btn" data-rules>Règles et rôles</button></div>`
         : `<div class="panel-paper"><p class="hint" style="margin:0">${me ? "Déchiffrement de ton rôle…" : "Tu es arrivé après la distribution : tu regardes cette partie."}</p></div>`}
-    <div class="on-side">
+    <div class="on-side">${notifyBtnHTML()}
       ${g.phase === "dealt"
         ? `<div class="secret-live"><h3>En attente du départ</h3><p>${host ? "Appuie quand la partie se charge : le chrono part pour tout le monde." : `${esc(memberName(st.host))} lance le chrono au chargement de la game.`}</p>
             ${host ? `<button class="btn-chip" data-on="start">La game commence</button>` : ""}</div>`
@@ -2843,30 +3058,29 @@ function onlineTick(force = false) {
   const mr = room.myRole?.gid === g.id ? room.myRole : null;
   const live = $("#onLive"), ev = $("#onEvent");
   if (live) {
-    const { html, key } = liveState(mr?.role || "", mr?.seed || 0, t);
-    if (live._h !== html) { live.innerHTML = html; live._h = html; }
-    notifyChange(live, "live", key, mr?.role === "PANTIN" ? "Nouvel ordre !" : "La pièce est relancée !");
+    const L = liveState(mr?.role || "", mr?.seed || 0, t, missionsDone(g.id));
+    paintLive(live, L);
+    notifyChange(live, "live", L.key, L.notice || "Nouveau !", L.text);
   }
   if (ev) {
-    let html, key;
-    if (t < EVENT_FIRST) { html = `<h3>Premier événement dans</h3><div class="big">${mmss(EVENT_FIRST - t)}</div>`; key = "wait"; }
+    let L;
+    if (t < EVENT_FIRST) L = { html: `<h3>Premier événement dans</h3><div class="big" data-clock></div>`, clock: mmss(EVENT_FIRST - t), key: "wait" };
     else {
       const k = Math.floor((t - EVENT_FIRST) / EVENT_EVERY), next = EVENT_FIRST + (k + 1) * EVENT_EVERY - t;
-      html = `<h3>Événement pour tous n° ${k + 1}</h3><div class="big">${ROOM_EVENTS[Math.floor(seeded(g.seed, 1000 + k) * ROOM_EVENTS.length)]}</div>
-        <div class="clock">Prochain événement dans ${mmss(next)}</div>`; key = "e" + k;
+      const text = ROOM_EVENTS[Math.floor(seeded(g.seed, 1000 + k) * ROOM_EVENTS.length)];
+      L = { html: `<h3>Événement pour tous n° ${k + 1}</h3><div class="big">${text}</div>${CLOCK}`,
+            clock: `Prochain événement dans ${mmss(next)}`, key: "e" + k, text };
     }
-    if (ev._h !== html) { ev.innerHTML = html; ev._h = html; }
-    notifyChange(ev, "event", key, "Nouvel événement !");
+    paintLive(ev, L);
+    notifyChange(ev, "event", L.key, "Nouvel événement !", L.text);
   }
 }
-function notifyChange(el, slot, key, title) {
+function notifyChange(el, slot, key, title, body) {
   const prev = room.last[slot];
   room.last[slot] = key;
   if (prev == null || prev === key || key === "static" || key === "wait") return;
-  chime(); navigator.vibrate?.([200, 100, 200]);
+  gameAlert(title, body);
   el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
-  document.title = `${title} TrollPicks+`;
-  setTimeout(() => document.title = "TrollPicks+", 6000);
 }
 
 /* ---------- interactions ---------- */
@@ -2874,12 +3088,15 @@ $("#onlineBody").addEventListener("click", async e => {
   const b = e.target.closest("button, #onCard"); if (!b) return;
   if (b.id === "onCard") { room.cardOpen = !room.cardOpen; b.classList.toggle("open", room.cardOpen); return; }
   const d = b.dataset, st = room?.state;
+  if (d.mission != null) { markMission(room.state.game.id, d.mission); return onlineTick(); }
   if (d.oticket != null) return openTicket(onlineTeam[+d.oticket], { from: "online", i: +d.oticket });
   switch (d.on) {
     case "create": return joinRoom(newCode(), true);
     case "join": return joinRoom($("#onCode").value);
     case "rejoin": return joinRoom(d.code);
     case "leave": await leaveRoom(true); return renderOnline();
+    case "takeover": if (room && !room.state) { room.state = freshState(); pushState(); toast("Tu es l'hôte de la salle"); } return;
+    case "copycode": return copy(room.code, `Code ${room.code} copié`);
     case "invite": return copy(`${pageUrl()}#salle=${room.code}`, `Invitation copiée : salle ${room.code}`);
     case "teamlink": return onlineTeam.length && copy(teamLink(onlineTeam.filter(Boolean)), "Lien de l'équipe copié");
     case "joker": return act("joker");
@@ -2917,7 +3134,7 @@ $("#onlineBody").addEventListener("change", e => {
   if (t.matches("[data-on-withpicks]")) { room.state.withPicks = t.checked; return pushState(); }
   if (t.dataset.ocheck) {
     const g = room.state.game, id = t.dataset.ocheck;
-    g.checks[id] = { ...g.checks[id], [t.dataset.k]: t.checked };
+    g.checks[id] = { ...g.checks[id], [t.dataset.k]: t.type === "checkbox" ? t.checked : +t.value };
     pushState();
     document.querySelector(`[data-ocheck="${id}"][data-k="${t.dataset.k}"]`)?.focus();
   }
