@@ -68,6 +68,7 @@ button:disabled{cursor:not-allowed;opacity:.45}
 /* ---------- header ---------- */
 header.top{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:28px 0 8px}
 .wordmark{font-family:var(--display);font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1;color:var(--cream);letter-spacing:-.01em}
+a.wordmark{text-decoration:none;border-radius:6px}
 .wordmark b{font-weight:400;color:var(--red);text-shadow:0 3px 0 var(--red-deep)}
 .tabs{display:flex;gap:4px;margin-left:auto}
 .tab{padding:10px 14px;font-weight:800;color:var(--muted);border-bottom:3px solid transparent;transition:color .15s,border-color .15s}
@@ -422,7 +423,6 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;padding:24px var(--
 @keyframes flash{0%{box-shadow:0 0 0 0 var(--gold)}30%{box-shadow:0 0 0 6px var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
 .secret-points{width:100%;color:var(--muted);font-size:.9rem;text-align:left}
 .secret-points li{margin-left:18px}
-body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 
 /* ---------- cartes de rôle (maquette Figma) ---------- */
 .rcard{position:relative;container-type:inline-size;width:100%;aspect-ratio:5/7;background:var(--paper);color:var(--ink);
@@ -484,7 +484,6 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 .on-bar-actions{margin-left:auto}
 .on-member{background:rgba(0,0,0,.25);color:var(--cream);font-weight:800;font-size:.88rem;padding:5px 12px;border-radius:999px;overflow-wrap:anywhere}
 .on-member.me{background:var(--cream);color:var(--ink)}
-.on-member.bot{background:transparent;box-shadow:inset 0 0 0 2px rgba(243,236,220,.35);color:var(--muted)}
 .on-member small{font-weight:700;opacity:.7}
 .on-bar-actions{display:flex;gap:8px;flex-wrap:wrap}
 .on-bar-actions .btn{padding:9px 16px;font-size:.9rem}
@@ -500,6 +499,10 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 .on-truque .secret{margin:0}
 .on-side{display:grid;gap:14px}
 .on-event{border-left:6px solid var(--gold)}
+.ev-left{font-weight:800;color:var(--red);font-size:1.1rem;font-variant-numeric:tabular-nums}
+.ev-left b{font-family:var(--display);font-weight:400;font-size:1.6rem}
+.ev-done{opacity:.55;text-decoration:line-through;text-decoration-thickness:2px}
+.ev-end{font-weight:800;color:#1f7a4c}
 .on-auto code.on-cmd{display:block;font-family:ui-monospace,Consolas,monospace;font-size:.95rem;font-weight:700;background:var(--ink);color:var(--gold);padding:10px 12px;border-radius:6px;overflow-x:auto;white-space:nowrap}
 .on-auto-ok{color:#1f7a4c;font-weight:800}
 .on-pc{display:grid;gap:4px;font-size:.85rem;font-weight:800;color:var(--ink-2)}
@@ -510,6 +513,59 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 .on-vote{display:flex;gap:10px;flex-wrap:wrap;align-items:center;max-width:520px}
 .on-vote .role-pick{flex:1;min-width:200px}
 @media (max-width:760px){.on-truque{grid-template-columns:1fr}}
+
+/* ---------- en ligne (refonte) ---------- */
+#view-online.in-room .intro{display:none}
+#view-online.in-room{padding-top:28px}
+.on-home{display:grid;gap:22px;max-width:760px}
+.on-home .on-name{max-width:280px}
+.on-split{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:18px}
+.on-create{white-space:nowrap}
+.on-or{font-weight:800;color:var(--ink-2)}
+.on-split .on-join{display:flex;gap:8px;min-width:0}
+.on-split .on-join input{font-family:var(--display);font-size:1.4rem;letter-spacing:.14em;text-transform:uppercase;width:150px;text-align:center}
+.on-back{justify-self:start}
+@media (max-width:680px){.on-split{grid-template-columns:1fr;justify-items:start}.on-or{display:none}}
+
+.on-bar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px 22px;margin-bottom:22px}
+.on-plaque{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 18px;border-radius:12px;background:var(--rail);
+  box-shadow:inset 0 0 0 2px var(--gold),0 6px 18px rgba(0,0,0,.35);color:var(--cream);transition:transform .12s var(--ease-out)}
+.on-plaque span{font-weight:800;font-size:.8rem;color:var(--muted)}
+.on-plaque b{font-family:var(--display);font-weight:400;font-size:2rem;letter-spacing:.1em;color:var(--gold);line-height:1}
+.on-plaque svg{width:18px;height:18px;color:var(--muted)}
+.on-plaque:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){.on-plaque:hover svg{color:var(--cream)}}
+.on-seats{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+.on-seat{display:inline-flex;align-items:center;gap:7px;padding:4px 12px 4px 4px;border-radius:999px;background:rgba(0,0,0,.25);
+  color:var(--cream);font-weight:800;font-size:.88rem;max-width:100%}
+.on-seat i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:.8rem;flex:none}
+.on-seat.host i{background:var(--gold)}
+.on-seat.me{box-shadow:inset 0 0 0 2px var(--cream)}
+.on-seat small{font-weight:700;opacity:.65}
+.on-bar .on-bar-actions{display:flex;gap:8px}
+.on-bar .on-bar-actions .btn{padding:9px 16px;font-size:.9rem}
+.on-quit{opacity:.8}
+@media (max-width:860px){.on-bar{grid-template-columns:auto 1fr}.on-bar .on-seats{grid-column:1/-1;order:3}}
+@media (max-width:560px){.on-bar{grid-template-columns:1fr}.on-bar .on-bar-actions{flex-wrap:wrap}.on-plaque{justify-self:start}}
+
+.on-modes{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.on-mode{background:var(--paper);color:var(--ink);border-radius:12px;padding:24px;display:grid;gap:16px;justify-items:start;box-shadow:0 18px 40px rgba(0,0,0,.3)}
+.on-mode h2{font-family:var(--display);font-weight:400;font-size:1.6rem;line-height:1}
+.on-sub{color:var(--ink-2);font-weight:600;margin-top:-8px}
+.on-mode .on-lane{width:100%;max-width:260px;margin:0}
+.on-opts .chip[aria-pressed="true"]{background:#1f7a4c}
+.on-need{font-weight:800;color:var(--ink-2)}
+.on-waiting{display:grid;gap:16px;justify-items:start}
+.on-teams{margin-top:18px}
+@media (max-width:760px){.on-modes{grid-template-columns:1fr}}
+
+.on-tovote{justify-self:start}
+details.on-auto{background:rgba(0,0,0,.2);border-radius:12px;padding:12px 16px;color:var(--cream)}
+details.on-auto summary{cursor:pointer;font-weight:800;color:var(--muted)}
+details.on-auto[open]{display:grid;gap:10px}
+details.on-auto .on-pc{color:var(--muted)}
+details.on-auto .clock{color:var(--muted)}
+p.on-auto-ok{color:var(--muted);font-weight:800}
 
 /* ---------- mouvement ---------- */
 /* changement d'onglet : simple fondu court (action fréquente) */
@@ -539,10 +595,9 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 
 <div class="wrap">
   <header class="top">
-    <div class="wordmark" aria-label="TrollPicks plus">TROLL<b>PICKS</b>+</div>
+    <a class="wordmark" href="./" id="homeLink" aria-label="TrollPicks+, retour à l'accueil">TROLL<b>PICKS</b>+</a>
     <nav class="tabs" role="tablist" aria-label="Modes">
       <button class="tab" role="tab" aria-selected="true" data-view="solo">Solo</button>
-      <button class="tab" role="tab" aria-selected="false" data-view="team">Équipe</button>
       <button class="tab" role="tab" aria-selected="false" data-view="online">En ligne</button>
       <button class="tab" role="tab" aria-selected="false" data-view="history">Historique</button>
     </nav>
@@ -598,56 +653,13 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
     <div class="ticket-wrap" id="result" hidden aria-live="polite"></div>
   </section>
 
-  <!-- =============== TEAM =============== -->
-  <section class="view" id="view-team" role="tabpanel" hidden>
-    <div class="intro">
-      <h1>Toute l'équipe passe à la table</h1>
-      <p>De 2 à 5 joueurs, chacun sa lane et son champion. Personne n'est épargné.</p>
-    </div>
-    <div class="panel-paper">
-      <div class="team-head">
-        <span class="label" style="color:var(--ink)">Les joueurs</span>
-        <div class="size-pick" role="radiogroup" aria-label="Nombre de joueurs" id="teamSize">
-          <span>Joueurs</span>
-          <button role="radio" aria-checked="false" data-size="2">2</button>
-          <button role="radio" aria-checked="false" data-size="3">3</button>
-          <button role="radio" aria-checked="false" data-size="4">4</button>
-          <button role="radio" aria-checked="false" data-size="5">5</button>
-        </div>
-        <p class="hint">Choisis un rôle pour le verrouiller. Sinon, la roue décide.</p>
-      </div>
-      <div class="team-form" id="teamForm"></div>
-    </div>
-    <div class="team-actions">
-      <button class="btn-chip" id="spinTeam" disabled>Distribuer</button>
-      <button class="btn" id="linkTeam" hidden>Copier le lien de l'équipe</button>
-      <button class="btn" id="copyTeam" hidden>Copier le texte</button>
-    </div>
-    <div class="team-grid" id="teamGrid"></div>
-  </section>
-
   <!-- =============== EN LIGNE =============== -->
   <section class="view" id="view-online" role="tabpanel" hidden>
     <div class="intro">
       <h1>Toute la bande à la même table</h1>
-      <p>Crée une salle, envoie le code à tes potes : troll picks en direct ou Partie truquée, chacun sur son PC, à côté de la game.</p>
+      <p>Une salle, un code, chacun sur son PC.</p>
     </div>
     <div id="onlineBody"></div>
-  </section>
-
-  <!-- =============== PARTIE TRUQUÉE (hôte) =============== -->
-  <section class="view" id="view-party" role="tabpanel" hidden>
-    <div class="intro">
-      <h1>La partie est truquée</h1>
-      <div class="party-actions" style="margin:0"><button class="btn" data-goto="online">‹ Retour à En ligne</button><button class="btn" data-rules>Règles et rôles</button></div>
-      <p>Des rôles secrets pendant une vraie game, de 3 à 10 joueurs. Un tricheur dans chaque équipe, un vote à la fin, et des points pour tout le monde.</p>
-    </div>
-    <div id="partyBody"></div>
-  </section>
-
-  <!-- =============== CARTE SECRÈTE (joueur) =============== -->
-  <section class="view" id="view-secret" role="tabpanel" hidden>
-    <div id="secretBody"></div>
   </section>
 
   <!-- =============== HISTORY =============== -->
@@ -1017,13 +1029,8 @@ if (settings.builds.length < 2) settings.builds = Object.keys(BUILDS);
 if (window.matchMedia("(prefers-reduced-motion: reduce)").matches && !store.get("settings", null)) settings.speed = "fast";
 
 let history = store.get("history", []);
-let teamNames = store.get("team", ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4", "Joueur 5"]);
-let teamSize = Math.min(5, Math.max(2, +store.get("teamSize", 5) || 5));
-let teamRoles = store.get("teamRoles", ["", "", "", "", ""]);   // "" = rôle au hasard
-let teamFocus = null;   // carte à remettre en avant au retour d'un ticket
 const solo = { champ: null, role: null, build: null };
 let busy = false;
-let lastTeam = [];
 
 const $ = s => document.querySelector(s);
 const rand = a => a[Math.floor(Math.random() * a.length)];
@@ -1322,7 +1329,7 @@ function addHistory(pick) { history.unshift(pick); history = history.slice(0, 40
 
 /* =========================================================
    LIEN DE PARTAGE
-   Le tirage complet est rangé dans l'adresse (#p= pour un joueur, #t= pour l'équipe) :
+   Le tirage complet est rangé dans l'adresse (#p=) :
    pas de serveur, le lien suffit.
 ========================================================= */
 const b64e = s => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -1366,7 +1373,6 @@ function unpackPick(a) {
 }
 const pageUrl = () => location.href.split("#")[0];
 const pickLink = p => `${pageUrl()}#p=${b64e(JSON.stringify(packPick(p)))}`;
-const teamLink = team => `${pageUrl()}#t=${b64e(JSON.stringify(team.map(packPick)))}`;
 function clearHash() { if (location.hash) window.history.replaceState(null, "", pageUrl()); }
 
 function openFromHash() {
@@ -1378,18 +1384,10 @@ function openFromHash() {
     else { const c = $("#onCode"); if (c) c.value = cleanCode(sm[1]); toast("Choisis ton pseudo, puis rejoins la salle"); $("#onName")?.focus(); }
     return;
   }
-  const m = location.hash.match(/^#([ptr])=([\w-]+)$/); if (!m) return;
-  if (m[1] === "r") { if (!openSecret(m[2])) toast("Ce lien secret est illisible"); return; }
+  const m = location.hash.match(/^#p=([\w-]+)$/); if (!m) return;
   try {
-    const data = JSON.parse(b64d(m[2]));
-    if (m[1] === "p") {
-      const p = unpackPick(data); if (!p) throw new Error("tirage invalide");
-      showView("solo"); renderResult(p);
-    } else {
-      const team = (Array.isArray(data) ? data : []).slice(0, 5).map(unpackPick).filter(Boolean);
-      if (!team.length) throw new Error("équipe invalide");
-      showView("team"); renderTeam(team, false);
-    }
+    const p = unpackPick(JSON.parse(b64d(m[1]))); if (!p) throw new Error("tirage invalide");
+    showView("solo"); renderResult(p);
   } catch (e) {
     console.warn(e);
     toast("Ce lien de tirage est illisible");
@@ -1524,7 +1522,7 @@ function refreshBuildWheel() {
 ========================================================= */
 function setBusy(v) {
   busy = v;
-  ["#spinAll", "#spinChamp", "#spinRole", "#spinBuild", "#spinTeam"].forEach(s => $(s).disabled = v);
+  ["#spinAll", "#spinChamp", "#spinRole", "#spinBuild"].forEach(s => $(s).disabled = v);
   if (!v) $("#spinRole").disabled = !!settings.soloRole;
   document.querySelectorAll("#result .btn, #result .btn-chip").forEach(b => b.disabled = v);
 }
@@ -1614,7 +1612,7 @@ function itemHTML(pick, id, i = 0) {
 }
 function runeHTML(id) { const r = RUNE_BY_ID[id]; return r ? `<span class="rune"><img src="${imgRune(r)}" alt="">${esc(r.name)}</span>` : ""; }
 
-const ctxList = ctx => ctx?.from === "online" ? onlineTeam : lastTeam;
+const ctxList = ctx => ctx?.from === "online" ? onlineTeam : [];
 function ticketNavHTML(ctx) {
   if (!ctx) return "";
   if (ctx.from === "history") return `<nav class="t-nav" aria-label="Navigation du ticket"><button class="btn" data-act="back">‹ Retour à l'historique</button></nav>`;
@@ -1759,8 +1757,7 @@ $("#result").addEventListener("click", async e => {
     const c = CHAMP_BY_ID[pick.champ];
     const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build, c), skills: shuffle(["Q", "W", "E"]), ts: Date.now(), shared: false };
     addHistory(np); clearHash();
-    if (ctx?.from === "team") { lastTeam[ctx.i] = np; $("#teamGrid").innerHTML = ""; }   // la grille sera redessinée au retour
-    await renderResult(np, ctx?.from === "team" ? ctx : null);
+    await renderResult(np, null);
   }
 });
 
@@ -1952,50 +1949,6 @@ async function saveTicketImage(pick, done = "Image enregistrée") {
   }
 }
 
-/* =========================================================
-   ÉQUIPE
-========================================================= */
-function renderTeamForm() {
-  document.querySelectorAll("#teamSize [data-size]").forEach(b => b.setAttribute("aria-checked", +b.dataset.size === teamSize));
-  const form = $("#teamForm");
-  form.style.setProperty("--n", teamSize);
-  form.innerHTML = teamNames.slice(0, teamSize).map((n, i) => `<div class="field">
-    <label for="tn${i}">Joueur ${i + 1}</label>
-    <input type="text" id="tn${i}" data-name="${i}" value="${esc(n)}" maxlength="24" autocomplete="off">
-    <div class="role-pick"><select id="tr${i}" data-role="${i}" aria-label="Rôle du joueur ${i + 1}">
-      <option value="">Rôle au hasard</option>
-      ${ROLES.map(r => `<option value="${r.key}">${r.label}</option>`).join("")}
-    </select></div>
-  </div>`).join("");
-  syncRoleSelects();
-}
-/* Un rôle verrouillé par un joueur n'est plus proposé aux autres. */
-function syncRoleSelects() {
-  const taken = teamRoles.slice(0, teamSize);
-  document.querySelectorAll("#teamForm select").forEach(sel => {
-    const i = +sel.dataset.role;
-    sel.value = teamRoles[i] || "";
-    sel.classList.toggle("locked", !!sel.value);
-    [...sel.options].forEach(o => o.disabled = !!o.value && taken.some((r, j) => j !== i && r === o.value));
-  });
-}
-$("#teamForm").addEventListener("input", e => {
-  const i = e.target.dataset.name; if (i == null) return;
-  teamNames[i] = e.target.value.trim() || `Joueur ${+i + 1}`;
-  store.set("team", teamNames);
-});
-$("#teamForm").addEventListener("change", e => {
-  const i = e.target.dataset.role; if (i == null) return;
-  teamRoles[i] = e.target.value;
-  store.set("teamRoles", teamRoles);
-  syncRoleSelects();
-});
-$("#teamSize").addEventListener("click", e => {
-  const n = +e.target.closest("[data-size]")?.dataset.size; if (!n) return;
-  teamSize = n; store.set("teamSize", n);
-  renderTeamForm();
-  syncSoloRole();
-});
 function teamCardHTML(p, i) {
   const c = CHAMP_BY_ID[p.champ], role = ROLES.find(r => r.key === p.role), key = RUNE_BY_ID[p.runes.keystone];
   return `<article class="tcard reveal" data-card="${i}" style="animation-delay:${i * 70}ms">
@@ -2010,54 +1963,10 @@ function teamCardHTML(p, i) {
     </div>
   </article>`;
 }
-async function spinTeam() {
-  if (busy) return;
-  setBusy(true);
-  try {
-    const locks = teamRoles.slice(0, teamSize).map(r => ROLES.some(x => x.key === r) ? r : "");
-    const free = shuffle(ROLES.map(r => r.key).filter(r => !locks.includes(r)));
-    const roles = locks.map(r => r || free.pop());
-    const used = [], builds = activeBuilds();
-    const team = teamNames.slice(0, teamSize).map((name, i) => {
-      const c = rand(eligibleChamps(used)); used.push(c.id);
-      return { ...makePick(c, roles[i], rand(builds), name), locked: !!locks[i] };
-    });
-    team.slice().reverse().forEach(addHistory);
-    clearHash();
-    await renderTeam(team, true);
-    chime();
-  } finally { setBusy(false); }
-}
-async function renderTeam(team, animate) {
-  lastTeam = team;
-  const grid = $("#teamGrid");
-  grid.style.setProperty("--n", team.length);
-  grid.innerHTML = team.map(teamCardHTML).join("");
-  if (!animate) grid.querySelectorAll(".tcard").forEach(c => c.classList.remove("reveal"));
-  $("#copyTeam").hidden = $("#linkTeam").hidden = false;
-  const pool = eligibleChamps(), imgs = [...grid.querySelectorAll(".tcard-img img")], f = speedF();
-  if (!animate || f === 0) return;
-  await Promise.all(imgs.map((img, i) => new Promise(res => {
-    const end = performance.now() + (900 + i * 350) * f;
-    (function tick() {
-      if (performance.now() >= end) { img.src = img.dataset.final; beep(1300, .06, "sine", .04); return res(); }
-      img.src = imgChamp(rand(pool)); beep(900, .015); setTimeout(tick, 80);
-    })();
-  })));
-}
-$("#spinTeam").addEventListener("click", spinTeam);
-$("#copyTeam").addEventListener("click", () => copy(lastTeam.map(recap).join("\n\n")));
-$("#linkTeam").addEventListener("click", () => copy(teamLink(lastTeam), "Lien de l'équipe copié"));
-$("#teamGrid").addEventListener("click", e => {
-  const i = e.target.closest("[data-team]")?.dataset.team; if (i == null) return;
-  openTicket(lastTeam[+i], { from: "team", i: +i });
-});
-
 /* =========================================================
    PARTIE TRUQUÉE : rôles secrets pendant une vraie game
-   L'hôte distribue les rôles et envoie un lien secret à chaque joueur (#r=…).
-   La page du joueur calcule seule ses ordres et ses bascules à partir d'une graine :
-   pas de serveur, et deux appareils avec le même lien affichent la même chose.
+   Jouée dans une salle en ligne (voir plus bas). Les ordres, la pièce et les événements
+   sont calculés à partir d'une graine : tous les PC affichent la même chose au même moment.
 ========================================================= */
 const PARTY_ROLES = {
   TRICHEUR:   { name: "Le Tricheur", suit: "♠", color: "#1b1714",
@@ -2141,32 +2050,6 @@ function seeded(seed, k) {
   t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
-/* Le lien secret est brouillé pour qu'un coup d'œil sur l'adresse ne révèle pas le rôle. */
-const KEY = [116, 114, 111, 108, 108, 112, 105, 99, 107, 115];
-function scramble(str) {
-  const bytes = new TextEncoder().encode(str).map((b, i) => b ^ KEY[i % KEY.length]);
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-function unscramble(s) {
-  const raw = Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)).map((b, i) => b ^ KEY[i % KEY.length]);
-  return new TextDecoder().decode(raw);
-}
-
-let party = store.get("party", null);
-let revealAnim = false;
-const saveParty = () => store.set("party", party);
-function newParty() {
-  const names = teamNames.slice();
-  party = {
-    id: Math.random().toString(36).slice(2, 8), phase: "setup", size: Math.max(3, Math.min(10, teamSize)),
-    players: Array.from({ length: 10 }, (_, i) => ({ name: names[i] || `Joueur ${i + 1}`, team: i < 5 ? 0 : 1 })),
-    enabled: PARTY_OPTIONAL.slice(), deal: [], sent: [], votes: [], result: [null, null], checks: {}
-  };
-  saveParty();
-}
-const activePlayers = () => party.players.slice(0, party.size);
-const teamsInPlay = () => [...new Set(activePlayers().map(p => p.team))].sort();
-
 /* Un Tricheur par équipe, les autres rôles actifs au hasard (un exemplaire par équipe). */
 function dealFor(players, enabled) {
   const deal = players.map(() => null);
@@ -2182,27 +2065,15 @@ function dealFor(players, enabled) {
   deal.forEach(d => d.seed = Math.floor(Math.random() * 2 ** 31));
   return deal;
 }
-function dealRoles() {
-  const players = activePlayers();
-  const deal = dealFor(players, party.enabled);
-  Object.assign(party, { deal, phase: "dealt", sent: [], votes: players.map(() => -1), result: [null, null], checks: {} });
-  saveParty();
-}
-const secretLink = i => {
-  const p = activePlayers()[i], d = party.deal[i];
-  return `${pageUrl()}#r=${scramble(JSON.stringify({ g: party.id, n: p.name, r: d.role, s: d.seed, p: d.partner || "", t: teamsInPlay().length > 1 ? p.team : -1 }))}`;
-};
-
 /* ---------- calcul des points ---------- */
-const localP = () => ({ players: activePlayers(), deal: party.deal, votes: party.votes, result: party.result, checks: party.checks });
-function accusedIn(team, P = localP()) {
+function accusedIn(team, P) {
   const players = P.players, counts = {};
   P.votes.forEach((v, i) => { if (v >= 0 && players[i].team === team) counts[v] = (counts[v] || 0) + 1; });
   const best = Math.max(0, ...Object.values(counts));
   const top = Object.keys(counts).filter(k => counts[k] === best);
   return best > 0 && top.length === 1 ? +top[0] : -1;   // égalité = personne n'est accusé
 }
-function scoreOf(i, P = localP()) {
+function scoreOf(i, P) {
   const players = P.players, p = players[i], d = P.deal[i], c = P.checks[i] || {};
   if (!d || !PARTY_ROLES[d.role]) return { total: 0, lines: [], unknown: true };
   const win = P.result[p.team], tricheur = P.deal.findIndex((x, j) => x?.role === "TRICHEUR" && players[j].team === p.team);
@@ -2229,7 +2100,7 @@ function revealHTML(P, opts = {}) {
   const pts = n => `${n > 0 ? "+" : ""}${n} pt${Math.abs(n) > 1 ? "s" : ""}`;
   return `<div class="party-step" style="margin-top:0">
       <h2>Les cartes sur la table</h2>
-      <p class="hint">${opts.check ? "Coche ce qui s'est passé pendant la game : les points se mettent à jour." : "L'hôte coche ce qui s'est passé pendant la game."}</p>
+      ${opts.check ? `<p class="hint">Coche ce qui s'est passé pendant la game.</p>` : ""}
       <div class="reveal-grid">${players.map((p, i) => {
         const d = P.deal[i], R = PARTY_ROLES[d?.role], sc = scores[i];
         if (!R) return `<div class="reveal-card${opts.animate ? "" : " still"}"><div class="role-line"><span class="suit" style="background:var(--ink-2)">?</span>
@@ -2259,120 +2130,6 @@ const CHECKS = {
   AME: [["a", "A respecté le lien"]]
 };
 
-/* ---------- écran de l'hôte ---------- */
-function renderParty() {
-  if (!party) newParty();
-  const body = $("#partyBody"), players = activePlayers(), two = teamsInPlay().length > 1;
-  const teamTag = p => two ? `<span class="team-dot" style="background:${TEAM_COLORS[p.team]}" title="Équipe ${TEAM_NAMES[p.team]}"></span>` : "";
-
-  if (party.phase === "setup") {
-    body.innerHTML = `<div class="panel-paper">
-      <div class="team-head">
-        <span class="label" style="color:var(--ink)">1. Les joueurs</span>
-        <div class="size-pick" role="radiogroup" aria-label="Nombre de joueurs" id="partySize"><span>Joueurs</span>
-          ${[3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button role="radio" aria-checked="${n === party.size}" data-psize="${n}">${n}</button>`).join("")}
-        </div>
-        <p class="hint">Au-delà de 5 joueurs, répartis-les dans les deux équipes d'une partie personnalisée. Chaque équipe a son Tricheur.</p>
-      </div>
-      <div class="party-players">${players.map((p, i) => `<div class="party-player">
-        <label for="pn${i}">Joueur ${i + 1}</label>
-        <input type="text" id="pn${i}" data-pname="${i}" value="${esc(p.name)}" maxlength="24" autocomplete="off">
-        ${party.size > 5 ? `<div class="team-toggle" role="group" aria-label="Équipe de ${esc(p.name)}">
-          ${[0, 1].map(t => `<button data-pteam="${i}" data-team="${t}" aria-pressed="${p.team === t}">${TEAM_NAMES[t]}</button>`).join("")}</div>` : ""}
-      </div>`).join("")}</div>
-      <div class="party-step">
-        <h2>2. Les rôles en jeu</h2>
-        <p class="hint">Le Tricheur est toujours là. Les autres rôles actifs sont distribués au hasard, un seul exemplaire par équipe. S'il manque des rôles, les joueurs restants sont des Honnêtes joueurs.</p>
-        <div class="chips">${PARTY_OPTIONAL.map(k => `<button class="chip" aria-pressed="${party.enabled.includes(k)}" data-prole="${k}">${PARTY_ROLES[k].name}</button>`).join("")}</div>
-      </div>
-      <div class="party-actions"><button class="btn-chip" data-pact="deal">Distribuer les rôles</button></div>
-    </div>`;
-    return;
-  }
-
-  if (party.phase === "dealt") {
-    body.innerHTML = `<div class="panel-paper">
-      <div class="party-step" style="margin-top:0">
-        <h2>3. Envoie les liens secrets</h2>
-        <p class="hint">Envoie chaque lien en message privé (Discord…). Chacun ouvre le sien, découvre sa carte et appuie sur « La game commence » au chargement de la partie. N'ouvre que ton propre lien.</p>
-        <div class="link-list">${players.map((p, i) => `<div class="link-row">${teamTag(p)}<span class="who">${esc(p.name)}</span>
-          ${party.sent[i] ? `<span class="sent">Copié</span>` : ""}
-          <button class="btn btn-ink" data-plink="${i}">Copier son lien</button></div>`).join("")}</div>
-      </div>
-      <div class="party-step">
-        <h2>4. Après la game : le vote</h2>
-        <p class="hint">Débattez, puis chacun désigne qui il pense être le Tricheur de son équipe.</p>
-        <div class="vote-grid">${players.map((p, i) => `<div class="party-player">
-          <label for="pv${i}">${two ? `${TEAM_NAMES[p.team]} • ` : ""}${esc(p.name)} accuse</label>
-          <div class="role-pick" style="margin:0"><select id="pv${i}" data-pvote="${i}">
-            <option value="-1">Personne</option>
-            ${players.map((q, j) => j !== i && q.team === p.team ? `<option value="${j}" ${party.votes[i] === j ? "selected" : ""}>${esc(q.name)}</option>` : "").join("")}
-          </select></div></div>`).join("")}</div>
-      </div>
-      <div class="party-step">
-        <h2>5. Le résultat</h2>
-        ${teamsInPlay().map(t => `<div class="result-toggle" style="margin-bottom:8px"><span>${two ? `Équipe ${TEAM_NAMES[t]}` : "Votre équipe"} :</span>
-          <button class="chip" aria-pressed="${party.result[t] === true}" data-presult="${t}" data-win="1">Victoire</button>
-          <button class="chip" aria-pressed="${party.result[t] === false}" data-presult="${t}" data-win="0">Défaite</button></div>`).join("")}
-      </div>
-      <div class="party-actions">
-        <button class="btn-chip" data-pact="reveal">Révéler les cartes</button>
-        <button class="btn btn-ink" data-pact="reset">Recommencer</button>
-      </div>
-    </div>`;
-    return;
-  }
-
-  // phase "reveal" (les cartes ne sont distribuées en animation qu'à la première révélation)
-  body.innerHTML = `<div class="panel-paper">
-    ${revealHTML(localP(), { animate: revealAnim, check: i => `data-pcheck="${i}"` })}
-    <div class="party-actions">
-      <button class="btn-chip" data-pact="again">Rejouer avec les mêmes joueurs</button>
-      <button class="btn btn-ink" data-pact="back">Revenir au vote</button>
-    </div>
-  </div>`;
-}
-$("#partyBody").addEventListener("click", async e => {
-  const b = e.target.closest("button"); if (!b) return;
-  const d = b.dataset;
-  if (d.psize) { party.size = +d.psize; if (party.size <= 5) party.players.forEach(p => p.team = 0); else party.players.forEach((p, i) => p.team = i < Math.ceil(party.size / 2) ? 0 : 1); }
-  else if (d.pteam) party.players[+d.pteam].team = +d.team;
-  else if (d.prole) party.enabled = party.enabled.includes(d.prole) ? party.enabled.filter(r => r !== d.prole) : [...party.enabled, d.prole];
-  else if (d.plink) { await copy(secretLink(+d.plink), `Lien de ${activePlayers()[+d.plink].name} copié`); party.sent[+d.plink] = true; }
-  else if (d.presult) party.result[+d.presult] = d.win === "1";
-  else if (d.pact === "deal") {
-    if (teamsInPlay().some(t => activePlayers().filter(p => p.team === t).length < 2)) return toast("Chaque équipe doit avoir au moins 2 joueurs");
-    dealRoles(); chime();
-  }
-  else if (d.pact === "reveal") {
-    if (teamsInPlay().some(t => party.result[t] == null)) return toast("Indique d'abord victoire ou défaite");
-    party.phase = "reveal"; revealAnim = true; chime();
-  }
-  else if (d.pact === "back") party.phase = "dealt";
-  else if (d.pact === "reset" || d.pact === "again") {
-    if (d.pact === "reset" && !confirm("Recommencer ? Les rôles distribués seront perdus.")) return;
-    Object.assign(party, { phase: "setup", id: Math.random().toString(36).slice(2, 8), deal: [], sent: [], votes: [], result: [null, null], checks: {} });
-  }
-  else return;
-  saveParty(); renderParty(); revealAnim = false;
-});
-$("#partyBody").addEventListener("input", e => {
-  const i = e.target.dataset.pname; if (i == null) return;
-  party.players[+i].name = e.target.value.trim() || `Joueur ${+i + 1}`; saveParty();
-});
-$("#partyBody").addEventListener("change", e => {
-  const t = e.target;
-  if (t.dataset.pvote != null) party.votes[+t.dataset.pvote] = +t.value;
-  else if (t.dataset.pcheck != null) {
-    const i = +t.dataset.pcheck, k = t.dataset.k;
-    party.checks[i] = { ...party.checks[i], [k]: t.type === "checkbox" ? t.checked : +t.value }; saveParty(); renderParty();
-    document.querySelector(`[data-pcheck="${i}"][data-k="${k}"]`)?.focus();
-    return;
-  }
-  else return;
-  saveParty();
-});
-
 /* ---------- battement d'horloge ----------
    Chrome ralentit les minuteurs d'un onglet en arrière-plan (jusqu'à une fois par minute).
    Pendant la game, LoL est au premier plan : un worker garde un battement à la seconde. */
@@ -2389,8 +2146,8 @@ const ticker = (() => {
 const canNotify = () => "Notification" in window;
 function notifyBtnHTML() {
   if (!canNotify()) return "";
-  if (Notification.permission === "default") return `<button class="btn notif-btn" data-notif>Activer les notifications Windows</button>`;
-  if (Notification.permission === "denied") return `<p class="hint notif-btn">Notifications bloquées : autorise-les via le cadenas de la barre d'adresse.</p>`;
+  if (Notification.permission === "default") return `<button class="btn notif-btn" data-notif>Activer les notifications</button>`;
+  if (Notification.permission === "denied") return `<p class="hint notif-btn">Notifications bloquées (cadenas de la barre d'adresse)</p>`;
   return "";
 }
 document.addEventListener("click", async e => {
@@ -2472,64 +2229,6 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-close-rules]") || e.target === $("#rules")) $("#rules").close();
 });
 
-/* ---------- page secrète du joueur ---------- */
-let secretTimer = null;
-function openSecret(token) {
-  let s;
-  try { s = JSON.parse(unscramble(token)); } catch { return false; }
-  const R = PARTY_ROLES[s.r]; if (!R || typeof s.n !== "string") return false;
-  document.body.classList.add("secret-mode");
-  document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "view-secret");
-  const startKey = `secret:${s.g}:${s.n}`, goal = R.goal.replaceAll("{p}", esc(s.p || "ton allié"));
-  $("#secretBody").innerHTML = `<div class="secret">
-    <div class="secret-who">${esc(s.n)}${s.t >= 0 ? `, équipe ${TEAM_NAMES[s.t]}` : ""} • ne montre pas cet écran (attention au partage d'écran sur Discord)</div>
-    <div class="card3d" id="secretCard" role="button" tabindex="0" aria-label="Retourner ma carte">
-      <div class="card3d-inner">
-        <div class="card-face card-back">${CARD_BACK}</div>
-        <div class="card-face card-front rc-host">${roleCardHTML(s.r, goal, true)}</div>
-      </div>
-    </div>
-    <div class="secret-live" id="secretLive"></div>
-    ${notifyBtnHTML()}
-    <button class="btn" id="secretReset" hidden>Remettre le chrono à zéro</button>
-    <ul class="secret-points"><li>${R.points.join("</li><li>")}</li></ul>
-    <button class="btn" data-rules>Règles et rôles</button>
-  </div>`;
-  const card = $("#secretCard");
-  const flip = () => card.classList.toggle("open");
-  card.addEventListener("click", flip);
-  card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } });
-
-  let last = null;
-  const tick = () => {
-    const start = store.get(startKey, null), live = $("#secretLive");
-    if (!live) return ticker.remove(tick);
-    if (!start) {
-      $("#secretReset").hidden = true;
-      if (live._h === "start") return;
-      live._h = "start";
-      live.innerHTML = `<h3>Prêt ?</h3><p>Clique quand la partie se charge. Garde cet onglet ouvert pendant la game : un son et une notification te préviennent.</p>
-        <button class="btn-chip" id="secretStart">La game commence</button>`;
-      $("#secretStart").onclick = () => { store.set(startKey, Date.now()); beep(1000, .05); tick(); };
-      return;
-    }
-    const L = liveState(s.r, s.s, Date.now() - start), key = L.key;
-    $("#secretReset").hidden = false;
-    paintLive(live, L);
-    if (last !== null && key !== last && key !== "static" && key !== "wait") {
-      gameAlert(L.notice || "Nouveau !", L.text);
-      live.classList.remove("flash"); void live.offsetWidth; live.classList.add("flash");
-    }
-    last = key;
-  };
-  $("#secretReset").onclick = () => { if (confirm("Remettre le chrono à zéro ?")) { store.set(startKey, null); last = null; tick(); } };
-  if (secretTimer) ticker.remove(secretTimer);
-  secretTimer = tick;
-  ticker.add(tick);
-  tick();
-  return true;
-}
-
 /* =========================================================
    EN LIGNE : salles en direct (Supabase Realtime, sans base de données)
    - Chaque salle est un canal "tp-room-CODE". La présence liste les joueurs connectés.
@@ -2544,18 +2243,19 @@ const SB_KEY = "sb_publishable_LKbQM48TJjDut7tUfQWMHg_2wbiKrCf";   // clé publi
 const SB_LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js";
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const EVENT_FIRST = 5 * 60e3, EVENT_EVERY = 8 * 60e3;
+/* min = durée de l'événement en minutes (0 = événement ponctuel, sans compte à rebours) */
 const ROOM_EVENTS = [
-  "Pendant 3 minutes : interdit de rentrer à la base.",
-  "Toute l'équipe doit jouer le prochain objectif ensemble.",
-  "Pendant 2 minutes : pings interdits.",
-  "Pendant 3 minutes : Flash interdit pour tout le monde.",
-  "Le joueur avec le moins de kills choisit le prochain objectif.",
-  "Pendant 2 minutes : restez groupés à au moins deux.",
-  "Pendant 2 minutes : échangez vos lanes (top et mid, ADC et support). Le jungler choisit son camp.",
-  "Prochain combat d'équipe : tout le monde y va, personne ne reste en split.",
-  "Prochain kill ennemi : toute l'équipe doit être à côté.",
-  "Silence radio : pendant 1 minute, micros coupés, on ne communique qu'avec les pings.",
-  "Grève du farm : pendant 2 minutes, interdit de taper les sbires et les monstres, seulement les champions."
+  { min: 3, text: "Pendant 3 minutes : interdit de rentrer à la base." },
+  { min: 0, text: "Toute l'équipe doit jouer le prochain objectif ensemble." },
+  { min: 2, text: "Pendant 2 minutes : pings interdits." },
+  { min: 3, text: "Pendant 3 minutes : Flash interdit pour tout le monde." },
+  { min: 0, text: "Le joueur avec le moins de kills choisit le prochain objectif." },
+  { min: 2, text: "Pendant 2 minutes : restez groupés à au moins deux." },
+  { min: 2, text: "Pendant 2 minutes : échangez vos lanes (top et mid, ADC et support). Le jungler choisit son camp." },
+  { min: 0, text: "Prochain combat d'équipe : tout le monde y va, personne ne reste en split." },
+  { min: 0, text: "Prochain kill ennemi : toute l'équipe doit être à côté." },
+  { min: 1, text: "Silence radio : pendant 1 minute, micros coupés, on ne communique qu'avec les pings." },
+  { min: 2, text: "Grève du farm : pendant 2 minutes, interdit de taper les sbires et les monstres, seulement les champions." }
 ];
 
 const ME = { id: store.get("meId", null) || Math.random().toString(36).slice(2, 12), name: store.get("meName", "") };
@@ -2609,7 +2309,7 @@ async function unseal(priv, pubJwk, box) {
 const cleanCode = c => String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
 const newCode = () => Array.from(crypto.getRandomValues(new Uint8Array(4)), b => CODE_CHARS[b % CODE_CHARS.length]).join("");
 const isHost = () => room?.state?.host === ME.id;
-const memberName = id => room?.members.find(m => m.id === id)?.name || room?.state?.bots?.find(b => b.id === id)?.name || room?.state?.game?.players.find(p => p.id === id)?.name || "?";
+const memberName = id => room?.members.find(m => m.id === id)?.name || room?.state?.game?.players.find(p => p.id === id)?.name || "?";
 
 async function joinRoom(rawCode, asHost = false) {
   const code = cleanCode(rawCode);
@@ -2665,7 +2365,7 @@ function send(event, payload) { room?.ch?.send({ type: "broadcast", event, paylo
 function trackMe() { return room.ch.track({ id: ME.id, name: ME.name, pub: room.keys.pub, lane: room.lane || "", at: room.at }); }
 
 function freshState() {
-  return { v: 0, host: ME.id, activity: "lobby", teams: {}, enabled: PARTY_OPTIONAL.slice(), withPicks: false, events: true, picks: null, game: null, bots: [] };
+  return { v: 0, host: ME.id, activity: "lobby", teams: {}, enabled: PARTY_OPTIONAL.slice(), withPicks: false, events: true, picks: null, game: null };
 }
 /* L'hôte diffuse l'état complet ; les autres l'appliquent. */
 function pushState(render = true) {
@@ -2765,22 +2465,19 @@ function onGameEnd() {
 }
 function autoStartHTML(g) {
   const seen = room.scriptSeen && Date.now() - room.scriptSeen < AUTO_FRESH_MS;
+  if (seen || g.auto) return `<p class="on-auto-ok">Chrono calé sur l'horloge de LoL</p>`;
   const k = pcKeyStored();
-  return `<div class="secret-live on-auto">
-    <h3>Départ automatique</h3>
-    ${seen || g.auto
-      ? `<p class="on-auto-ok">Chrono calé sur l'horloge de LoL.</p>`
-      : `<p>Facultatif. Si le script TrollPicks+ tourne sur ton PC, le chrono se cale tout seul sur le 0:00 de la game.</p>`}
+  return `<details class="on-auto">
+    <summary>Départ automatique</summary>
     <label class="on-pc"><span>Clé de ton PC</span>
       <input type="text" id="onPcKey" maxlength="9" autocomplete="off" placeholder="ABCD-EF23" value="${esc(k)}"></label>
-    <p class="clock">${k ? `PC lié : le départ de tes parties sera relayé à la salle.` : `La clé s'affiche au premier lancement du script (ou avec <code>--cle</code>). À coller une seule fois.`}</p>
-    ${isHost() ? `<details class="on-oneshot"><summary>Sans script permanent : commande ponctuelle</summary>
+    ${isHost() ? `<p class="clock">Sans script permanent :</p>
       <code class="on-cmd">node trollpicks-start.mjs ${room.code}</code>
       <div class="party-actions" style="margin:0">
-        <button class="btn btn-ink" data-on="copycmd">Copier la commande</button>
+        <button class="btn btn-ink" data-on="copycmd">Copier</button>
         <a class="btn btn-ink" href="outils/trollpicks-start.mjs" download>Télécharger le script</a>
-      </div></details>` : ""}
-  </div>`;
+      </div>` : ""}
+  </details>`;
 }
 
 /* ---------- présence ---------- */
@@ -2840,10 +2537,7 @@ function onMeRole(m) {
 }
 
 /* ---------- ce que fait l'hôte ---------- */
-/* Mode test : l'hôte peut ajouter des bots (faux joueurs) pour dérouler une partie seul. */
-const BOT_NAMES = ["Bot Teemo", "Bot Garen", "Bot Yuumi", "Bot Singed", "Bot Malphite", "Bot Lux", "Bot Darius", "Bot Blitzcrank", "Bot Zilean"];
-const isBot = id => String(id).startsWith("bot-");
-const allSeats = () => [...room.members, ...(room.state?.bots || [])];
+const allSeats = () => room.members;
 function roomPlayers() {
   const seats = allSeats().slice(0, 10), many = seats.length > 5;
   return seats.map((m, i) => ({ id: m.id, name: m.name, lane: m.lane || "", team: many ? (room.state.teams[m.id] ?? (i % 2)) : 0 }));
@@ -2875,16 +2569,14 @@ async function hostDealTruque() {
   if (!teamsOk(players, 2)) return;
   const deal = dealFor(players, st.enabled), boxes = {};
   const pubs = Object.fromEntries(room.members.map(m => [m.id, m.pub]));
-  const botRoles = {};
   for (let i = 0; i < players.length; i++) {
     const p = players[i], d = deal[i];
-    if (isBot(p.id)) botRoles[p.id] = { role: d.role, partner: d.partner || "" };
-    else boxes[p.id] = await seal(room.keys.priv, pubs[p.id], { role: d.role, seed: d.seed, partner: d.partner || "", team: p.team });
+    boxes[p.id] = await seal(room.keys.priv, pubs[p.id], { role: d.role, seed: d.seed, partner: d.partner || "", team: p.team });
   }
   st.game = {
     id: Math.random().toString(36).slice(2, 10), seed: Math.floor(Math.random() * 2 ** 31), phase: "dealt", hostPub: room.keys.pub,
     players: players.map(p => ({ id: p.id, name: p.name, team: p.team })), boxes, startedAt: null,
-    votes: {}, result: [null, null], checks: {}, roles: {}, picks: st.withPicks ? drawFor(players) : null, botRoles, events: st.events !== false
+    votes: {}, result: [null, null], checks: {}, roles: {}, picks: st.withPicks ? drawFor(players) : null, events: st.events !== false
   };
   st.activity = "truque"; st.picks = null;
   chime(); pushState();
@@ -2895,11 +2587,12 @@ let onlineTimer = null;
 function renderOnline() {
   const body = $("#onlineBody"); if (!body) return;
   if (currentView !== "online") return;
+  $("#view-online").classList.toggle("in-room", !!room);
   if (!room) return body.innerHTML = onlineHomeHTML();
   if (room.connecting || !room.state) {
     body.innerHTML = `<div class="panel-paper on-wait">
       ${room.waitedTooLong
-        ? `<h2 class="on-title">Personne dans la salle ${room.code}</h2><p class="hint">L'hôte n'est pas connecté, ou le code est faux. Si toute la bande a fermé la page, l'un de vous peut reprendre la salle et devenir l'hôte.</p>`
+        ? `<h2 class="on-title">Salle ${room.code} vide</h2><p class="hint">Code faux, ou plus personne dedans.</p>`
         : `<h2 class="on-title">Connexion à la salle ${room.code}…</h2>`}
       <div class="party-actions">${room.waitedTooLong ? `<button class="btn-chip" data-on="takeover">Reprendre la salle</button>` : ""}<button class="btn btn-ink" data-on="leave">Quitter</button></div></div>`;
     return;
@@ -2915,40 +2608,36 @@ function onlineHomeHTML() {
   const last = store.get("lastRoom", null);
   return `<div class="panel-paper on-home">
     <div class="field on-name"><label for="onName">Ton pseudo</label>
-      <input type="text" id="onName" maxlength="20" autocomplete="nickname" value="${esc(ME.name)}" placeholder="Ex. Skybreacoeur"></div>
-    <div class="on-choices">
-      <div class="on-choice">
-        <h2>Créer une salle</h2>
-        <p>Tu deviens l'hôte : tu lances les tirages et la Partie truquée.</p>
-        <button class="btn-chip" data-on="create">Créer une salle</button>
-      </div>
-      <div class="on-choice">
-        <h2>Rejoindre</h2>
-        <p>Entre le code de 4 caractères que ton pote t'a donné.</p>
-        <div class="on-join"><input type="text" id="onCode" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="K7QF" aria-label="Code de la salle" value="${esc(room?.code || "")}">
-          <button class="btn btn-ink" data-on="join">Rejoindre</button></div>
-        ${last ? `<button class="btn btn-ink on-back" data-on="rejoin" data-code="${esc(last)}">Revenir dans la salle ${esc(last)}</button>` : ""}
+      <input type="text" id="onName" maxlength="20" autocomplete="nickname" value="${esc(ME.name)}" placeholder="Pseudo"></div>
+    <div class="on-split">
+      <button class="btn-chip on-create" data-on="create">Créer une salle</button>
+      <span class="on-or">ou</span>
+      <div class="on-join">
+        <input type="text" id="onCode" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="CODE" aria-label="Code de la salle" value="${esc(room?.code || "")}">
+        <button class="btn btn-ink" data-on="join">Rejoindre</button>
       </div>
     </div>
-    <p class="hint on-offline">Pas de connexion ? <button class="linkish" data-goto="party">Partie truquée avec des liens secrets</button>, sans salle.</p>
+    ${last ? `<button class="linkish on-back" data-on="rejoin" data-code="${esc(last)}">Revenir dans la salle ${esc(last)}</button>` : ""}
   </div>`;
 }
+const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
 function roomBarHTML() {
   const st = room.state;
   return `<div class="on-bar">
-    <div class="on-code"><span>Salle</span><b>${room.code}</b>
-      <button class="btn on-copy" data-on="copycode" aria-label="Copier le code ${room.code}">Copier le code</button></div>
-    <div class="on-members" aria-label="Joueurs connectés">${room.members.map(m => `<span class="on-member${m.id === ME.id ? " me" : ""}">
-      ${esc(m.name)}${m.id === st.host ? ` <small>hôte</small>` : ""}${m.id === ME.id ? ` <small>toi</small>` : ""}</span>`).join("")}${(st.bots || []).map(b => `<span class="on-member bot">${esc(b.name)} <small>bot</small></span>`).join("")}</div>
+    <button class="on-plaque" data-on="copycode" title="Copier le code">
+      <span>Salle</span><b>${room.code}</b>${COPY_ICON}
+    </button>
+    <div class="on-seats" aria-label="Joueurs connectés">${room.members.map(m => `<span class="on-seat${m.id === ME.id ? " me" : ""}${m.id === st.host ? " host" : ""}">
+      <i aria-hidden="true">${esc((m.name || "?").trim().charAt(0).toUpperCase())}</i>${esc(m.name)}${m.id === st.host ? `<small>hôte</small>` : ""}</span>`).join("")}</div>
     <div class="on-bar-actions">
-      <button class="btn" data-on="invite">Copier l'invitation</button>
+      <button class="btn" data-on="invite">Inviter</button>
       <button class="btn" data-rules>Règles</button>
-      <button class="btn" data-on="leave">Quitter</button>
+      <button class="btn on-quit" data-on="leave">Quitter</button>
     </div>
   </div>`;
 }
 function laneSelectHTML() {
-  return `<div class="on-lane"><label for="onLane">Ta lane pour les troll picks</label>
+  return `<div class="on-lane"><label for="onLane">Ta lane</label>
     <div class="role-pick"><select id="onLane" class="${room.lane ? "locked" : ""}">
       <option value="">Au hasard</option>${ROLES.map(r => `<option value="${r.key}" ${room.lane === r.key ? "selected" : ""}>${r.label}</option>`).join("")}
     </select></div></div>`;
@@ -2956,42 +2645,32 @@ function laneSelectHTML() {
 function teamsEditorHTML() {
   if (allSeats().length <= 5 || !isHost()) return "";
   const players = roomPlayers();
-  return `<div class="party-step"><h2>Les équipes</h2><p class="hint">Plus de 5 joueurs : répartissez-vous dans les deux équipes d'une partie personnalisée.</p>
+  return `<div class="panel-paper on-teams"><h2 class="on-title">Les équipes</h2>
     <div class="party-players">${players.map(p => `<div class="party-player"><span style="font-weight:800">${esc(p.name)}</span>
       <div class="team-toggle">${[0, 1].map(t => `<button data-oteam="${p.id}" data-team="${t}" aria-pressed="${p.team === t}">${TEAM_NAMES[t]}</button>`).join("")}</div></div>`).join("")}</div></div>`;
 }
 function lobbyHTML() {
-  const st = room.state, host = isHost(), n = allSeats().length, bots = st.bots || [];
-  if (!host) return `<div class="panel-paper"><h2 class="on-title">${esc(memberName(st.host))} prépare la partie…</h2>
-    <p class="hint">Tu peux déjà choisir ta lane : elle sera respectée si personne d'autre ne l'a prise dans ton équipe.</p>${laneSelectHTML()}</div>`;
-  return `<div class="panel-paper">
-    ${laneSelectHTML()}
-    ${teamsEditorHTML()}
-    <div class="on-choices">
-      <div class="on-choice">
-        <h2>Troll picks en direct</h2>
-        <p>Un pick par joueur, dévoilé chez tout le monde en même temps. Chacun a un joker pour relancer le sien.</p>
-        <button class="btn-chip" data-on="draw" ${n < 1 ? "disabled" : ""}>Tirer pour tout le monde</button>
-      </div>
-      <div class="on-choice">
-        <h2>Partie truquée</h2>
-        <p>Rôles secrets, événements pour tous, vote depuis chaque PC. À partir de 3 joueurs.</p>
-        <div class="chips">${PARTY_OPTIONAL.map(k => `<button class="chip" aria-pressed="${st.enabled.includes(k)}" data-orole="${k}">${PARTY_ROLES[k].name}</button>`).join("")}</div>
-        <label class="on-check"><input type="checkbox" data-on-events ${st.events !== false ? "checked" : ""}> Événements pour tous pendant la game (toutes les 8 min)</label>
-        <label class="on-check"><input type="checkbox" data-on-withpicks ${st.withPicks ? "checked" : ""}> Imposer aussi un troll pick à chacun</label>
-        <button class="btn-chip" data-on="deal" ${n < 3 ? "disabled" : ""}>Distribuer les rôles</button>
-        ${n < 3 ? `<p class="hint">En attente d'au moins 3 joueurs (${n} pour l'instant). Seul ? Ajoute des bots ci-dessous.</p>` : ""}
-      </div>
-    </div>
-    <div class="party-step on-bots">
-      <h2>Mode test : des bots</h2>
-      <p class="hint">Pour essayer seul : les bots reçoivent un rôle, votent au hasard et montrent leur carte à la révélation. Ils ne jouent pas à LoL, bien sûr.</p>
-      <div class="party-actions" style="margin:0">
-        <button class="btn btn-ink" data-on="addbot" ${n >= 10 ? "disabled" : ""}>Ajouter un bot</button>
-        ${bots.length ? `<button class="btn btn-ink" data-on="clearbots">Retirer les ${bots.length} bot${bots.length > 1 ? "s" : ""}</button>` : ""}
-      </div>
-    </div>
-  </div>`;
+  const st = room.state, host = isHost(), n = allSeats().length;
+  if (!host) return `<div class="panel-paper on-waiting">
+    <h2 class="on-title">${esc(memberName(st.host))} prépare la partie…</h2>${laneSelectHTML()}</div>`;
+  const opt = (key, label, on) => `<button class="chip on-opt" aria-pressed="${on}" data-on-opt="${key}">${label}</button>`;
+  return `<div class="on-modes">
+    <section class="on-mode">
+      <h2>Troll picks</h2>
+      <p class="on-sub">Un pick par joueur, un joker chacun.</p>
+      ${laneSelectHTML()}
+      <button class="btn-chip" data-on="draw">Tirer</button>
+    </section>
+    <section class="on-mode">
+      <h2>Partie truquée</h2>
+      <p class="on-sub">Rôles secrets, vote à la fin.</p>
+      <div class="chips">${PARTY_OPTIONAL.map(k => `<button class="chip" aria-pressed="${st.enabled.includes(k)}" data-orole="${k}">${PARTY_ROLES[k].name}</button>`).join("")}</div>
+      <div class="chips on-opts">${opt("events", "Événements", st.events !== false)}${opt("withPicks", "Troll pick imposé", !!st.withPicks)}</div>
+      <button class="btn-chip" data-on="deal" ${n < 3 ? "disabled" : ""}>Distribuer les rôles</button>
+      ${n < 3 ? `<p class="on-need">${n}/3 joueurs</p>` : ""}
+    </section>
+  </div>
+  ${teamsEditorHTML()}`;
 }
 function picksHTML() {
   const st = room.state, pk = st.picks, two = new Set(pk.list.map(x => x.team)).size > 1;
@@ -3007,7 +2686,6 @@ function picksHTML() {
       : `<div class="team-grid" style="--n:${pk.list.length}" id="onGrid0">${cards(null)}</div>`}
     <div class="team-actions">
       ${mine ? `<button class="btn-chip" data-on="joker" ${used ? "disabled" : ""}>${used ? "Joker utilisé" : "Utiliser mon joker"}</button>` : `<p class="hint" style="color:var(--muted)">Tu es arrivé après le tirage : tu regardes.</p>`}
-      <button class="btn" data-on="teamlink">Copier le lien de l'équipe</button>
       ${isHost() ? `<button class="btn" data-on="draw">Nouveau tirage</button><button class="btn" data-on="lobby">Retour au salon</button>` : ""}
     </div>
     ${laneSelectHTML()}
@@ -3073,11 +2751,11 @@ function truqueHTML() {
     const voted = g.votes[ME.id], count = Object.keys(g.votes).length;
     return `<div class="panel-paper">
       <h2 class="on-title">Le vote</h2>
-      <p class="hint">Débattez en vocal, puis chacun désigne en secret qui il pense être le Tricheur de son équipe. ${count}/${g.players.length} votes reçus.</p>
+      <p class="hint">Qui est le Tricheur de ton équipe ? ${count}/${g.players.length} votes</p>
       ${me ? `<div class="on-vote"><div class="role-pick" style="margin:0"><select id="onVote" aria-label="Qui est le Tricheur ?">
           <option value="">Choisis un suspect…</option>${mates.map(p => `<option value="${p.id}" ${voted === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}
         </select></div><button class="btn-chip" data-on="vote">${voted ? "Changer mon vote" : "Voter"}</button></div>
-        ${voted ? `<p class="hint">Ton vote est enregistré : ${esc(memberName(voted))}.</p>` : ""}` : `<p class="hint">Tu regardes cette partie.</p>`}
+        ${voted ? `<p class="hint">Vote enregistré : ${esc(memberName(voted))}</p>` : ""}` : `<p class="hint">Tu regardes cette partie.</p>`}
       ${host ? `<div class="party-step"><h2>Le résultat</h2>
         ${[...new Set(g.players.map(p => p.team))].sort().map(t => `<div class="result-toggle" style="margin-bottom:8px"><span>${two ? `Équipe ${TEAM_NAMES[t]}` : "Votre équipe"} :</span>
           <button class="chip" aria-pressed="${g.result[t] === true}" data-oresult="${t}" data-win="1">Victoire</button>
@@ -3088,14 +2766,14 @@ function truqueHTML() {
 
   // phases "dealt" (en attente du départ) et "live" (game en cours)
   return `<div class="on-truque">
-    ${R ? `<div class="secret">${myCardHTML(R, mr)}<ul class="secret-points"><li>${R.points.join("</li><li>")}</li></ul><button class="btn" data-rules>Règles et rôles</button></div>`
+    ${R ? `<div class="secret">${myCardHTML(R, mr)}<ul class="secret-points"><li>${R.points.join("</li><li>")}</li></ul></div>`
         : `<div class="panel-paper"><p class="hint" style="margin:0">${me ? "Déchiffrement de ton rôle…" : "Tu es arrivé après la distribution : tu regardes cette partie."}</p></div>`}
     <div class="on-side">${notifyBtnHTML()}
       ${g.phase === "dealt"
-        ? `<div class="secret-live"><h3>En attente du départ</h3><p>${host ? "Appuie quand la partie se charge : le chrono part pour tout le monde." : `${esc(memberName(st.host))} lance le chrono au chargement de la game.`}</p>
-            ${host ? `<button class="btn-chip" data-on="start">La game commence</button>` : ""}</div>`
+        ? `<div class="secret-live"><h3>En attente du départ</h3>
+            ${host ? `<button class="btn-chip" data-on="start">La game commence</button>` : `<p>${esc(memberName(st.host))} lance le chrono au chargement.</p>`}</div>`
         : `<div class="secret-live" id="onLive"></div>${g.events !== false ? `<div class="secret-live on-event" id="onEvent"></div>` : ""}
-           ${host ? `<button class="btn" data-on="tovote">Fin de la game : passer au vote</button>` : ""}`}
+           ${host ? `<button class="btn on-tovote" data-on="tovote">Fin de la game : vote</button>` : ""}`}
       ${autoStartHTML(g)}
       ${pickBox}
     </div>
@@ -3118,12 +2796,20 @@ function onlineTick(force = false) {
     if (t < EVENT_FIRST) L = { html: `<h3>Premier événement dans</h3><div class="big" data-clock></div>`, clock: mmss(EVENT_FIRST - t), key: "wait" };
     else {
       const k = Math.floor((t - EVENT_FIRST) / EVENT_EVERY), next = EVENT_FIRST + (k + 1) * EVENT_EVERY - t;
-      const text = ROOM_EVENTS[Math.floor(seeded(g.seed, 1000 + k) * ROOM_EVENTS.length)];
-      L = { html: `<h3>Événement pour tous n° ${k + 1}</h3><div class="big">${text}</div>${CLOCK}`,
-            clock: `Prochain événement dans ${mmss(next)}`, key: "e" + k, text };
+      const E = ROOM_EVENTS[Math.floor(seeded(g.seed, 1000 + k) * ROOM_EVENTS.length)];
+      const left = E.min * 60e3 - (t - EVENT_FIRST - k * EVENT_EVERY);   // temps restant de l'événement en cours
+      if (E.min && left > 0)
+        L = { html: `<h3>Événement pour tous n° ${k + 1}</h3><div class="big">${E.text}</div><div class="ev-left">Encore <b data-clock></b></div>`,
+              clock: mmss(left), key: "e" + k, text: E.text, title: "Nouvel événement !" };
+      else if (E.min)
+        L = { html: `<h3>Événement pour tous n° ${k + 1}</h3><div class="big ev-done">${E.text}</div><div class="ev-end">Terminé : vous êtes libres.</div>${CLOCK}`,
+              clock: `Prochain événement dans ${mmss(next)}`, key: "e" + k + "fin", text: "Fin de l'événement : " + E.text, title: "Fin de l'événement" };
+      else
+        L = { html: `<h3>Événement pour tous n° ${k + 1}</h3><div class="big">${E.text}</div>${CLOCK}`,
+              clock: `Prochain événement dans ${mmss(next)}`, key: "e" + k, text: E.text, title: "Nouvel événement !" };
     }
     paintLive(ev, L);
-    notifyChange(ev, "event", L.key, "Nouvel événement !", L.text);
+    notifyChange(ev, "event", L.key, L.title || "Nouvel événement !", L.text);
   }
 }
 function notifyChange(el, slot, key, title, body) {
@@ -3149,12 +2835,13 @@ $("#onlineBody").addEventListener("click", async e => {
     case "copycode": return copy(room.code, `Code ${room.code} copié`);
     case "copycmd": return copy(`node trollpicks-start.mjs ${room.code}`, "Commande copiée");
     case "invite": return copy(`${pageUrl()}#salle=${room.code}`, `Invitation copiée : salle ${room.code}`);
-    case "teamlink": return onlineTeam.length && copy(teamLink(onlineTeam.filter(Boolean)), "Lien de l'équipe copié");
     case "joker": return act("joker");
     case "vote": { const v = $("#onVote").value; if (!v) return toast("Choisis d'abord un suspect"); act("vote", { target: v }); return toast("Vote envoyé"); }
   }
   if (!isHost()) return;
   if (d.oteam) { st.teams[d.oteam] = +d.team; return pushState(); }
+  if (d.onOpt === "events") { st.events = st.events === false; return pushState(); }
+  if (d.onOpt === "withPicks") { st.withPicks = !st.withPicks; return pushState(); }
   if (d.orole) { st.enabled = st.enabled.includes(d.orole) ? st.enabled.filter(r => r !== d.orole) : [...st.enabled, d.orole]; return pushState(); }
   if (d.oresult != null) { st.game.result[+d.oresult] = d.win === "1"; return pushState(); }
   switch (d.on) {
@@ -3168,27 +2855,10 @@ $("#onlineBody").addEventListener("click", async e => {
     case "deal": return hostDealTruque();
     case "redeal": return hostDealTruque();
     case "lobby": st.activity = "lobby"; st.picks = null; st.game = null; return pushState();
-    case "addbot": {
-      st.bots = st.bots || [];
-      if (allSeats().length >= 10) return toast("10 joueurs maximum");
-      const used = new Set(st.bots.map(b => b.name));
-      st.bots.push({ id: "bot-" + Math.random().toString(36).slice(2, 8), name: BOT_NAMES.find(n => !used.has(n)) || `Bot ${st.bots.length + 1}` });
-      return pushState();
-    }
-    case "clearbots": st.bots = []; return pushState();
     case "start": st.game.startedAt = Date.now(); st.game.phase = "live"; beep(1000, .05); return pushState();
-    case "tovote": {
-      if (!confirm("Terminer la game et passer au vote ?")) return;
-      const g = st.game;
-      g.players.filter(p => isBot(p.id)).forEach(b => {
-        const mates = g.players.filter(p => p.team === b.team && p.id !== b.id);
-        if (mates.length) g.votes[b.id] = rand(mates).id;
-      });
-      g.phase = "vote"; return pushState();
-    }
+    case "tovote": if (!confirm("Terminer la game et passer au vote ?")) return; st.game.phase = "vote"; return pushState();
     case "reveal":
       if ([...new Set(st.game.players.map(p => p.team))].some(t => st.game.result[t] == null)) return toast("Indique d'abord victoire ou défaite");
-      Object.assign(st.game.roles, st.game.botRoles || {});
       st.game.phase = "reveal"; chime(); return pushState();
   }
 });
@@ -3205,8 +2875,7 @@ $("#onlineBody").addEventListener("change", e => {
     t.classList.toggle("locked", !!t.value); trackMe(); act("lane", { lane: t.value }); return;
   }
   if (!isHost()) return;
-  if (t.matches("[data-on-withpicks]")) { room.state.withPicks = t.checked; return pushState(); }
-  if (t.matches("[data-on-events]")) { room.state.events = t.checked; return pushState(); }
+
   if (t.dataset.ocheck) {
     const g = room.state.game, id = t.dataset.ocheck;
     g.checks[id] = { ...g.checks[id], [t.dataset.k]: t.type === "checkbox" ? t.checked : +t.value };
@@ -3221,9 +2890,6 @@ $("#onlineBody").addEventListener("input", e => {
 $("#onlineBody").addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "onCode") joinRoom(e.target.value);
   if ((e.key === "Enter" || e.key === " ") && e.target.id === "onCard") { e.preventDefault(); e.target.click(); }
-});
-document.addEventListener("click", e => {
-  const g = e.target.closest("[data-goto]"); if (g) showView(g.dataset.goto);
 });
 addEventListener("pagehide", () => { if (room?.ch) room.ch.untrack(); });
 
@@ -3258,7 +2924,7 @@ $("#clearHist").addEventListener("click", () => {
 /* =========================================================
    NAVIGATION
 ========================================================= */
-/* Chaque onglet et chaque ticket ouvert depuis l'équipe ou l'historique crée une étape
+/* Chaque onglet et chaque ticket ouvert depuis la salle ou l'historique crée une étape
    dans l'historique du navigateur : le bouton (ou le geste) retour fonctionne. */
 const nav = window.history;
 nav.scrollRestoration = "manual";
@@ -3269,25 +2935,10 @@ function showView(v, { push = true } = {}) {
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
   document.querySelectorAll(".view").forEach(s => s.hidden = s.id !== "view-" + v);
   if (v === "history") renderHistory();
-  if (v === "party") renderParty();
   if (v === "online") renderOnline();
-  if (v === "team") {
-    if (lastTeam.length && $("#teamGrid").childElementCount !== lastTeam.length) renderTeam(lastTeam, false);
-    focusTeamCard();
-  }
   if (push && changed) nav.pushState({ view: v }, "", pageUrl());
 }
-function focusTeamCard() {
-  if (teamFocus == null) return;
-  const card = document.querySelector(`#teamGrid [data-card="${teamFocus}"]`);
-  teamFocus = null;
-  if (!card) return;
-  card.classList.remove("reveal", "focus");
-  void card.offsetWidth;   // relance l'animation si on revient deux fois sur la même carte
-  card.classList.add("focus");
-  card.scrollIntoView({ behavior: speedF() ? "smooth" : "auto", block: "center" });
-}
-/* Ouvre un ticket depuis l'équipe ou l'historique, avec retour possible. */
+/* Ouvre un ticket depuis la salle ou l'historique, avec retour possible. */
 function openTicket(pick, ctx) {
   showView("solo", { push: false });
   nav.pushState({ view: "solo", from: ctx.from, i: ctx.i }, "", pageUrl());
@@ -3295,21 +2946,24 @@ function openTicket(pick, ctx) {
 }
 function goBack(ctx) {
   if (nav.state?.from === ctx.from) nav.back();
-  else { teamFocus = ctx.from === "team" ? ctx.i : null; showView(ctx.from); }
+  else showView(ctx.from);
 }
 addEventListener("popstate", e => {
   const s = e.state || { view: "solo" };
   const prev = $("#result")._ctx;
-  if (s.from === "team" && lastTeam[s.i]) { showView("solo", { push: false }); renderResult(lastTeam[s.i], { from: "team", i: s.i }); return; }
   if (s.from === "online" && onlineTeam[s.i]) { showView("solo", { push: false }); renderResult(onlineTeam[s.i], { from: "online", i: s.i }); return; }
   if (s.from === "history" && history[s.i]) { showView("solo", { push: false }); renderResult(history[s.i], { from: "history", i: s.i }); return; }
-  if (s.view === "team" && prev?.from === "team") teamFocus = prev.i;
   showView(s.view || "solo", { push: false });
   if (s.view === "history" && prev?.from === "history")
     document.querySelector(`#histList [data-hist="${prev.i}"]`)?.closest(".hrow")?.scrollIntoView({ block: "center" });
 });
 nav.replaceState({ view: "solo" }, "", location.href);
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
+$("#homeLink").addEventListener("click", e => {
+  e.preventDefault();
+  showView("solo");
+  scrollTo({ top: 0, behavior: speedF() ? "smooth" : "auto" });
+});
 
 /* =========================================================
    RÉGLAGES
@@ -3400,7 +3054,6 @@ function initAfterLoad() {
   casinoPreview();
   $("#spinAll").textContent = "Tout tirer";
   setBusy(false);
-  renderTeamForm();
 }
 $("#spinAll").addEventListener("click", () => runSolo("all"));
 $("#spinChamp").addEventListener("click", () => runSolo("champ"));
