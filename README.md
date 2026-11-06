@@ -2,7 +2,9 @@
 
 Randomizer League of Legends façon table de casino : champion, lane, type de build, puis un build complet et cohérent (objets dans l'ordre d'achat, objets selon la game, runes, sorts, ordre des compétences). Mode équipe de 2 à 5 joueurs avec rôles verrouillables, historique et réglages. En solo, on peut aussi verrouiller sa lane.
 
-La Partie truquée : un mode à rôles secrets pour jouer une vraie game entre potes (3 à 10 joueurs, un Tricheur par équipe, vote et points à la fin), inspiré du concept Among Legends de Solary avec des rôles et des visuels propres au site. Chaque joueur reçoit un lien secret (#r=) qui affiche sa carte, les ordres du Pantin et les tirages de Pile ou Face, sans serveur.
+En ligne : on crée une salle (code de 4 caractères ou lien d'invitation) et chacun la rejoint depuis son téléphone. L'hôte lance soit des troll picks en direct (lanes verrouillables, un joker par joueur), soit la Partie truquée : rôles secrets de 3 à 10 joueurs, un Tricheur par équipe, ordres du Pantin, pièce de Pile ou Face, événements pour tous, vote sur chaque téléphone, révélation et points. Inspiré du concept Among Legends de Solary, avec des rôles et visuels propres au site.
+
+Technique du mode en ligne : Supabase Realtime (canaux de diffusion et présence, sans base de données). L'hôte fait foi et diffuse l'état de la salle ; les rôles sont chiffrés pour chaque joueur (ECDH P-256 + AES-GCM) ; si l'hôte part, le joueur arrivé le plus tôt reprend la main. La clé utilisée dans index.html est la clé publique (publishable) du projet. Une version sans connexion (liens secrets #r=) reste disponible.
 
 Site : https://skybreacoeur.github.io/trollpicks-plus/
 
