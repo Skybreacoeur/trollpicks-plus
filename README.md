@@ -6,6 +6,8 @@ En ligne : on crée une salle (code de 4 caractères ou lien d'invitation) et ch
 
 Technique du mode en ligne : Supabase Realtime (canaux de diffusion et présence, sans base de données). L'hôte fait foi et diffuse l'état de la salle ; les rôles sont chiffrés pour chaque joueur (ECDH P-256 + AES-GCM) ; si l'hôte part, le joueur arrivé le plus tôt reprend la main. La clé utilisée dans index.html est la clé publique (publishable) du projet. Une version sans connexion (liens secrets #r=) reste disponible.
 
+Départ automatique (facultatif) : sur un seul PC qui joue, lancer pendant la partie `node outils/trollpicks-start.mjs CODE` (Node.js 18+). Le script lit l'horloge de la partie sur l'API locale du jeu (https://127.0.0.1:2999/liveclientdata/gamestats, certificat auto-signé accepté pour cette seule adresse) et envoie `game-start` { startedAt, gameTime } dans le canal de la salle toutes les 10 secondes, puis `game-end` à la fin. L'hôte recale le chrono à partir de gameTime ; le bouton « La game commence » reste en secours. Test sans LoL : `--simuler=95`.
+
 Pensé pour PC : pendant la game, la page joue un son d'alerte et peut envoyer des notifications Windows (bouton « Activer les notifications »). Le chrono tourne dans un worker pour ne pas être ralenti quand LoL est au premier plan.
 
 Cartes de rôle : dessinées dans Figma (fichier « TrollPicks+ — Cartes de la Partie truquée », https://www.figma.com/design/bAYhpiQMBsy9th4fyrYIjC, composant « Carte de rôle »). Les illustrations sont exportées en SVG dans cartes/ ; le reste de la carte est reconstruit en HTML (fonction roleCardHTML). Pour changer une illustration : la modifier dans Figma, réexporter le calque « Illustration » en SVG et remplacer le fichier dans cartes/.

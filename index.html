@@ -498,6 +498,9 @@ body.secret-mode .tabs,body.secret-mode .head-actions #settingsBtn{display:none}
 .on-truque .secret{margin:0}
 .on-side{display:grid;gap:14px}
 .on-event{border-left:6px solid var(--gold)}
+.on-auto code.on-cmd{display:block;font-family:ui-monospace,Consolas,monospace;font-size:.95rem;font-weight:700;background:var(--ink);color:var(--gold);padding:10px 12px;border-radius:6px;overflow-x:auto;white-space:nowrap}
+.on-auto-ok{color:#1f7a4c;font-weight:800}
+.on-side > .on-auto-ok{color:var(--muted)}
 .on-vote{display:flex;gap:10px;flex-wrap:wrap;align-items:center;max-width:520px}
 .on-vote .role-pick{flex:1;min-width:200px}
 @media (max-width:760px){.on-truque{grid-template-columns:1fr}}
@@ -2668,7 +2671,9 @@ async function joinRoom(rawCode, asHost = false) {
     .on("broadcast", { event: "state" }, ({ payload }) => onState(payload))
     .on("broadcast", { event: "act" }, ({ payload }) => onAct(payload))
     .on("broadcast", { event: "me-role" }, ({ payload }) => onMeRole(payload))
-    .on("broadcast", { event: "hello" }, ({ payload }) => onHello(payload));
+    .on("broadcast", { event: "hello" }, ({ payload }) => onHello(payload))
+    .on("broadcast", { event: "game-start" }, ({ payload }) => onGameStart(payload))
+    .on("broadcast", { event: "game-end" }, () => onGameEnd());
   ch.subscribe(async status => {
     if (room?.ch !== ch) return;
     if (status === "SUBSCRIBED") {
@@ -2746,6 +2751,55 @@ function onHello(p) {
   if (isHost()) return pushState(false);
   const others = room.members.filter(m => m.id !== p?.from);
   if (p?.from === room.state.host && others[0]?.id === ME.id) send("state", { s: room.state, sentAt: Date.now() });
+}
+
+/* ---------- départ automatique (script local outils/trollpicks-start.mjs) ----------
+   Le script lit l'horloge de LoL et envoie gameTime toutes les 10 secondes.
+   Seul l'hôte s'en sert : il recale le départ sur sa propre horloge (pas de décalage entre PC),
+   puis diffuse l'état comme d'habitude. Le bouton « La game commence » reste en secours. */
+const AUTO_FRESH_MS = 25e3;
+function onGameStart(p) {
+  if (!room) return;
+  const wasSeen = room.scriptSeen && Date.now() - room.scriptSeen < AUTO_FRESH_MS;
+  room.scriptSeen = Date.now();
+  const gt = Number(p?.gameTime);
+  const g = room.state?.game;
+  if (isHost() && g && Number.isFinite(gt) && gt >= 0 && gt < 4 * 3600) {
+    const startedAt = Date.now() - Math.round(gt * 1000);
+    if (g.phase === "dealt") {
+      Object.assign(g, { startedAt, phase: "live", auto: true });
+      toast("Game détectée : chrono lancé pour tout le monde");
+      return pushState();
+    }
+    if (g.phase === "live" && (!g.auto || Math.abs(g.startedAt - startedAt) > 2000)) {
+      Object.assign(g, { startedAt, auto: true });
+      if (!wasSeen) toast("Chrono recalé sur l'horloge de LoL");
+      return pushState();
+    }
+  }
+  if (!wasSeen) renderOnline();
+}
+function onGameEnd() {
+  if (!room) return;
+  room.scriptSeen = 0;
+  if (isHost() && room.state?.game?.phase === "live") toast("La game est finie : tu peux passer au vote");
+  renderOnline();
+}
+function autoStartHTML(g) {
+  const seen = room.scriptSeen && Date.now() - room.scriptSeen < AUTO_FRESH_MS;
+  if (!isHost()) return g.auto || seen ? `<p class="hint on-auto-ok">Chrono calé automatiquement sur l'horloge de LoL.</p>` : "";
+  return `<div class="secret-live on-auto">
+    <h3>Départ automatique</h3>
+    ${seen || g.auto
+      ? `<p class="on-auto-ok">Script connecté : le chrono suit l'horloge de LoL.</p>`
+      : `<p>Facultatif. Sur le PC qui joue, lance ce script pendant la partie : le chrono se cale tout seul sur le 0:00 de la game.</p>`}
+    <code class="on-cmd">node trollpicks-start.mjs ${room.code}</code>
+    <div class="party-actions" style="margin:0">
+      <button class="btn btn-ink" data-on="copycmd">Copier la commande</button>
+      <a class="btn btn-ink" href="outils/trollpicks-start.mjs" download>Télécharger le script</a>
+    </div>
+    <p class="clock">Nécessite Node.js. Lance la commande dans le dossier où tu as téléchargé le script.</p>
+  </div>`;
 }
 
 /* ---------- présence ---------- */
@@ -3046,6 +3100,7 @@ function truqueHTML() {
             ${host ? `<button class="btn-chip" data-on="start">La game commence</button>` : ""}</div>`
         : `<div class="secret-live" id="onLive"></div><div class="secret-live on-event" id="onEvent"></div>
            ${host ? `<button class="btn" data-on="tovote">Fin de la game : passer au vote</button>` : ""}`}
+      ${autoStartHTML(g)}
       ${pickBox}
     </div>
   </div>`;
@@ -3097,6 +3152,7 @@ $("#onlineBody").addEventListener("click", async e => {
     case "leave": await leaveRoom(true); return renderOnline();
     case "takeover": if (room && !room.state) { room.state = freshState(); pushState(); toast("Tu es l'hôte de la salle"); } return;
     case "copycode": return copy(room.code, `Code ${room.code} copié`);
+    case "copycmd": return copy(`node trollpicks-start.mjs ${room.code}`, "Commande copiée");
     case "invite": return copy(`${pageUrl()}#salle=${room.code}`, `Invitation copiée : salle ${room.code}`);
     case "teamlink": return onlineTeam.length && copy(teamLink(onlineTeam.filter(Boolean)), "Lien de l'équipe copié");
     case "joker": return act("joker");
