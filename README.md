@@ -6,7 +6,12 @@ En ligne : on crée une salle (code de 4 caractères ou lien d'invitation) et ch
 
 Technique du mode en ligne : Supabase Realtime (canaux de diffusion et présence, sans base de données). L'hôte fait foi et diffuse l'état de la salle ; les rôles sont chiffrés pour chaque joueur (ECDH P-256 + AES-GCM) ; si l'hôte part, le joueur arrivé le plus tôt reprend la main. La clé utilisée dans index.html est la clé publique (publishable) du projet. Une version sans connexion (liens secrets #r=) reste disponible.
 
-Départ automatique (facultatif) : sur un seul PC qui joue, lancer pendant la partie `node outils/trollpicks-start.mjs CODE` (Node.js 18+). Le script lit l'horloge de la partie sur l'API locale du jeu (https://127.0.0.1:2999/liveclientdata/gamestats, certificat auto-signé accepté pour cette seule adresse) et envoie `game-start` { startedAt, gameTime } dans le canal de la salle toutes les 10 secondes, puis `game-end` à la fin. L'hôte recale le chrono à partir de gameTime ; le bouton « La game commence » reste en secours. Test sans LoL : `--simuler=95`.
+Départ automatique (facultatif) : le script outils/trollpicks-start.mjs (Node.js 18+) lit l'horloge de la partie sur l'API locale du jeu (https://127.0.0.1:2999/liveclientdata/gamestats, certificat auto-signé accepté pour cette seule adresse) et envoie gameTime toutes les 10 secondes, puis game-end à la fin. L'hôte recale le chrono ; le bouton « La game commence » reste en secours.
+- Mode permanent (sans argument) : tourne en fond, avec une clé propre au PC (config dans %LOCALAPPDATA%TrollPicks, journal trollpicks-start.log, une seule copie à la fois). Il envoie sur le canal tp-pc-<CLÉ> ; la clé se colle une fois dans la salle (champ « Clé de ton PC ») et le site relaie à la salle. Lancement au démarrage de Windows : TrollPicks-Start.vbs dans le dossier Démarrage (comme OLYCITY Live). Pour désinstaller : supprimer ce fichier et arrêter le processus node indiqué dans trollpicks-start.pid.
+- Mode ponctuel : node trollpicks-start.mjs CODE envoie directement à la salle.
+- Test sans LoL : --simuler=95 ; afficher la clé : --cle.
+
+Mode test : dans le salon d'une salle, l'hôte peut ajouter des bots (faux joueurs, 10 places au total). Ils reçoivent un rôle, votent au hasard dans leur équipe et montrent leur carte à la révélation : de quoi dérouler une Partie truquée seul, par exemple pendant une partie de LoL contre des bots ou en mode Entraînement.
 
 Pensé pour PC : pendant la game, la page joue un son d'alerte et peut envoyer des notifications Windows (bouton « Activer les notifications »). Le chrono tourne dans un worker pour ne pas être ralenti quand LoL est au premier plan.
 
