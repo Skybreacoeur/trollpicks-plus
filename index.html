@@ -2081,33 +2081,15 @@ const PARTY_ROLES = {
   AME:        { name: "L'Âme liée", suit: "♥", color: "#c2417a",
     goal: "Ton destin est lié à {p}. Chaque fois que {p} meurt, tu dois mourir aussi, le plus vite possible. Et gagne la partie.",
     points: ["+2 si tu as respecté le lien", "+1 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] },
-  CONTREBANDIER: { name: "Le Contrebandier", suit: "♠", color: "#6b4e2e",
-    goal: "Gagne la partie en accomplissant en douce les missions qui s'affichent ici, une toutes les 5 à 7 minutes. Personne ne doit comprendre ce que tu fabriques.",
-    points: ["+1 par mission réussie (clique sur « Fait » quand c'est fait)", "+1 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] },
   HONNETE:    { name: "L'Honnête joueur", suit: "♠", color: "#1f7a4c",
     goal: "Aucun pouvoir, aucune consigne. Gagne la partie et démasque le Tricheur.",
     points: ["+2 si ton équipe gagne", "+1 si tu votes contre le Tricheur"] }
 };
-const PARTY_OPTIONAL = ["PANTIN", "PILEFACE", "FLAMBEUR", "HIGHROLLER", "BLUFFEUR", "AME", "CONTREBANDIER"];
-const SMUGGLER_MISSIONS = [
-  "Vole un camp de la jungle ennemie.",
-  "Meurs sous une tour ennemie, sans que ce soit pendant un combat d'équipe.",
-  "Rappelle à la base au milieu d'une lane, sous les yeux d'un adversaire.",
-  "Pose 2 balises dans la jungle ennemie.",
-  "Prends un camp de ton propre jungler sans qu'il s'en rende compte.",
-  "Utilise un sort d'invocateur sans raison visible.",
-  "Sois présent sur un objectif (dragon, héraut, baron) sans lui faire de dégâts.",
-  "Fais l'emote de rire devant un adversaire.",
-  "Reste 30 secondes dans un buisson de la rivière.",
-  "Achève un sbire avec ton ultime.",
-  "Achète un objet qui n'a rien à faire dans ton build, puis revends-le.",
-  "Va saluer (emote) l'équipe ennemie dans sa propre jungle."
-];
-const SMUGGLER_FIRST = 3 * 60e3;
+const PARTY_OPTIONAL = ["PANTIN", "PILEFACE", "FLAMBEUR", "HIGHROLLER", "BLUFFEUR", "AME"];
 /* Cartes dessinées dans Figma (fichier « TrollPicks+ — Cartes de la Partie truquée ») :
    l'illustration de chaque rôle est exportée en SVG dans cartes/, le reste de la carte est en HTML. */
 const ROLE_ART = { TRICHEUR: "tricheur", HONNETE: "honnete", PANTIN: "pantin", PILEFACE: "pileface", FLAMBEUR: "flambeur",
-  HIGHROLLER: "highroller", BLUFFEUR: "bluffeur", AME: "ame", CONTREBANDIER: "contrebandier" };
+  HIGHROLLER: "highroller", BLUFFEUR: "bluffeur", AME: "ame" };
 const ROLE_TAG = {
   TRICHEUR: "Fais perdre ton équipe. Sans te faire prendre.",
   HONNETE: "Aucun pouvoir. Gagne et démasque le Tricheur.",
@@ -2116,8 +2098,7 @@ const ROLE_TAG = {
   FLAMBEUR: "Meurs le plus, frappe le plus. Et gagne.",
   HIGHROLLER: "Tu mises gros : tu dois gagner, sinon tu perds.",
   BLUFFEUR: "Fais-toi accuser au vote. Et gagne quand même.",
-  AME: "Quand ton allié meurt, tu meurs aussi.",
-  CONTREBANDIER: "Des missions en douce. Personne ne doit voir."
+  AME: "Quand ton allié meurt, tu meurs aussi."
 };
 const roleArt = key => `cartes/${ROLE_ART[key]}.svg`;
 const shortName = name => name.replace(/^(Le |La |L')/, "");
@@ -2191,7 +2172,7 @@ function dealFor(players, enabled) {
   const deal = players.map(() => null);
   for (const t of [...new Set(players.map(p => p.team))]) {
     const idx = players.map((p, i) => p.team === t ? i : -1).filter(i => i >= 0);
-    const order = shuffle(idx), pool = shuffle(enabled.filter(r => r !== "AME" || idx.length > 1));
+    const order = shuffle(idx), pool = shuffle(enabled.filter(r => PARTY_OPTIONAL.includes(r) && (r !== "AME" || idx.length > 1)));
     order.forEach((pi, k) => deal[pi] = { role: k === 0 ? "TRICHEUR" : pool[k - 1] || "HONNETE" });
     // l'Âme liée est liée à un autre joueur de son équipe
     idx.forEach(pi => {
@@ -2236,7 +2217,6 @@ function scoreOf(i, P = localP()) {
     case "HIGHROLLER": add(win ? 2 : win === false ? -2 : 0, win ? "victoire" : "défaite"); add(c.a ? 2 : 0, "premier en kills, dégâts ou assists"); break;
     case "BLUFFEUR": add(accused === i ? 3 : 0, "accusé au vote"); add(win ? 1 : win === false ? -1 : 0, win ? "victoire" : "défaite"); break;
     case "AME": add(c.a ? 2 : 0, "lien respecté"); add(win ? 1 : 0, "victoire"); break;
-    case "CONTREBANDIER": add(c.n || 0, `${c.n || 0} mission${c.n > 1 ? "s" : ""} réussie${c.n > 1 ? "s" : ""}`); add(win ? 1 : 0, "victoire"); break;
     case "HONNETE": add(win ? 2 : 0, "victoire"); break;
   }
   return { total: lines.reduce((s, [n]) => s + n, 0), lines };
@@ -2276,8 +2256,7 @@ const CHECKS = {
   PILEFACE: [["a", "Était côté Allié à la fin"]],
   FLAMBEUR: [["a", "Le plus de morts de l'équipe"], ["b", "Le plus de dégâts de l'équipe"]],
   HIGHROLLER: [["a", "Premier en kills, dégâts ou assists"]],
-  AME: [["a", "A respecté le lien"]],
-  CONTREBANDIER: [["n", "Missions réussies", "count"]]
+  AME: [["a", "A respecté le lien"]]
 };
 
 /* ---------- écran de l'hôte ---------- */
@@ -2419,7 +2398,7 @@ document.addEventListener("click", async e => {
   const r = await Notification.requestPermission();
   document.querySelectorAll(".notif-btn").forEach(b => b.remove());
   toast(r === "granted" ? "Notifications activées" : "Notifications refusées");
-  if (r === "granted") new Notification("TrollPicks+", { body: "Les ordres, missions et événements s'afficheront ici pendant la game." });
+  if (r === "granted") new Notification("TrollPicks+", { body: "Les ordres, la pièce et les événements s'afficheront ici pendant la game." });
 });
 /* Son + notification (si l'onglet n'est pas visible) quand il se passe quelque chose. */
 function gameAlert(title, body) {
@@ -2436,12 +2415,7 @@ const mmss = ms => `${Math.floor(Math.max(0, ms) / 60e3)}:${String(Math.floor(Ma
 /* html : contenu stable (redessiné seulement s'il change) ; clock : texte du compte à rebours ;
    key : change quand il se passe quelque chose (son + vibration) ; notice : titre de l'onglet à ce moment-là. */
 const CLOCK = '<div class="clock" data-clock></div>';
-function smugglerSlot(seed, t) {
-  let at = SMUGGLER_FIRST, k = -1;
-  while (at <= t) { k++; at += (5 + 2 * seeded(seed, 500 + k)) * 60e3; }
-  return { k, next: at - t };
-}
-function liveState(role, seed, t, done = new Set()) {
+function liveState(role, seed, t) {
   if (role === "PANTIN") {
     if (t < PANTIN_FIRST) return { html: `<h3>Premier ordre dans</h3><div class="big" data-clock></div>`, clock: mmss(PANTIN_FIRST - t), key: "wait" };
     const k = Math.floor((t - PANTIN_FIRST) / PANTIN_EVERY), next = PANTIN_FIRST + (k + 1) * PANTIN_EVERY - t;
@@ -2457,17 +2431,6 @@ function liveState(role, seed, t, done = new Set()) {
       text: warn ? "Dans 30 secondes, ton côté peut changer." : (ally ? "Côté Allié : fais gagner ton équipe." : "Côté Tricheur : fais perdre ton équipe.")
     };
   }
-  if (role === "CONTREBANDIER") {
-    const { k, next } = smugglerSlot(seed, t);
-    if (k < 0) return { html: `<h3>Première mission dans</h3><div class="big" data-clock></div>`, clock: mmss(next), key: "wait" };
-    const mission = SMUGGLER_MISSIONS[Math.floor(seeded(seed, 700 + k) * SMUGGLER_MISSIONS.length)];
-    return {
-      html: `<h3>Mission n° ${k + 1}</h3><div class="big">${mission}</div>
-        ${done.has(k) ? `<p class="done">Mission accomplie</p>` : `<button class="btn-chip" data-mission="${k}">Fait !</button>`}
-        ${CLOCK}<p class="clock">Missions réussies : ${done.size}</p>`,
-      clock: `Mission suivante dans ${mmss(next)}`, key: "m" + k, notice: "Nouvelle mission !", text: mission
-    };
-  }
   return { html: `<h3>Temps de jeu</h3><div class="big" data-clock></div>`, clock: mmss(t), key: "static" };
 }
 function paintLive(el, L) {
@@ -2475,10 +2438,6 @@ function paintLive(el, L) {
   const c = el.querySelector("[data-clock]");
   if (c && c.textContent !== L.clock) c.textContent = L.clock;
 }
-const missionKey = id => "missions:" + id;
-const missionsDone = id => new Set(store.get(missionKey(id), []));
-function markMission(id, k) { const d = missionsDone(id); d.add(+k); store.set(missionKey(id), [...d]); beep(1300, .08, "sine", .05); }
-
 /* ---------- fenêtre des règles ---------- */
 const ROLE_ORDER = ["TRICHEUR", "HONNETE", ...PARTY_OPTIONAL];
 function rulesHTML() {
@@ -2495,8 +2454,8 @@ function rulesHTML() {
       <h3>Comment ça se passe</h3>
       <ol class="rule-steps">
         <li><b>Distribution.</b> Chaque joueur découvre son rôle secret sur sa page TrollPicks+, dans son navigateur. Il y a un Tricheur par équipe, les autres rôles sont tirés au hasard (un exemplaire de chaque par équipe).</li>
-        <li><b>La game.</b> Vous jouez une vraie partie de League. Chacun suit l'objectif de son rôle sans se trahir. Certains rôles reçoivent des ordres, des missions ou une pièce qui tourne : la page joue un son et envoie une notification Windows, même quand LoL est au premier plan.</li>
-        <li><b>Événements pour tous</b> (en salle en ligne) : toutes les 8 minutes à partir de 5 minutes, une contrainte ou une rumeur s'affiche chez tout le monde.</li>
+        <li><b>La game.</b> Vous jouez une vraie partie de League. Chacun suit l'objectif de son rôle sans se trahir. Certains rôles reçoivent des ordres ou une pièce qui tourne : la page joue un son et envoie une notification Windows, même quand LoL est au premier plan.</li>
+        <li><b>Événements pour tous</b> (en salle en ligne, si l'hôte les a laissés activés) : toutes les 8 minutes à partir de 5 minutes, une contrainte ou une rumeur s'affiche chez tout le monde.</li>
         <li><b>Le débat.</b> Après la game, discutez en vocal : qui a joué bizarrement ?</li>
         <li><b>Le vote.</b> Chacun accuse en secret un joueur de son équipe. Le plus accusé est démasqué ; en cas d'égalité, personne ne l'est.</li>
         <li><b>La révélation.</b> Les cartes se retournent, l'hôte coche ce qui s'est passé (le plus de morts, ordres respectés…) et le classement s'affiche.</li>
@@ -2554,7 +2513,7 @@ function openSecret(token) {
       $("#secretStart").onclick = () => { store.set(startKey, Date.now()); beep(1000, .05); tick(); };
       return;
     }
-    const L = liveState(s.r, s.s, Date.now() - start, missionsDone(startKey)), key = L.key;
+    const L = liveState(s.r, s.s, Date.now() - start), key = L.key;
     $("#secretReset").hidden = false;
     paintLive(live, L);
     if (last !== null && key !== last && key !== "static" && key !== "wait") {
@@ -2563,10 +2522,6 @@ function openSecret(token) {
     }
     last = key;
   };
-  $("#secretLive").addEventListener("click", e => {
-    const m = e.target.closest("[data-mission]"); if (!m) return;
-    markMission(startKey, m.dataset.mission); tick();
-  });
   $("#secretReset").onclick = () => { if (confirm("Remettre le chrono à zéro ?")) { store.set(startKey, null); last = null; tick(); } };
   if (secretTimer) ticker.remove(secretTimer);
   secretTimer = tick;
@@ -2711,7 +2666,7 @@ function send(event, payload) { room?.ch?.send({ type: "broadcast", event, paylo
 function trackMe() { return room.ch.track({ id: ME.id, name: ME.name, pub: room.keys.pub, lane: room.lane || "", at: room.at }); }
 
 function freshState() {
-  return { v: 0, host: ME.id, activity: "lobby", teams: {}, enabled: PARTY_OPTIONAL.slice(), withPicks: false, picks: null, game: null, bots: [] };
+  return { v: 0, host: ME.id, activity: "lobby", teams: {}, enabled: PARTY_OPTIONAL.slice(), withPicks: false, events: true, picks: null, game: null, bots: [] };
 }
 /* L'hôte diffuse l'état complet ; les autres l'appliquent. */
 function pushState(render = true) {
@@ -2740,7 +2695,7 @@ async function afterState() {
   }
   if (!g) room.myRole = null;
   if (g?.phase === "reveal" && room.myRole?.gid === g.id && !g.roles[ME.id]) {
-    const mine = { pid: ME.id, role: room.myRole.role, partner: room.myRole.partner || "", done: missionsDone(g.id).size };
+    const mine = { pid: ME.id, role: room.myRole.role, partner: room.myRole.partner || "" };
     if (isHost()) onMeRole(mine); else send("me-role", mine);
   }
   const pk = room.state.picks;
@@ -2882,8 +2837,6 @@ function onMeRole(m) {
   const g = room?.state?.game;
   if (!isHost() || !g || g.phase !== "reveal" || !PARTY_ROLES[m?.role] || !g.players.some(p => p.id === m.pid)) return;
   g.roles[m.pid] = { role: m.role, partner: String(m.partner || "").slice(0, 24) };
-  if (m.role === "CONTREBANDIER" && g.checks[m.pid]?.n == null)
-    g.checks[m.pid] = { ...g.checks[m.pid], n: Math.max(0, Math.min(8, Math.floor(+m.done) || 0)) };
   pushState();
 }
 
@@ -2932,7 +2885,7 @@ async function hostDealTruque() {
   st.game = {
     id: Math.random().toString(36).slice(2, 10), seed: Math.floor(Math.random() * 2 ** 31), phase: "dealt", hostPub: room.keys.pub,
     players: players.map(p => ({ id: p.id, name: p.name, team: p.team })), boxes, startedAt: null,
-    votes: {}, result: [null, null], checks: {}, roles: {}, picks: st.withPicks ? drawFor(players) : null, botRoles
+    votes: {}, result: [null, null], checks: {}, roles: {}, picks: st.withPicks ? drawFor(players) : null, botRoles, events: st.events !== false
   };
   st.activity = "truque"; st.picks = null;
   chime(); pushState();
@@ -3025,6 +2978,7 @@ function lobbyHTML() {
         <h2>Partie truquée</h2>
         <p>Rôles secrets, événements pour tous, vote depuis chaque PC. À partir de 3 joueurs.</p>
         <div class="chips">${PARTY_OPTIONAL.map(k => `<button class="chip" aria-pressed="${st.enabled.includes(k)}" data-orole="${k}">${PARTY_ROLES[k].name}</button>`).join("")}</div>
+        <label class="on-check"><input type="checkbox" data-on-events ${st.events !== false ? "checked" : ""}> Événements pour tous pendant la game (toutes les 8 min)</label>
         <label class="on-check"><input type="checkbox" data-on-withpicks ${st.withPicks ? "checked" : ""}> Imposer aussi un troll pick à chacun</label>
         <button class="btn-chip" data-on="deal" ${n < 3 ? "disabled" : ""}>Distribuer les rôles</button>
         ${n < 3 ? `<p class="hint">En attente d'au moins 3 joueurs (${n} pour l'instant). Seul ? Ajoute des bots ci-dessous.</p>` : ""}
@@ -3141,7 +3095,7 @@ function truqueHTML() {
       ${g.phase === "dealt"
         ? `<div class="secret-live"><h3>En attente du départ</h3><p>${host ? "Appuie quand la partie se charge : le chrono part pour tout le monde." : `${esc(memberName(st.host))} lance le chrono au chargement de la game.`}</p>
             ${host ? `<button class="btn-chip" data-on="start">La game commence</button>` : ""}</div>`
-        : `<div class="secret-live" id="onLive"></div><div class="secret-live on-event" id="onEvent"></div>
+        : `<div class="secret-live" id="onLive"></div>${g.events !== false ? `<div class="secret-live on-event" id="onEvent"></div>` : ""}
            ${host ? `<button class="btn" data-on="tovote">Fin de la game : passer au vote</button>` : ""}`}
       ${autoStartHTML(g)}
       ${pickBox}
@@ -3156,7 +3110,7 @@ function onlineTick(force = false) {
   const mr = room.myRole?.gid === g.id ? room.myRole : null;
   const live = $("#onLive"), ev = $("#onEvent");
   if (live) {
-    const L = liveState(mr?.role || "", mr?.seed || 0, t, missionsDone(g.id));
+    const L = liveState(mr?.role || "", mr?.seed || 0, t);
     paintLive(live, L);
     notifyChange(live, "live", L.key, L.notice || "Nouveau !", L.text);
   }
@@ -3186,7 +3140,6 @@ $("#onlineBody").addEventListener("click", async e => {
   const b = e.target.closest("button, #onCard"); if (!b) return;
   if (b.id === "onCard") { room.cardOpen = !room.cardOpen; b.classList.toggle("open", room.cardOpen); return; }
   const d = b.dataset, st = room?.state;
-  if (d.mission != null) { markMission(room.state.game.id, d.mission); return onlineTick(); }
   if (d.oticket != null) return openTicket(onlineTeam[+d.oticket], { from: "online", i: +d.oticket });
   switch (d.on) {
     case "create": return joinRoom(newCode(), true);
@@ -3254,6 +3207,7 @@ $("#onlineBody").addEventListener("change", e => {
   }
   if (!isHost()) return;
   if (t.matches("[data-on-withpicks]")) { room.state.withPicks = t.checked; return pushState(); }
+  if (t.matches("[data-on-events]")) { room.state.events = t.checked; return pushState(); }
   if (t.dataset.ocheck) {
     const g = room.state.game, id = t.dataset.ocheck;
     g.checks[id] = { ...g.checks[id], [t.dataset.k]: t.type === "checkbox" ? t.checked : +t.value };
