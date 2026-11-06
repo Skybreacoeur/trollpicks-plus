@@ -2455,7 +2455,7 @@ function rulesHTML() {
       <ol class="rule-steps">
         <li><b>Distribution.</b> Chaque joueur découvre son rôle secret sur sa page TrollPicks+, dans son navigateur. Il y a un Tricheur par équipe, les autres rôles sont tirés au hasard (un exemplaire de chaque par équipe).</li>
         <li><b>La game.</b> Vous jouez une vraie partie de League. Chacun suit l'objectif de son rôle sans se trahir. Certains rôles reçoivent des ordres ou une pièce qui tourne : la page joue un son et envoie une notification Windows, même quand LoL est au premier plan.</li>
-        <li><b>Événements pour tous</b> (en salle en ligne, si l'hôte les a laissés activés) : toutes les 8 minutes à partir de 5 minutes, une contrainte ou une rumeur s'affiche chez tout le monde.</li>
+        <li><b>Événements pour tous</b> (en salle en ligne, si l'hôte les a laissés activés) : toutes les 8 minutes à partir de 5 minutes, une contrainte s'affiche chez tout le monde.</li>
         <li><b>Le débat.</b> Après la game, discutez en vocal : qui a joué bizarrement ?</li>
         <li><b>Le vote.</b> Chacun accuse en secret un joueur de son équipe. Le plus accusé est démasqué ; en cas d'égalité, personne ne l'est.</li>
         <li><b>La révélation.</b> Les cartes se retournent, l'hôte coche ce qui s'est passé (le plus de morts, ordres respectés…) et le classement s'affiche.</li>
@@ -2546,17 +2546,16 @@ const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const EVENT_FIRST = 5 * 60e3, EVENT_EVERY = 8 * 60e3;
 const ROOM_EVENTS = [
   "Pendant 3 minutes : interdit de rentrer à la base.",
-  "Le prochain qui meurt écrit « c'était prévu » dans le chat d'équipe.",
   "Toute l'équipe doit jouer le prochain objectif ensemble.",
   "Pendant 2 minutes : pings interdits.",
   "Pendant 3 minutes : Flash interdit pour tout le monde.",
-  "Au prochain retour base, chacun achète une Balise de contrôle.",
   "Le joueur avec le moins de kills choisit le prochain objectif.",
-  "Débat éclair de 30 secondes en vocal : chacun dit qui il soupçonne.",
-  "Rumeur : le Tricheur a déjà participé à un kill. Vrai ou faux ?",
-  "Rumeur : quelqu'un ment sur son rôle depuis le début.",
-  "Rumeur : le Tricheur n'est pas celui qui meurt le plus.",
-  "Pendant 2 minutes : restez groupés à au moins deux."
+  "Pendant 2 minutes : restez groupés à au moins deux.",
+  "Pendant 2 minutes : échangez vos lanes (top et mid, ADC et support). Le jungler choisit son camp.",
+  "Prochain combat d'équipe : tout le monde y va, personne ne reste en split.",
+  "Prochain kill ennemi : toute l'équipe doit être à côté.",
+  "Silence radio : pendant 1 minute, micros coupés, on ne communique qu'avec les pings.",
+  "Grève du farm : pendant 2 minutes, interdit de taper les sbires et les monstres, seulement les champions."
 ];
 
 const ME = { id: store.get("meId", null) || Math.random().toString(36).slice(2, 12), name: store.get("meName", "") };
