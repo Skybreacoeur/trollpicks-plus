@@ -568,6 +568,29 @@ details.on-auto .on-pc{color:var(--muted)}
 details.on-auto .clock{color:var(--muted)}
 p.on-auto-ok{color:var(--muted);font-weight:800}
 
+/* accueil En ligne : deux chemins bien distincts */
+.on-home{display:grid;gap:24px;max-width:900px}
+.on-home .on-name{max-width:280px}
+.on-home .on-name label{color:var(--muted)}
+.on-paths{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.on-path{border-radius:14px;padding:26px;display:grid;gap:14px;align-content:start;justify-items:start;box-shadow:0 18px 40px rgba(0,0,0,.3)}
+.on-path h2{font-family:var(--display);font-weight:400;font-size:1.6rem;line-height:1}
+.on-path p{font-weight:600;margin-top:-6px}
+.on-path-join{background:var(--rail);color:var(--cream);box-shadow:inset 0 0 0 2px var(--gold),0 18px 40px rgba(0,0,0,.3)}
+.on-path-join p{color:var(--muted)}
+.on-path-join .on-join{display:flex;gap:10px;flex-wrap:wrap}
+.on-path-join .on-join input{font-family:var(--display);font-size:1.8rem;letter-spacing:.2em;text-transform:uppercase;width:190px;text-align:center;
+  background:var(--felt-deep);color:var(--gold);border:2px solid var(--gold);border-radius:10px;padding:8px 10px}
+.on-path-join .on-join input::placeholder{color:rgba(226,178,74,.35)}
+.on-path-join .on-join input:focus{border-color:var(--cream);outline:none}
+.on-path-join .linkish{color:var(--muted)}
+.btn-gold{background:var(--gold);color:var(--ink);box-shadow:0 5px 0 #8a6420,inset 0 0 0 3px rgba(255,255,255,.25)}
+.btn-gold:hover:not(:disabled){background:#efc25c;box-shadow:0 5px 0 #8a6420,inset 0 0 0 3px rgba(255,255,255,.35)}
+.btn-gold:active:not(:disabled){box-shadow:0 1px 0 #8a6420,inset 0 0 0 3px rgba(255,255,255,.25)}
+.on-path-create{background:var(--paper);color:var(--ink)}
+.on-path-create p{color:var(--ink-2)}
+@media (max-width:720px){.on-paths{grid-template-columns:1fr}}
+
 /* bans personnels */
 .on-mybans{display:grid;gap:6px;width:100%}
 .on-mybans-label{font-size:.85rem;font-weight:800;color:var(--ink-2)}
@@ -2709,18 +2732,26 @@ function renderOnline() {
 }
 function onlineHomeHTML() {
   const last = store.get("lastRoom", null);
-  return `<div class="panel-paper on-home">
+  const code = room?.code || "";
+  return `<div class="on-home">
     <div class="field on-name"><label for="onName">Ton pseudo</label>
       <input type="text" id="onName" maxlength="20" autocomplete="nickname" value="${esc(ME.name)}" placeholder="Pseudo"></div>
-    <div class="on-split">
-      <button class="btn-chip on-create" data-on="create">Créer une salle</button>
-      <span class="on-or">ou</span>
-      <div class="on-join">
-        <input type="text" id="onCode" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="CODE" aria-label="Code de la salle" value="${esc(room?.code || "")}">
-        <button class="btn btn-ink" data-on="join">Rejoindre</button>
-      </div>
+    <div class="on-paths">
+      <section class="on-path on-path-join">
+        <h2>Rejoindre une salle</h2>
+        <p>Un pote t'a donné un code ?</p>
+        <div class="on-join">
+          <input type="text" id="onCode" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="CODE" aria-label="Code de la salle" value="${esc(code)}">
+          <button class="btn-chip btn-gold" data-on="join" ${cleanCode(code).length === 4 ? "" : "disabled"}>Rejoindre</button>
+        </div>
+        ${last ? `<button class="linkish on-back" data-on="rejoin" data-code="${esc(last)}">Revenir dans la salle ${esc(last)}</button>` : ""}
+      </section>
+      <section class="on-path on-path-create">
+        <h2>Créer une salle</h2>
+        <p>Tu deviens l'hôte et tu partages le code.</p>
+        <button class="btn-chip" data-on="create">Créer</button>
+      </section>
     </div>
-    ${last ? `<button class="linkish on-back" data-on="rejoin" data-code="${esc(last)}">Revenir dans la salle ${esc(last)}</button>` : ""}
   </div>`;
 }
 const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
@@ -3007,7 +3038,10 @@ $("#onlineBody").addEventListener("change", e => {
 });
 $("#onlineBody").addEventListener("input", e => {
   if (e.target.id === "onName") { ME.name = e.target.value.trim().slice(0, 20); store.set("meName", ME.name); }
-  if (e.target.id === "onCode") e.target.value = cleanCode(e.target.value);
+  if (e.target.id === "onCode") {
+    e.target.value = cleanCode(e.target.value);
+    const b = document.querySelector('[data-on="join"]'); if (b) b.disabled = e.target.value.length !== 4;
+  }
 });
 $("#onlineBody").addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "onCode") joinRoom(e.target.value);
