@@ -195,6 +195,16 @@ a.wordmark{text-decoration:none;border-radius:6px}
 .situ-item{display:flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;padding:3px 10px 3px 3px;border-radius:6px;background:var(--paper);text-align:left;line-height:1.15}
 .situ-item img{width:34px;height:34px;border-radius:4px;flex:none}
 .situ-item.owned{opacity:.55}
+.situ-card.hit{box-shadow:inset 0 0 0 2px #1f7a4c}
+.foes{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.foe{display:inline-flex;align-items:center;gap:8px;padding:3px 12px 3px 3px;border-radius:999px;background:var(--ink);color:var(--cream);font-weight:800;font-size:.9rem}
+.foe img{width:30px;height:30px;border-radius:50%}
+.foe span{opacity:.6;font-size:1.05rem;line-height:1}
+@media (hover:hover) and (pointer:fine){.foe:hover span{opacity:1}}
+#foeAdd{max-width:240px;padding:8px 12px;font-size:.92rem}
+.foe-note{margin-top:12px;font-size:.9rem;font-weight:600;color:var(--ink-2)}
+.item.adapted .item-step{color:#1f7a4c}
+.item.adapted img{box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f7a4c}
 
 .t-cols{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:32px;padding:26px 28px 30px}
 .t-cols h3{font-family:var(--display);font-weight:400;font-size:1.05rem;margin-bottom:14px}
@@ -749,6 +759,11 @@ p.on-auto-ok{color:var(--muted);font-weight:800}
       <div class="chips" id="setBuilds"></div>
     </div>
     <div class="set">
+      <h3>Builds tirés</h3>
+      <p class="hint">Jouables : jamais de build sans aucune stat utile (Enchanteur sur Darius…).</p>
+      <div class="chips" id="setChaos"></div>
+    </div>
+    <div class="set">
       <h3>Vitesse des animations</h3>
       <div class="chips" id="setSpeed"></div>
     </div>
@@ -900,16 +915,20 @@ const NO_AP = new Set(["Aatrox", "Akshan", "Ambessa", "Aphelios", "Camille", "Da
 /* Un champion inconnu (sorti après cette liste) : on se fie à sa note de magie Riot. */
 const canAP = champ => !NO_AP.has(champ.id) && (PROFILES[champ.id] ? true : (champ.info?.magic ?? 0) >= 4);
 /* Builds possibles pour ce champion parmi ceux de la roue (au moins un, même si les réglages sont étranges). */
+/* Risque du build seul (0 = méta, 0,85 = aucune stat utile). À partir de 0,7, la partie n'est plus jouable :
+   ces combinaisons ne sortent qu'en mode Chaos. */
+const buildRisk = (champ, b) => trollParts(champ, profileOf(champ).lanes[0] || "mid", b).build;
+const apOk = (champ, b) => !AP_BUILDS.includes(b) || canAP(champ);
+const okBuild = (champ, b) => apOk(champ, b) && (settings.chaos || buildRisk(champ, b) < .7);
 function buildsFor(champ, builds = activeBuilds()) {
-  const ok = builds.filter(b => !AP_BUILDS.includes(b) || canAP(champ));
-  return ok.length ? ok : builds;
+  for (const test of [okBuild, apOk]) { const ok = builds.filter(b => test(champ, b)); if (ok.length) return ok; }
+  return builds;
 }
-/* Si la roue ne contient que des builds AP, seuls les champions avec un ratio AP peuvent sortir. */
+/* Seuls les champions qui ont au moins un build jouable parmi ceux de la roue peuvent sortir. */
 function champPool(used = [], builds = activeBuilds()) {
   const list = eligibleChamps(used);
-  if (builds.some(b => !AP_BUILDS.includes(b))) return list;
-  const ap = list.filter(canAP);
-  return ap.length ? ap : list;
+  for (const test of [okBuild, apOk]) { const ok = list.filter(c => builds.some(b => test(c, b))); if (ok.length) return ok; }
+  return list;
 }
 function starterFor(role, buildKey) {
   const ap = AP_BUILDS.includes(buildKey), tank = buildKey === "TANK";
@@ -1081,7 +1100,7 @@ let V = "";
 let CHAMPS = [], CHAMP_BY_ID = {}, ITEMS = {}, RUNE_TREES = [], RUNE_BY_ID = {}, SUMMS = {};
 const champDetail = {};
 
-const settings = Object.assign({ classes: [], builds: Object.keys(BUILDS), bans: [], speed: "normal", sound: true }, store.get("settings", {}));
+const settings = Object.assign({ classes: [], builds: Object.keys(BUILDS), bans: [], speed: "normal", sound: true, chaos: false }, store.get("settings", {}));
 settings.builds = settings.builds.filter(k => BUILDS[k]);
 if (settings.builds.length < 2) settings.builds = Object.keys(BUILDS);
 if (window.matchMedia("(prefers-reduced-motion: reduce)").matches && !store.get("settings", null)) settings.speed = "fast";
@@ -1324,6 +1343,82 @@ function situationalFor(pick) {
   return out;
 }
 
+/* =========================================================
+   ADVERSAIRES
+   On choisit jusqu'à 5 champions d'en face ; on en déduit les menaces
+   et on remplace 1 ou 2 objets de fin de liste par les bons objets.
+========================================================= */
+/* Dégâts surtout magiques (type adaptatif « MAGIC_DAMAGE » de Meraki Analytics, novembre 2026). */
+const MAGIC_DMG = new Set(["Ahri", "Alistar", "Amumu", "Anivia", "Annie", "AurelionSol", "Aurora", "Azir", "Bard", "Brand", "Braum",
+  "Cassiopeia", "Chogath", "Diana", "Ekko", "Elise", "Evelynn", "Fiddlesticks", "Fizz", "Galio", "Gragas", "Gwen", "Heimerdinger",
+  "Hwei", "Ivern", "Janna", "Kaisa", "Karma", "Karthus", "Kassadin", "Katarina", "Kennen", "Leblanc", "Lillia", "Lissandra", "Lulu",
+  "Lux", "Malphite", "Malzahar", "Maokai", "Mel", "Milio", "Mordekaiser", "Morgana", "Nami", "Nautilus", "Neeko", "Nidalee", "Nunu",
+  "Orianna", "Rakan", "Rell", "Renata", "Rumble", "Ryze", "Sejuani", "Seraphine", "Singed", "Sona", "Soraka", "Swain", "Sylas",
+  "Syndra", "TahmKench", "Taliyah", "Teemo", "TwistedFate", "Veigar", "Velkoz", "Vex", "Viktor", "Vladimir", "Xerath", "Yuumi",
+  "Zac", "Ziggs", "Zilean", "Zoe", "Zyra"]);
+/* Champions qui se soignent ou soignent beaucoup : un anti-soins vaut le coup. */
+const HEALERS = new Set(["Aatrox", "Belveth", "Briar", "DrMundo", "Ekko", "Fiddlesticks", "Fiora", "Gwen", "Illaoi", "Kayn", "Kindred",
+  "Maokai", "MasterYi", "Milio", "Nami", "Nidalee", "Olaf", "Samira", "Seraphine", "Sona", "Soraka", "Swain", "Sylas", "Taric",
+  "Trundle", "Tryndamere", "Viego", "Vladimir", "Volibear", "Warwick", "Yuumi", "Zac"]);
+/* Beaucoup de contrôles durs. */
+const CC_HEAVY = new Set(["Alistar", "Amumu", "Annie", "Ashe", "Blitzcrank", "Braum", "Cassiopeia", "Galio", "JarvanIV", "Leona",
+  "Lissandra", "Lux", "Malphite", "Maokai", "Morgana", "Nautilus", "Neeko", "Nunu", "Ornn", "Poppy", "Rakan", "Rammus", "Rell",
+  "Sejuani", "Sion", "Skarner", "Taric", "Thresh", "TwistedFate", "Veigar", "Vi", "Warwick", "Zac", "Zyra", "Bard", "Swain",
+  "Renata", "Seraphine", "Lillia", "Ahri", "Leblanc", "Pantheon", "Xerath", "Syndra", "Vex"]);
+const MAX_FOES = 5;
+const THREAT_TEXT = { ap: "beaucoup de magie", ad: "beaucoup de physique", heal: "des soins", tanks: "des tanks", burst: "des assassins", cc: "beaucoup de contrôles" };
+const THREAT_SHORT = { ap: "anti-AP", ad: "anti-AD", heal: "anti-soins", tanks: "anti-tank", burst: "anti-burst", cc: "anti-contrôle" };
+const isMagic = c => MAGIC_DMG.has(c.id) || (!PROFILES[c.id] && (c.info?.magic ?? 0) > (c.info?.attack ?? 0));
+const cleanFoes = list => [...new Set((Array.isArray(list) ? list : []).filter(id => typeof id === "string" && CHAMP_BY_ID[id]))].slice(0, MAX_FOES);
+
+/* Menaces, de la plus forte à la plus faible. */
+function threatsOf(ids) {
+  const foes = cleanFoes(ids).map(id => CHAMP_BY_ID[id]), n = foes.length;
+  if (!n) return [];
+  const count = test => foes.filter(test).length;
+  const magic = count(isMagic), phys = n - magic, heal = count(c => HEALERS.has(c.id));
+  const tanks = count(c => c.tags.includes("Tank")), burst = count(c => c.tags.includes("Assassin")), cc = count(c => CC_HEAVY.has(c.id));
+  const need = Math.max(1, Math.ceil(n * .6)), few = n <= 2;
+  const out = [];
+  const dmg = [["ap", magic], ["ad", phys]].filter(([, v]) => v >= need).sort((a, b) => b[1] - a[1]).map(([k]) => k);
+  out.push(...dmg);
+  if (heal >= 1) out.push("heal");
+  if (burst >= (few ? 1 : 2)) out.push("burst");
+  if (tanks >= (few ? 1 : 2)) out.push("tanks");
+  if (cc >= Math.max(1, Math.ceil(n * .5))) out.push("cc");
+  return out;
+}
+
+/* Recalcule les objets du ticket selon les adversaires. Le 1er objet et les objets indispensables ne bougent jamais. */
+function applyFoes(pick, ids) {
+  const champ = CHAMP_BY_ID[pick.champ], b = BUILDS[pick.build];
+  if (!pick.baseItems) { pick.baseItems = pick.items.slice(); pick.baseBoots = pick.boots ?? null; }
+  pick.enemies = cleanFoes(ids);
+  const items = pick.baseItems.filter(id => ITEMS[id]);
+  let boots = pick.baseBoots;
+  const threats = threatsOf(pick.enemies), adapted = {};
+  const free = items.map((id, i) => i).filter(i => i > 0 && !b.must.includes(items[i])).reverse();   // de la fin vers le début
+  const isBoots = id => ITEMS[id]?.tags.includes("Boots");
+  let swaps = 0;
+  for (const t of threats) {
+    if (swaps >= 2 || !free.length) break;
+    const list = (b.situational[t] || []).filter(id => ITEMS[id] && !isBoots(id) && fitsChamp(champ, id));
+    if (!list.length || list.some(id => items.includes(id))) continue;           // déjà couvert
+    const slot = free[0];
+    const others = items.filter((_, i) => i !== slot);
+    const taken = new Set(others.flatMap(groupsOf));
+    const pickId = list.find(id => !groupsOf(id).some(g => taken.has(g)) && !others.some(o => ITEMS[o].name === ITEMS[id].name));
+    if (!pickId) continue;
+    items[slot] = pickId; adapted[pickId] = t; free.shift(); swaps++;
+  }
+  // bottes : Mercure contre les contrôles et la magie, Coqués contre les dégâts physiques (sauf builds à vitesse d'attaque)
+  const atkSpeed = ["AD_CRIT", "ON_HIT"].includes(pick.build);
+  const want = threats.includes("cc") || (threats[0] === "ap" && !atkSpeed) ? 3111 : threats[0] === "ad" && !atkSpeed && pick.build !== "ENCHANTER" ? 3047 : null;
+  if (boots && want && ITEMS[want] && boots !== want) { boots = want; adapted[want] = threats.includes("cc") ? "cc" : threats[0]; }
+  Object.assign(pick, { items, boots, adapted, threats });
+  return pick;
+}
+
 /* Fragments de stats (3 rangées, un choix par rangée). Sans eux, la page de runes est incomplète dans le client.
    Rangées en vigueur depuis la saison 2024 (vérifiées sur le patch 16.16). Icônes : Data Dragon. */
 const SHARD_ICON = name => `${DD}/cdn/img/perk-images/StatMods/StatMods${name}Icon.png`;
@@ -1418,7 +1513,7 @@ const SENTENCES = [...TROLL, ...VIABLE, ...META_LINES]; // ajouter à la fin seu
 function packPick(p) {
   const r = p.runes;
   return [p.champ, p.role, p.build, p.player || "", p.starter || 0, p.support || 0, p.boots || 0, p.items,
-    [r.tree, r.keystone, r.minors, r.secTree, r.sec, shardsOf(p)], p.summs, p.skills.join(""), p.score, SENTENCES.indexOf(p.sentence), p.ts];
+    [r.tree, r.keystone, r.minors, r.secTree, r.sec, shardsOf(p)], p.summs, p.skills.join(""), p.score, SENTENCES.indexOf(p.sentence), p.ts, cleanFoes(p.enemies)];
 }
 /* Tout est vérifié : un lien modifié à la main ne peut rien casser ni injecter. */
 function unpackPick(a) {
@@ -1447,6 +1542,7 @@ function unpackPick(a) {
     score: sc,
     sentence: SENTENCES[sentIdx] || sentenceFor(sc),
     ts: Number.isFinite(ts) ? ts : Date.now(),
+    enemies: cleanFoes(a[14]),
     shared: true
   };
 }
@@ -1687,9 +1783,9 @@ function slotLabel(pick, id) {
 const totalGold = pick => orderedItems(pick).reduce((s, id) => s + (ITEMS[id]?.gold.total || 0), 0);
 function itemHTML(pick, id, i = 0) {
   const it = ITEMS[id]; if (!it) return "";
-  const lab = slotLabel(pick, id);
-  return `<button class="item${lab === "1er objet" ? " core" : ""}" style="--i:${i}" data-tip='${esc(itemTip(id))}' aria-label="${esc(it.name)}, ${it.gold.total} PO">
-    <span class="item-step">${lab}</span><img src="${imgItem(id)}" alt="" loading="lazy">
+  const lab = slotLabel(pick, id), why = pick.adapted?.[id];
+  return `<button class="item${lab === "1er objet" ? " core" : ""}${why ? " adapted" : ""}" style="--i:${i}" data-tip='${esc(itemTip(id))}' aria-label="${esc(it.name)}, ${it.gold.total} PO${why ? ", " + THREAT_SHORT[why] : ""}">
+    <span class="item-step">${why ? THREAT_SHORT[why] : lab}</span><img src="${imgItem(id)}" alt="" loading="lazy">
     <span class="item-name">${esc(it.name)}</span><span class="item-cost">${gold(it.gold.total)}</span></button>`;
 }
 function runeHTML(id) { const r = RUNE_BY_ID[id]; return r ? `<span class="rune"><img src="${imgRune(r)}" alt="">${esc(r.name)}</span>` : ""; }
@@ -1712,7 +1808,19 @@ function verdictHTML(champ, pick) {
   return `<p class="verdict"><span class="${cls(t.lane).trim()}">${cap(t.laneLabel)}</span><span class="${cls(t.build).trim()}">${cap(t.buildLabel)}</span></p>`;
 }
 
-async function renderResult(pick, ctx = null) {
+function foesHTML(pick) {
+  const foes = cleanFoes(pick.enemies), th = pick.threats || [];
+  return `<section class="t-sec t-foes">
+      <h3>Contre qui tu joues <span>${foes.length}/${MAX_FOES}</span></h3>
+      <div class="foes">${foes.map(id => `<button class="foe" data-act="foe-del" data-id="${id}" aria-label="Retirer ${esc(CHAMP_BY_ID[id].name)}">
+        <img src="${imgChamp(CHAMP_BY_ID[id])}" alt="">${esc(CHAMP_BY_ID[id].name)}<span aria-hidden="true">×</span></button>`).join("")}
+        ${foes.length < MAX_FOES ? `<input type="text" id="foeAdd" list="foeList" placeholder="${foes.length ? "Ajouter un adversaire…" : "Champion d'en face…"}" autocomplete="off" aria-label="Ajouter un adversaire">` : ""}
+      </div>
+      <datalist id="foeList">${CHAMPS.filter(c => !foes.includes(c.id) && c.id !== pick.champ).map(c => `<option value="${esc(c.name)}"></option>`).join("")}</datalist>
+      ${foes.length ? `<p class="foe-note">${th.length ? `En face : ${th.map(t => THREAT_TEXT[t]).join(", ")}. ${Object.keys(pick.adapted || {}).length ? "Objets changés en vert." : "Ton build couvre déjà tout ça."}` : "Rien de spécial à contrer : build inchangé."}</p>` : ""}
+    </section>`;
+}
+async function renderResult(pick, ctx = null, opts = {}) {
   const champ = CHAMP_BY_ID[pick.champ]; if (!champ) return;
   const detail = await getChampDetail(champ.id);
   const role = ROLES.find(r => r.key === pick.role), b = BUILDS[pick.build], r = pick.runes;
@@ -1723,7 +1831,7 @@ async function renderResult(pick, ctx = null) {
 
   const el = $("#result");
   el.innerHTML = `${ticketNavHTML(ctx)}
-  <article class="ticket enter">
+  <article class="ticket${opts.quiet ? "" : " enter"}">
     <div class="t-top">
       <div class="t-art"><img src="${imgCard(champ)}" alt="${esc(champ.name)}"></div>
       <div class="t-head">
@@ -1749,10 +1857,12 @@ async function renderResult(pick, ctx = null) {
       <div class="items">${orderedItems(pick).map((id, i) => itemHTML(pick, id, i)).join("")}</div>
       ${pick.notes?.length ? `<ul class="notes">${pick.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
     </section>
+    <div class="perf"></div>
+    ${foesHTML(pick)}
     ${situ.length ? `<div class="perf"></div>
     <section class="t-sec">
       <h3>Selon la game <span>remplace un objet de fin de liste</span></h3>
-      <div class="situ">${situ.map(s => `<div class="situ-card"><p>${esc(s.label)}</p><div class="situ-items">
+      <div class="situ">${situ.map(s => `<div class="situ-card${pick.threats?.includes(s.key) ? " hit" : ""}"><p>${esc(s.label)}</p><div class="situ-items">
         ${s.items.map(x => `<button class="situ-item${x.owned ? " owned" : ""}" data-tip='${esc(itemTip(x.id))}'><img src="${imgItem(x.id)}" alt="">${esc(ITEMS[x.id].name)}${x.owned ? "<br>(déjà pris)" : ""}</button>`).join("")}
       </div></div>`).join("")}</div>
     </section>` : ""}
@@ -1794,7 +1904,17 @@ async function renderResult(pick, ctx = null) {
   el.hidden = false;
   el._pick = pick;
   el._ctx = ctx;
-  el.scrollIntoView({ behavior: speedF() ? "smooth" : "auto", block: "start" });
+  if (!opts.quiet) el.scrollIntoView({ behavior: speedF() ? "smooth" : "auto", block: "start" });
+}
+/* Met à jour les adversaires du ticket affiché, sans animation, et garde l'historique à jour. */
+async function setFoes(ids) {
+  const el = $("#result"), pick = el._pick; if (!pick) return;
+  const y = window.scrollY;
+  applyFoes(pick, ids);
+  if (history.includes(pick)) store.set("history", history);
+  await renderResult(pick, el._ctx, { quiet: true });
+  window.scrollTo(0, y);
+  $("#foeAdd")?.focus();
 }
 
 function recap(pick) {
@@ -1804,6 +1924,7 @@ function recap(pick) {
     `${pick.player ? pick.player + " — " : ""}${c.name} ${role.label} • ${BUILDS[pick.build].label} (troll ${pick.score}%)`,
     `Départ : ${pick.starter ? ITEMS[pick.starter]?.name : "—"}`,
     `Objets : ${orderedItems(pick).map(id => ITEMS[id]?.name).join(", ")}`,
+    ...(pick.enemies?.length ? [`Contre : ${cleanFoes(pick.enemies).map(id => CHAMP_BY_ID[id].name).join(", ")}${pick.threats?.length ? ` (en face : ${pick.threats.map(t => THREAT_TEXT[t]).join(", ")})` : ""}`] : []),
     `Selon la game :`, ...situ,
     `Runes : ${RUNE_BY_ID[r.keystone].name} + ${r.minors.map(id => RUNE_BY_ID[id].name).join(", ")} | ${r.sec.map(id => RUNE_BY_ID[id].name).join(", ")}`,
     `Fragments : ${shardsOf(pick).map(id => SHARDS[id].name).join(", ")}`,
@@ -1832,6 +1953,7 @@ $("#result").addEventListener("click", async e => {
     nav.replaceState({ view: "solo", from: ctx.from, i: j }, "", pageUrl());
     return renderResult(list[j], { from: ctx.from, i: j });
   }
+  if (act === "foe-del") return setFoes(cleanFoes(pick.enemies).filter(id => id !== e.target.closest("[data-id]").dataset.id));
   if (act === "again") runSolo("all");
   if (act === "copy") copy(recap(pick));
   if (act === "link") copy(pickLink(pick), "Lien copié : colle-le à tes potes");
@@ -1839,10 +1961,20 @@ $("#result").addEventListener("click", async e => {
   if (act === "dl") saveTicketImage(pick);
   if (act === "items") {
     const c = CHAMP_BY_ID[pick.champ];
-    const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build, c), skills: shuffle(["Q", "W", "E"]), ts: Date.now(), shared: false };
+    const np = { ...pick, ...pickItems(c, pick.build, pick.role), runes: pickRunes(pick.build, c), skills: shuffle(["Q", "W", "E"]), ts: Date.now(), shared: false,
+      baseItems: null, baseBoots: null, adapted: null, threats: null };
+    if (pick.enemies?.length) applyFoes(np, pick.enemies);
     addHistory(np); clearHash();
     await renderResult(np, null);
   }
+});
+
+$("#result").addEventListener("change", e => {
+  if (e.target.id !== "foeAdd") return;
+  const name = e.target.value.trim().toLowerCase(); if (!name) return;
+  const c = CHAMPS.find(x => x.name.toLowerCase() === name) || CHAMPS.find(x => x.name.toLowerCase().startsWith(name));
+  if (!c) { e.target.value = ""; return toast("Champion introuvable"); }
+  setFoes([...cleanFoes($("#result")._pick.enemies), c.id]);
 });
 
 /* =========================================================
@@ -3129,6 +3261,7 @@ const chip = (label, pressed, data) => `<button class="chip" aria-pressed="${pre
 function renderSettings() {
   $("#setClasses").innerHTML = Object.entries(CLASSES).map(([k, l]) => chip(l, settings.classes.includes(k), `data-class="${k}"`)).join("");
   $("#setBuilds").innerHTML = Object.entries(BUILDS).map(([k, b]) => chip(b.label, settings.builds.includes(k), `data-build="${k}"`)).join("");
+  $("#setChaos").innerHTML = chip("Jouables", !settings.chaos, 'data-chaos="0"') + chip("Chaos total", !!settings.chaos, 'data-chaos="1"');
   $("#setSpeed").innerHTML = Object.entries(SPEEDS).map(([k, s]) => chip(s.label, settings.speed === k, `data-speed="${k}"`)).join("");
   renderBans();
 }
@@ -3156,6 +3289,7 @@ dlg.addEventListener("click", e => {
     refreshBuildWheel(); solo.build = null; $("#chipBuild").textContent = "—";
   }
   if (t.dataset.speed) { settings.speed = t.dataset.speed; renderSettings(); }
+  if (t.dataset.chaos) { settings.chaos = t.dataset.chaos === "1"; renderSettings(); }
   if (t.dataset.ban) {
     const k = t.dataset.ban;
     settings.bans = settings.bans.includes(k) ? settings.bans.filter(x => x !== k) : [...settings.bans, k];
