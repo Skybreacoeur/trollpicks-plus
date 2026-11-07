@@ -204,6 +204,7 @@ a.wordmark{text-decoration:none;border-radius:6px}
 .keystone span{font-weight:800;font-size:.85rem;line-height:1.2}
 .rune-rows{display:grid;gap:12px;min-width:0}
 .rune-tree{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rune.shard img{background:var(--ink);padding:4px}
 .rune-tree-name{font-weight:800;font-size:.8rem;color:var(--ink-2);width:100%}
 .rune{display:flex;align-items:center;gap:6px;background:var(--paper-2);border-radius:999px;padding:3px 10px 3px 3px;font-size:.82rem;font-weight:700}
 .rune img{width:26px;height:26px;background:var(--ink);border-radius:50%;padding:2px}
@@ -1283,6 +1284,30 @@ function situationalFor(pick) {
   return out;
 }
 
+/* Fragments de stats (3 rangées, un choix par rangée). Sans eux, la page de runes est incomplète dans le client.
+   Rangées en vigueur depuis la saison 2024 (vérifiées sur le patch 16.16). Icônes : Data Dragon. */
+const SHARD_ICON = name => `${DD}/cdn/img/perk-images/StatMods/StatMods${name}Icon.png`;
+const SHARDS = {
+  5008: { name: "Force adaptative", icon: "AdaptiveForce" },
+  5005: { name: "Vitesse d'attaque", icon: "AttackSpeed" },
+  5007: { name: "Accélération de compétence", icon: "CDRScaling" },
+  5010: { name: "Vitesse de déplacement", icon: "MovementSpeed" },
+  5001: { name: "PV croissants", icon: "HealthScaling" },
+  5011: { name: "PV", icon: "HealthPlus" },
+  5013: { name: "Ténacité et résistance aux ralentissements", icon: "Tenacity" }
+};
+const SHARD_ROWS = [[5008, 5005, 5007], [5008, 5010, 5001], [5011, 5013, 5001]];
+/* Choix cohérent avec le build tiré. */
+function shardsFor(buildKey) {
+  const offense = ["AD_CRIT", "ON_HIT"].includes(buildKey) ? 5005 : buildKey === "ENCHANTER" ? 5007 : 5008;
+  const flex = buildKey === "TANK" ? 5001 : 5008;
+  const defense = buildKey === "TANK" ? 5013 : buildKey === "ENCHANTER" ? 5001 : 5011;
+  return [offense, flex, defense];
+}
+const shardsOf = pick => {
+  const sh = pick?.runes?.shards;
+  return Array.isArray(sh) && sh.length === 3 && sh.every((id, i) => SHARD_ROWS[i].includes(id)) ? sh : shardsFor(pick.build);
+};
 function pickRunes(buildKey, champ = null) {
   const b = BUILDS[buildKey], meta = champ && metaFor(champ, buildKey);
   const key = RUNE_BY_ID[meta && RUNE_BY_ID[meta.keystone] ? meta.keystone : rand(b.keystones)];
@@ -1293,7 +1318,7 @@ function pickRunes(buildKey, champ = null) {
   const secTree = RUNE_TREES.find(t => t.id === secId);
   const rows = shuffle([1, 2, 3]).slice(0, 2).sort();
   const sec = rows.map(i => rand(secTree.slots[i].runes).id);
-  return { tree: tree.id, keystone: key.id, minors, secTree: secTree.id, sec };
+  return { tree: tree.id, keystone: key.id, minors, secTree: secTree.id, sec, shards: shardsFor(buildKey) };
 }
 function pickSumms(role) { return ["SummonerFlash", rand(ROLE_SUMMS[role].filter(k => SUMMS[k]))]; }
 
@@ -1353,7 +1378,7 @@ const SENTENCES = [...TROLL, ...VIABLE, ...META_LINES]; // ajouter à la fin seu
 function packPick(p) {
   const r = p.runes;
   return [p.champ, p.role, p.build, p.player || "", p.starter || 0, p.support || 0, p.boots || 0, p.items,
-    [r.tree, r.keystone, r.minors, r.secTree, r.sec], p.summs, p.skills.join(""), p.score, SENTENCES.indexOf(p.sentence), p.ts];
+    [r.tree, r.keystone, r.minors, r.secTree, r.sec, shardsOf(p)], p.summs, p.skills.join(""), p.score, SENTENCES.indexOf(p.sentence), p.ts];
 }
 /* Tout est vérifié : un lien modifié à la main ne peut rien casser ni injecter. */
 function unpackPick(a) {
@@ -1364,7 +1389,7 @@ function unpackPick(a) {
   const item = x => Number.isInteger(x) && ITEMS[x] ? x : null;
   const rune = x => Number.isInteger(x) && RUNE_BY_ID[x];
   const treeOk = x => RUNE_TREES.some(t => t.id === x);
-  let runes = Array.isArray(ru) ? { tree: ru[0], keystone: ru[1], minors: ru[2], secTree: ru[3], sec: ru[4] } : null;
+  let runes = Array.isArray(ru) ? { tree: ru[0], keystone: ru[1], minors: ru[2], secTree: ru[3], sec: ru[4], shards: ru[5] } : null;
   if (!runes || !rune(runes.keystone) || !treeOk(runes.tree) || !treeOk(runes.secTree)
       || !Array.isArray(runes.minors) || !runes.minors.every(rune) || !Array.isArray(runes.sec) || !runes.sec.every(rune))
     runes = pickRunes(build, champ);
@@ -1697,6 +1722,7 @@ async function renderResult(pick, ctx = null) {
           <div class="rune-rows">
             <div class="rune-tree"><span class="rune-tree-name">${esc(tree.name)}</span>${r.minors.map(runeHTML).join("")}</div>
             <div class="rune-tree"><span class="rune-tree-name">${esc(sec.name)}</span>${r.sec.map(runeHTML).join("")}</div>
+            <div class="rune-tree"><span class="rune-tree-name">Fragments</span>${shardsOf(pick).map(id => `<span class="rune shard"><img src="${SHARD_ICON(SHARDS[id].icon)}" alt="">${SHARDS[id].name}</span>`).join("")}</div>
           </div>
         </div>
       </section>
@@ -1737,6 +1763,7 @@ function recap(pick) {
     `Objets : ${orderedItems(pick).map(id => ITEMS[id]?.name).join(", ")}`,
     `Selon la game :`, ...situ,
     `Runes : ${RUNE_BY_ID[r.keystone].name} + ${r.minors.map(id => RUNE_BY_ID[id].name).join(", ")} | ${r.sec.map(id => RUNE_BY_ID[id].name).join(", ")}`,
+    `Fragments : ${shardsOf(pick).map(id => SHARDS[id].name).join(", ")}`,
     `Sorts : ${pick.summs.map(k => SUMMS[k]?.name).join(" + ")} • Max ${pick.skills.join(" > ")}`
   ].join("\n");
 }
@@ -1912,6 +1939,7 @@ async function drawTicket(pick) {
   if (keyImg) ctx.drawImage(keyImg, CX + 4, 562, 48, 48);
   ctx.font = `800 17px ${A}`; ctx.fillStyle = C.ink; ctx.fillText(ellipsize(ctx, key.name, 250), CX + 70, 582);
   ctx.font = `600 15px ${A}`; ctx.fillStyle = C.ink2; ctx.fillText(ellipsize(ctx, `${tree.name} + ${sec.name}`, 250), CX + 70, 604);
+  ctx.font = `600 13px ${A}`; ctx.fillText(ellipsize(ctx, shardsOf(pick).map(id => SHARDS[id].name).join(" • "), 270), CX + 70, 624);
 
   const SX = CX + 350;
   label("SORTS", SX, 544);
