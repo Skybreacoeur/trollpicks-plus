@@ -868,6 +868,26 @@ const ITEM_GROUPS = [
 ];
 
 const AP_BUILDS = ["AP_BRUISER", "AP_ASSASSIN", "ENCHANTER"];
+/* Champions sans aucun ratio AP sur leurs sorts (passif compris) : un build AP ne leur sert à rien.
+   Calculé depuis les données de sorts de Meraki Analytics (novembre 2026) ; Locke et Zaahen, trop récents
+   pour ces données, ajoutés d'après leur profil Riot (magie 1 à 2 sur 10). */
+const NO_AP = new Set(["Aatrox", "Akshan", "Ambessa", "Aphelios", "Camille", "Darius", "DrMundo", "Draven", "Garen", "Illaoi",
+  "KSante", "Kayn", "Kled", "Naafiri", "Nilah", "Olaf", "Pyke", "Riven", "Samira", "Sett", "Talon", "Trundle", "Urgot",
+  "Xayah", "Yone", "Zed", "Locke", "Zaahen"]);
+/* Un champion inconnu (sorti après cette liste) : on se fie à sa note de magie Riot. */
+const canAP = champ => !NO_AP.has(champ.id) && (PROFILES[champ.id] ? true : (champ.info?.magic ?? 0) >= 4);
+/* Builds possibles pour ce champion parmi ceux de la roue (au moins un, même si les réglages sont étranges). */
+function buildsFor(champ, builds = activeBuilds()) {
+  const ok = builds.filter(b => !AP_BUILDS.includes(b) || canAP(champ));
+  return ok.length ? ok : builds;
+}
+/* Si la roue ne contient que des builds AP, seuls les champions avec un ratio AP peuvent sortir. */
+function champPool(used = [], builds = activeBuilds()) {
+  const list = eligibleChamps(used);
+  if (builds.some(b => !AP_BUILDS.includes(b))) return list;
+  const ap = list.filter(canAP);
+  return ap.length ? ap : list;
+}
 function starterFor(role, buildKey) {
   const ap = AP_BUILDS.includes(buildKey), tank = buildKey === "TANK";
   switch (role) {
@@ -1215,7 +1235,6 @@ function notesFor(champ, buildKey, role, hasSupport) {
     notes.push(`${champ.name} n'utilise pas de mana : objets à mana retirés`);
   if (isMelee(champ) && all.some(id => RANGED_ONLY.includes(id)))
     notes.push("Corps-à-corps : pas d'objets réservés aux distances");
-  if (champ.id === "Cassiopeia") notes.push("Cassiopeia ne peut pas acheter de bottes : un objet de plus");
   if (hasSupport) notes.push("Lane support : la quête de support occupe un emplacement");
   if (role === "jungle") notes.push("Jungle : familier adapté au build et Châtiment");
   if (metaFor(champ, buildKey)) notes.push(`Build du moment de ${champ.name} (OP.GG, patch ${META_PATCH})`);
@@ -1227,11 +1246,10 @@ function pickItems(champ, buildKey, role) {
   const b = BUILDS[buildKey];
   const fits = id => fitsChamp(champ, id);
   const all = [...b.core, ...b.must, ...b.items];
-  const noBoots = champ.id === "Cassiopeia";
   const support = role === "support" ? rand((SUPPORT_UPGRADES[buildKey] || [3869]).filter(id => ITEMS[id])) || null : null;
   const notes = notesFor(champ, buildKey, role, !!support);
 
-  const count = (noBoots ? 6 : 5) - (support ? 1 : 0);
+  const count = 5 - (support ? 1 : 0);
   const chosen = [];
   const used = new Set();
   const tryAdd = id => {
@@ -1267,7 +1285,7 @@ function pickItems(champ, buildKey, role) {
 
   const starter = starterFor(role, buildKey);
   const bootsPool = meta && live(meta.boots).length ? live(meta.boots) : b.boots;
-  return { starter: ITEMS[starter] ? starter : null, support, boots: noBoots ? null : rand(bootsPool) || null, items: chosen, notes };
+  return { starter: ITEMS[starter] ? starter : null, support, boots: rand(bootsPool) || null, items: chosen, notes };
 }
 
 /* Alternatives selon la game : objets adaptés au champion, avec indication si déjà dans le build. */
@@ -1277,7 +1295,6 @@ function situationalFor(pick) {
   const out = [];
   for (const [key, ids] of Object.entries(b.situational)) {
     let list = ids.filter(id => fitsChamp(champ, id));
-    if (key === "cc" && champ.id === "Cassiopeia") list = list.filter(id => !ITEMS[id].tags.includes("Boots"));
     if (!list.length) continue;
     out.push({ key, label: SITUATIONS[key], items: list.map(id => ({ id, owned: owned.has(id) })) });
   }
@@ -1566,7 +1583,8 @@ function setBusy(v) {
   document.querySelectorAll("#result .btn, #result .btn-chip").forEach(b => b.disabled = v);
 }
 async function doChamp() {
-  const winner = rand(eligibleChamps());
+  const fixed = solo.build && !solo.pendingAll ? [solo.build] : activeBuilds();   // « Champion seul » garde le build déjà tiré
+  const winner = rand(champPool([], fixed));
   $("#chipChamp").textContent = "…";
   await spinChampion(winner);
   solo.champ = winner;
@@ -1599,7 +1617,9 @@ $("#soloRole").addEventListener("change", e => {
 });
 async function doBuild() {
   $("#chipBuild").textContent = "…";
-  const segs = buildWheel.segs, i = Math.floor(Math.random() * segs.length);
+  const segs = buildWheel.segs, allowed = solo.champ ? buildsFor(solo.champ, segs.map(x => x.key)) : segs.map(x => x.key);
+  const choices = segs.map((x, k) => allowed.includes(x.key) ? k : -1).filter(k => k >= 0);
+  const i = rand(choices.length ? choices : segs.map((_, k) => k));
   await buildWheel.spinTo(i);
   solo.build = segs[i].key;
   $("#chipBuild").innerHTML = `<strong>${BUILDS[solo.build].label}</strong>`;
@@ -1608,7 +1628,7 @@ async function runSolo(which) {
   if (busy) return;
   setBusy(true);
   try {
-    if (which === "all") { $("#result").hidden = true; await doChamp(); await Promise.all([doRole(), doBuild()]); }
+    if (which === "all") { $("#result").hidden = true; solo.pendingAll = true; await doChamp(); solo.pendingAll = false; await Promise.all([doRole(), doBuild()]); }
     else if (which === "champ") await doChamp();
     else if (which === "role") await doRole();
     else if (which === "build") await doBuild();
@@ -2437,8 +2457,8 @@ function setMyBans(list) {
 /* Champions possibles pour ce joueur : réglages de l'hôte, champions déjà pris, et ses propres bans. */
 function eligibleFor(p, used) {
   const bans = new Set(cleanBans(p?.bans));
-  const list = eligibleChamps(used).filter(c => !bans.has(c.id));
-  return list.length ? list : eligibleChamps(used);
+  const list = champPool(used).filter(c => !bans.has(c.id));
+  return list.length ? list : champPool(used);
 }
 function trackMe() { return room.ch.track({ id: ME.id, name: ME.name, pub: room.keys.pub, lane: room.lane || "", bans: myBans(), at: room.at }); }
 
@@ -2602,7 +2622,7 @@ function onAct(a) {
     const old = unpackPick(x.pack); if (!old) return;
     const used = st.picks.list.map(l => l.pack[0]);
     const c = rand(eligibleFor(room.members.find(m => m.id === a.from), used));
-    x.pack = packPick({ ...makePick(c, old.role, rand(activeBuilds()), old.player), locked: x.locked });
+    x.pack = packPick({ ...makePick(c, old.role, rand(buildsFor(c)), old.player), locked: x.locked });
     st.picks.jokers[a.from] = true;
     st.picks.flash = { pid: a.from, at: Date.now() };
     pushState();
@@ -2635,7 +2655,7 @@ function drawFor(players) {
     tp.forEach((p, k) => {
       const role = locks[k] || free.pop() || rand(ROLES).key, c = rand(eligibleFor(p, used));
       used.push(c.id);
-      out.push({ pid: p.id, team: t, locked: !!locks[k], pack: packPick({ ...makePick(c, role, rand(builds), p.name) }) });
+      out.push({ pid: p.id, team: t, locked: !!locks[k], pack: packPick({ ...makePick(c, role, rand(buildsFor(c, builds)), p.name) }) });
     });
   }
   return out;
